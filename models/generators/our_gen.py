@@ -107,7 +107,7 @@ class ConvUpBlock(nn.Module):
         return self.layers(concat_tensor)
 
 
-class GeneratorModelAdler(nn.Module):
+class GeneratorModel(nn.Module):
     def __init__(self, in_chans, out_chans, z_location, latent_size=None):
         """
         Args:
