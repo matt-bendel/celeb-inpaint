@@ -108,7 +108,7 @@ class ConvUpBlock(nn.Module):
 
 
 class GeneratorModel(nn.Module):
-    def __init__(self, in_chans, out_chans, z_location, latent_size=None):
+    def __init__(self, in_chans, out_chans, z_location=None, latent_size=None):
         """
         Args:
             in_chans (int): Number of channels in the input to the U-Net model.

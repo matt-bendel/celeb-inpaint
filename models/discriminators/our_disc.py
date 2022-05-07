@@ -136,7 +136,7 @@ class FullDownBlock(nn.Module):
 
 
 class DiscriminatorModel(nn.Module):
-    def __init__(self, in_chans, out_chans, z_location, model_type, mbsd=False):
+    def __init__(self, in_chans, out_chans, z_location=None, model_type=None, mbsd=False):
         """
         Args:
             in_chans (int): Number of channels in the input to the U-Net model.

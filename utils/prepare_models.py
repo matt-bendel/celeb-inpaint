@@ -8,7 +8,6 @@ def build_model(args):
     model = GeneratorModel(
         in_chans=args.in_chans + 2,
         out_chans=args.out_chans,
-        resolution=args.im_size,
         latent_size=args.latent_size
     ).to(torch.device('cuda'))
 
@@ -17,9 +16,8 @@ def build_model(args):
 
 def build_discriminator(args):
     model = DiscriminatorModel(
-        in_chans=args.in_chans,
+        in_chans=args.in_chans*2,
         out_chans=args.out_chans,
-        resolution=args.im_size
     ).to(torch.device('cuda'))
 
     return model
