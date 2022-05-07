@@ -168,6 +168,9 @@ def train(args):
             for k in range(y.shape[0] - 1):
                 gen_pred_loss += torch.mean(fake_pred[k + 1])
 
+            x = x * std[:, :, None, None] + mean[:, :, None, None]
+            avg_recon = avg_recon * std[:, :, None, None] + mean[:, :, None, None]
+
             std_weight = np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
             var_weight = 0.01
             adv_weight = 1e-4 if args.L1 else 1e-3 if args.MSE else 1
@@ -208,7 +211,8 @@ def train(args):
                 for z in range(args.num_z):
                     gens[:, z, :, :, :] = G(y, inds)
 
-                avg = torch.mean(gens, dim=1) * std + mean
+                avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
+                x = x * std[:, :, None, None] + mean[:, :, None, None]
 
                 for j in range(y.size(0)):
                     losses['ssim'].append(ssim(x.cpu().numpy(), avg.cpu().numpy()))
@@ -228,7 +232,7 @@ def train(args):
                     place = 1
 
                     for r in range(args.num_z):
-                        gif_im(x[ind, :, :, :], gens[ind, r, :, :, :], place, 'image')
+                        gif_im(x[ind, :, :, :], gens[ind, r, :, :, :] * std[0, :, None, None] + mean[0, :, None, None], place, 'image')
                         place += 1
 
                     generate_gif('image')
