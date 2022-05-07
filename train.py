@@ -79,25 +79,31 @@ def compute_gradient_penalty(D, real_samples, fake_samples, args, y):
 
 
 # TODO: REMOVE
-# def gif_im(true, gen_im, index, type, disc_num=False):
-#     fig = plt.figure()
-#
-#     generate_image(fig, true, gen_im, f'z {index}', 1, 2, 1, disc_num=False)
-#     im, ax = generate_error_map(fig, true, gen_im, f'z {index}', 2, 2, 1)
-#
-#     plt.savefig(f'/gif_{type}_{index - 1}.png')
-#     plt.close()
-#
-#
-# def generate_gif(type):
-#     images = []
-#     for i in range(8):
-#         images.append(iio.imread(f'/gif_{type}_{i}.png'))
-#
-#     iio.mimsave(f'variation_gif.gif', images, duration=0.25)
-#
-#     for i in range(8):
-#         os.remove(f'/gif_{type}_{i}.png')
+def gif_im(true, gen_im, index, type, disc_num=False):
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    fig.suptitle('Dev Example')
+    ax1.imshow(gen_im.cpu().numpy().transpose(1, 2, 0))
+    ax1.set_title('GT')
+    ax2.imshow(true.cpu().numpy().transpose(1, 2, 0))
+    ax2.set_title(f'Z {index}')
+    ax1.set_xticks([])
+    ax1.set_yticks([])
+    ax2.set_xticks([])
+    ax2.set_yticks([])
+
+    plt.savefig(f'/gif_{type}_{index - 1}.png')
+    plt.close(fig)
+
+
+def generate_gif(type):
+    images = []
+    for i in range(8):
+        images.append(iio.imread(f'/gif_{type}_{i}.png'))
+
+    iio.mimsave(f'variation_gif.gif', images, duration=0.25)
+
+    for i in range(8):
+        os.remove(f'/gif_{type}_{i}.png')
 ######################
 
 def train(args):
@@ -211,7 +217,23 @@ def train(args):
                     losses['psnr'].append(psnr(x.cpu().numpy(), avg.cpu().numpy()))
 
                 if i == 0:
-                    pass
+                    ind = 0
+                    fig, (ax1, ax2) = plt.subplots(1, 2)
+                    fig.suptitle('Dev Example')
+                    ax1.imshow(avg[ind, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax1.set_title('GT')
+                    ax2.imshow(x[ind, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax2.set_title('Avg. Recon')
+                    plt.savefig('dev_ex.png')
+                    plt.close(fig)
+
+                    place = 1
+
+                    for r in range(args.num_z):
+                        gif_im(x[ind, :, :, :], gens[ind, r, :, :, :], place, 'image')
+                        place += 1
+
+                    generate_gif('image')
                     # TODO: ADD PLOT LOGIC - GIF AND STD. DEV
 
         ssim_loss = np.mean(losses['ssim'])

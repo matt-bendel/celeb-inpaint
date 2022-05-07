@@ -35,6 +35,8 @@ class DataTransform:
         self.inv_mask = 1 - self.mask
 
     def __call__(self, gt_im):
+        print(gt_im.shape)
+        exit()
         mean = torch.tensor([0.5, 0.5, 0.5])
         std = torch.tensor([0.5, 0.5, 0.5])
         gt = (gt_im - mean[:, None, None]) / std[:, None, None]
