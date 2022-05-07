@@ -3,10 +3,6 @@ import shutil
 import torch
 import numpy as np
 
-from utils.fftc import ifft2c_new, fft2c_new
-from utils.get_mask import get_mask
-
-
 # THIS FILE CONTAINTS UTILITY FUNCTIONS FOR OUR GAN AND A WRAPPER CLASS FOR THE GENERATOR
 def load_best_gan(args):
     from utils.prepare_models import build_model
