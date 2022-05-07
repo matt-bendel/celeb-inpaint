@@ -35,12 +35,15 @@ class DataTransform:
         self.inv_mask = 1 - self.mask
 
     def __call__(self, gt_im):
-        mean, std = gt_im.mean([1,2]), gt_im.std([1,2])
+        mean = torch.tensor([0.5, 0.5, 0.5])
+        std = torch.tensor([0.5, 0.5, 0.5])
         gt = (gt_im - mean[:, None, None]) / std[:, None, None]
         masked_im = gt * self.mask
         inds = np.where(self.inv_mask == 1)
 
         print(torch.max(gt))
+        print(torch.min(gt))
+
         exit()
 
         return gt, masked_im, mean, std, inds
