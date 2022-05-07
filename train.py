@@ -276,4 +276,5 @@ if __name__ == '__main__':
     else:
         args.model_num = 4
 
+    print(f'MODEL NUM: {args.model_num}')
     train(args)
