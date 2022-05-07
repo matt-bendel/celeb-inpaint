@@ -41,11 +41,6 @@ class DataTransform:
         masked_im = gt * self.mask
         inds = np.where(self.inv_mask == 1)
 
-        print(torch.max(gt))
-        print(torch.min(gt))
-
-        exit()
-
         return gt, masked_im, mean, std, inds
 
 
