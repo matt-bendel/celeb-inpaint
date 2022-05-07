@@ -31,16 +31,16 @@ class DataTransform:
         arr = np.zeros(total)
         arr[:n] = 1
         np.random.shuffle(arr)
-        self.mask = np.reshape(arr, (128, 128))
+        self.mask = torch.tensor(np.reshape(arr, (128, 128))).repeat(3, 1, 1)
         self.inv_mask = 1 - self.mask
 
     def __call__(self, gt_im):
-        print(gt_im.shape)
+        print(torch.max(gt_im))
         exit()
         mean = torch.tensor([0.5, 0.5, 0.5])
         std = torch.tensor([0.5, 0.5, 0.5])
         gt = (gt_im - mean[:, None, None]) / std[:, None, None]
-        masked_im = gt * self.mask[None, :, :]
+        masked_im = gt * self.mask
 
         inds = np.where(self.inv_mask == 1)
 
