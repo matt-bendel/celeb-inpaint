@@ -135,7 +135,7 @@ class FullDownBlock(nn.Module):
         return f'AvgPool(in_chans={self.in_chans}, out_chans={self.out_chans}\nResBlock(in_chans={self.out_chans}, out_chans={self.out_chans}'
 
 
-class DiscriminatorModelLowRes(nn.Module):
+class DiscriminatorModel(nn.Module):
     def __init__(self, in_chans, out_chans, z_location, model_type, mbsd=False):
         """
         Args:
