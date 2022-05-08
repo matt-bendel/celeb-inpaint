@@ -204,7 +204,7 @@ def train(args):
                 mean = mean.cuda()
                 std = std.cuda()
                 y = y.to(args.device)
-                x = x.to(args.device) * std + mean
+                x = x.to(args.device)
 
                 gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
