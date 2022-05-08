@@ -152,7 +152,7 @@ def train(args):
             gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(args.num_z):
-                gens[:, z, :, :, :] = G(y, inds)
+                gens[:, z, :, :, :] = G(y)
 
             fake_pred = torch.zeros(size=(y.shape[0], args.num_z), device=args.device)
             for k in range(y.shape[0]):
