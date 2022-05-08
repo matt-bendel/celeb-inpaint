@@ -1,10 +1,9 @@
-import cv2
 import torch
 import numpy as np
 
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
-import torchvision.transforms.functional as F
+import matplotlib.pyplot as plt
 
 class DataTransform:
     """
@@ -31,6 +30,9 @@ class DataTransform:
         arr = np.zeros(total)
         arr[:n] = 1
         np.random.shuffle(arr)
+        plt.imshow(np.reshape(arr, (128, 128)), cmap='viridis')
+        plt.savefig('temp.png')
+        plt.close()
         self.mask = torch.tensor(np.reshape(arr, (128, 128))).repeat(3, 1, 1)
         self.inv_mask = 1 - self.mask
 
