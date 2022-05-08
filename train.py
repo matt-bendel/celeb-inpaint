@@ -89,19 +89,19 @@ def gif_im(true, gen_im, index, type, disc_num=False):
     ax2.set_xticks([])
     ax2.set_yticks([])
 
-    plt.savefig(f'/gif_{type}_{index - 1}.png')
+    plt.savefig(f'gif_{type}_{index - 1}.png')
     plt.close(fig)
 
 
 def generate_gif(type):
     images = []
     for i in range(8):
-        images.append(iio.imread(f'/gif_{type}_{i}.png'))
+        images.append(iio.imread(f'gif_{type}_{i}.png'))
 
     iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 
     for i in range(8):
-        os.remove(f'/gif_{type}_{i}.png')
+        os.remove(f'gif_{type}_{i}.png')
 ######################
 
 def train(args):
@@ -121,7 +121,6 @@ def train(args):
         }
 
         for i, data in enumerate(train_loader):
-            break
             G.update_gen_status(val=False)
             x, y, mean, std = data[0]
             y = y.cuda()
