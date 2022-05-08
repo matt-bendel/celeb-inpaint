@@ -47,7 +47,7 @@ def ssim(
     maxval = gt.max() if maxval is None else maxval
 
     ssim = structural_similarity(
-        gt, pred, data_range=maxval, multichannel=True
+        gt.transpose(1, 2, 0), pred.transpose(1, 2, 0), data_range=maxval, multichannel=True
     )
 
     return ssim
