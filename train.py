@@ -122,7 +122,10 @@ def train(args):
 
         for i, data in enumerate(train_loader):
             G.update_gen_status(val=False)
-            print(len(data))
+            print(type(data[0]))
+            print(type(data[1]))
+            exit()
+
             x, y, mean, std, inds = data
             y = y.cuda()
             x = x.cuda()

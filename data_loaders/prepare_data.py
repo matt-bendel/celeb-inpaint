@@ -53,15 +53,14 @@ def create_datasets(args):
         generator=torch.Generator().manual_seed(0)
     )
 
-    # return test_data, dev_data, train_data
-    return dataset
+    return test_data, dev_data, train_data
+
 
 def create_data_loaders(args):
-    # test_data, dev_data, train_data = create_datasets(args)
-    test_data = create_datasets(args)
+    test_data, dev_data, train_data = create_datasets(args)
 
     train_loader = DataLoader(
-        dataset=test_data,
+        dataset=train_data,
         batch_size=args.batch_size,
         shuffle=True,
         num_workers=16,
@@ -69,20 +68,20 @@ def create_data_loaders(args):
         drop_last=True,
     )
 
-    # dev_loader = DataLoader(
-    #     dataset=dev_data,
-    #     batch_size=args.batch_size,
-    #     num_workers=16,
-    #     pin_memory=True,
-    #     drop_last=True,
-    # )
-    #
-    # test_loader = DataLoader(
-    #     dataset=dev_data,
-    #     batch_size=args.batch_size,
-    #     num_workers=16,
-    #     pin_memory=True,
-    #     drop_last=True,
-    # )
+    dev_loader = DataLoader(
+        dataset=dev_data,
+        batch_size=args.batch_size,
+        num_workers=16,
+        pin_memory=True,
+        drop_last=True,
+    )
 
-    return train_loader, None, None
+    test_loader = DataLoader(
+        dataset=dev_data,
+        batch_size=args.batch_size,
+        num_workers=16,
+        pin_memory=True,
+        drop_last=True,
+    )
+
+    return train_loader, dev_loader, test_loader
