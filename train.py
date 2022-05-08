@@ -128,7 +128,8 @@ def train(args):
             print(data[0][3].shape)
             print(data[0][4].shape)
 
-            torch.nonzero(data[0][1] == 0)
+            temp = torch.nonzero(data[0][1] == 0)
+            print(temp.shape)
             exit()
 
             x, y, mean, std, inds = data
