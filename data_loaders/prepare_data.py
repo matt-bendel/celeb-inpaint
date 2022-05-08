@@ -31,7 +31,7 @@ class DataTransform:
         arr[:n] = 1
         np.random.shuffle(arr)
         plt.imshow(np.reshape(arr, (128, 128)), cmap='viridis')
-        plt.savefig(f'mask_{self.R}.png')
+        plt.savefig(f'mask_{self.args.R}.png')
         plt.close()
         self.mask = torch.tensor(np.reshape(arr, (128, 128))).repeat(3, 1, 1)
         self.inv_mask = 1 - self.mask
