@@ -215,8 +215,8 @@ def train(args):
                 x = x * std[:, :, None, None] + mean[:, :, None, None]
 
                 for j in range(y.size(0)):
-                    losses['ssim'].append(ssim(x.cpu().numpy(), avg.cpu().numpy()))
-                    losses['psnr'].append(psnr(x.cpu().numpy(), avg.cpu().numpy()))
+                    losses['ssim'].append(ssim(x[j].cpu().numpy(), avg[j].cpu().numpy()))
+                    losses['psnr'].append(psnr(x[j].cpu().numpy(), avg[j].cpu().numpy()))
 
                 if i == 0:
                     ind = 0
