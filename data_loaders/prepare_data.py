@@ -34,14 +34,13 @@ class DataTransform:
         plt.savefig(f'mask_{self.args.R}.png')
         plt.close()
         self.mask = torch.tensor(np.reshape(arr, (128, 128))).repeat(3, 1, 1)
-        self.inv_mask = 1 - self.mask
 
     def __call__(self, gt_im):
         mean = torch.tensor([0.5, 0.5, 0.5])
         std = torch.tensor([0.5, 0.5, 0.5])
         gt = (gt_im - mean[:, None, None]) / std[:, None, None]
         masked_im = gt * self.mask
-        inds = torch.nonzero(self.inv_mask)
+        inds = torch.nonzero(self.mask)
 
         return gt, masked_im, mean, std, inds
 
