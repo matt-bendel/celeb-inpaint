@@ -122,8 +122,11 @@ def train(args):
 
         for i, data in enumerate(train_loader):
             G.update_gen_status(val=False)
-            print(len(data[0]))
-            print(data[1].shape)
+            print(data[0][0].shape)
+            print(data[0][1].shape)
+            print(data[0][2].shape)
+            print(data[0][3].shape)
+            print(data[0][4].shape)
             exit()
 
             x, y, mean, std, inds = data
