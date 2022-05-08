@@ -236,7 +236,6 @@ def train(args):
                         place += 1
 
                     generate_gif('image')
-                    # TODO: ADD PLOT LOGIC - GIF AND STD. DEV
 
         ssim_loss = np.mean(losses['ssim'])
         best_model = ssim_loss > best_loss
