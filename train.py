@@ -93,12 +93,12 @@ def gif_im(true, gen_im, index, type, disc_num=False):
     plt.close(fig)
 
 
-def generate_gif(type):
+def generate_gif(args, type):
     images = []
     for i in range(8):
         images.append(iio.imread(f'gif_{type}_{i}.png'))
 
-    iio.mimsave(f'variation_gif.gif', images, duration=0.25)
+    iio.mimsave(f'variation_gif_{args.R}.gif', images, duration=0.25)
 
     for i in range(8):
         os.remove(f'gif_{type}_{i}.png')
@@ -230,7 +230,7 @@ def train(args):
                     ax1.set_title('GT')
                     ax2.imshow(avg[ind, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     ax2.set_title('Avg. Recon')
-                    plt.savefig('dev_ex.png')
+                    plt.savefig(f'dev_ex_{args.R}.png')
                     plt.close(fig)
 
                     place = 1
@@ -239,7 +239,7 @@ def train(args):
                         gif_im(x[ind, :, :, :], gens[ind, r, :, :, :] * std[0, :, None, None] + mean[0, :, None, None], place, 'image')
                         place += 1
 
-                    generate_gif('image')
+                    generate_gif(args, 'image')
 
         ssim_loss = np.mean(losses['ssim'])
         best_model = ssim_loss > best_loss
