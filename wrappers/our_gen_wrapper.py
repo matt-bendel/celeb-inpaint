@@ -105,14 +105,14 @@ class GANWrapper:
     def update_gen_status(self, val):
         self.gen.eval() if val else self.gen.train()
 
-    def data_consistency(self, samples, masked_ims, inds):
-        samples[:, :, inds[0], inds[1]] = masked_ims[:, :, inds[0], inds[1]]
-        return samples
+    def data_consistency(self, samples, masked_ims):
+        # samples[:, :, inds[0], inds[1]] = masked_ims[:, :, inds[0], inds[1]]
+        return torch.where(masked_ims > 0 + 1e-6, masked_ims, samples)
 
-    def __call__(self, y, inds, noise_var=1):
+    def __call__(self, y, noise_var=1):
         num_vectors = y.size(0)
         z = self.get_noise(num_vectors, noise_var)
         samples = self.gen(torch.cat([y, z], dim=1))
-        samples = self.data_consistency(samples, y, inds)
+        samples = self.data_consistency(samples, y)
 
         return samples

@@ -40,9 +40,8 @@ class DataTransform:
         std = torch.tensor([0.5, 0.5, 0.5])
         gt = (gt_im - mean[:, None, None]) / std[:, None, None]
         masked_im = gt * self.mask
-        inds = torch.where(self.mask > 0)
 
-        return gt, masked_im, mean, std, inds
+        return gt, masked_im, mean, std
 
 
 

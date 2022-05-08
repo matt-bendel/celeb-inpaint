@@ -122,15 +122,7 @@ def train(args):
 
         for i, data in enumerate(train_loader):
             G.update_gen_status(val=False)
-            print(data[0][0].shape)
-            print(data[0][1].shape)
-            print(data[0][2].shape)
-            print(data[0][3].shape)
-            print(data[0][4].shape)
-
-            exit()
-
-            x, y, mean, std, inds = data
+            x, y, mean, std = data[0]
             y = y.cuda()
             x = x.cuda()
             mean = mean.cuda()
@@ -140,7 +132,7 @@ def train(args):
                 for param in D.parameters():
                     param.grad = None
 
-                x_hat = G(y, inds)
+                x_hat = G(y)
 
                 real_pred = D(input=x, y=y)
                 fake_pred = D(input=x_hat, y=y)
@@ -208,7 +200,7 @@ def train(args):
         for i, data in enumerate(dev_loader):
             G.update_gen_status(val=True)
             with torch.no_grad():
-                x, y, mean, std, inds = data
+                x, y, mean, std = data
                 mean = mean.cuda()
                 std = std.cuda()
                 y = y.to(args.device)
@@ -217,7 +209,7 @@ def train(args):
                 gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
                 for z in range(args.num_z):
-                    gens[:, z, :, :, :] = G(y, inds)
+                    gens[:, z, :, :, :] = G(y)
 
                 avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
                 x = x * std[:, :, None, None] + mean[:, :, None, None]
