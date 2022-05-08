@@ -200,7 +200,7 @@ def train(args):
         for i, data in enumerate(dev_loader):
             G.update_gen_status(val=True)
             with torch.no_grad():
-                x, y, mean, std = data
+                x, y, mean, std = data[0]
                 mean = mean.cuda()
                 std = std.cuda()
                 y = y.to(args.device)
