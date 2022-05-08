@@ -27,11 +27,11 @@ def get_gan(args):
 
     if args.resume:
         checkpoint_file_gen = pathlib.Path(
-            f'{args.checkpoint_dir}/generator_model.pt')
+            f'{args.checkpoint_dir}/{args.model_num}/{args.R}/generator_model.pt')
         checkpoint_gen = torch.load(checkpoint_file_gen, map_location=torch.device('cuda'))
 
         checkpoint_file_dis = pathlib.Path(
-            f'{args.checkpoint_dir}/discriminator_model.pt')
+            f'{args.checkpoint_dir}/{args.model_num}/{args.R}/discriminator_model.pt')
         checkpoint_dis = torch.load(checkpoint_file_dis, map_location=torch.device('cuda'))
 
         generator = build_model(args)
