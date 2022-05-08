@@ -33,7 +33,7 @@ class DataTransform:
         plt.imshow(np.reshape(arr, (128, 128)), cmap='viridis')
         plt.savefig(f'mask_{self.args.R}.png')
         plt.close()
-        self.mask = torch.tensor(np.reshape(arr, (128, 128)), type=torch.float).repeat(3, 1, 1)
+        self.mask = torch.tensor(np.reshape(arr, (128, 128)), dtype=torch.float).repeat(3, 1, 1)
 
     def __call__(self, gt_im):
         mean = torch.tensor([0.5, 0.5, 0.5])
