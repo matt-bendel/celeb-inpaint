@@ -3,6 +3,7 @@ import shutil
 import torch
 import numpy as np
 
+
 # THIS FILE CONTAINTS UTILITY FUNCTIONS FOR OUR GAN AND A WRAPPER CLASS FOR THE GENERATOR
 def load_best_gan(args):
     from utils.prepare_models import build_model
@@ -84,12 +85,12 @@ def save_model(args, epoch, model, optimizer, best_dev_loss, is_new_best, m_type
             'best_dev_loss': best_dev_loss,
             'exp_dir': args.exp_dir
         },
-        f=args.exp_dir / f'{model_dir}' / f'{m_type}_model.pt'
+        f=args.exp_dir / f'{model_dir}' / f'{args.R}' / f'{m_type}_model.pt'
     )
 
     if is_new_best:
-        shutil.copyfile(args.exp_dir / f'{model_dir}' / f'{m_type}_model.pt',
-                        args.exp_dir / f'{model_dir}' / f'{m_type}_best_model.pt')
+        shutil.copyfile(args.exp_dir / f'{model_dir}' / f'{args.R}' / f'{m_type}_model.pt',
+                        args.exp_dir / f'{model_dir}' / f'{args.R}' / f'{m_type}_best_model.pt')
 
 
 class GANWrapper:
@@ -107,7 +108,7 @@ class GANWrapper:
 
     def data_consistency(self, samples, masked_ims):
         # samples[:, :, inds[0], inds[1]] = masked_ims[:, :, inds[0], inds[1]]
-        return torch.where(masked_ims > 0 + 1e-6, masked_ims, samples)
+        return torch.where(torch.abs(masked_ims) > 0 + 1e-8, masked_ims, samples)
 
     def __call__(self, y, noise_var=1):
         num_vectors = y.size(0)

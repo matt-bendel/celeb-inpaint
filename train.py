@@ -79,15 +79,15 @@ def compute_gradient_penalty(D, real_samples, fake_samples, args, y):
 # TODO: REMOVE
 def gif_im(true, gen_im, index, type, disc_num=False):
     fig, (ax1, ax2) = plt.subplots(1, 2)
-    fig.suptitle('Dev Example')
-    ax1.imshow(gen_im.cpu().numpy().transpose(1, 2, 0))
-    ax1.set_title('GT')
-    ax2.imshow(true.cpu().numpy().transpose(1, 2, 0))
-    ax2.set_title(f'Z {index}')
     ax1.set_xticks([])
     ax1.set_yticks([])
     ax2.set_xticks([])
     ax2.set_yticks([])
+    fig.suptitle('Dev Example')
+    ax1.imshow(true.cpu().numpy().transpose(1, 2, 0))
+    ax1.set_title('GT')
+    ax2.imshow(gen_im.cpu().numpy().transpose(1, 2, 0))
+    ax2.set_title(f'Z {index}')
 
     plt.savefig(f'gif_{type}_{index - 1}.png')
     plt.close(fig)
@@ -221,6 +221,10 @@ def train(args):
                 if i == 0:
                     ind = 0
                     fig, (ax1, ax2) = plt.subplots(1, 2)
+                    ax1.set_xticks([])
+                    ax1.set_yticks([])
+                    ax2.set_xticks([])
+                    ax2.set_yticks([])
                     fig.suptitle('Dev Example')
                     ax1.imshow(avg[ind, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     ax1.set_title('GT')
