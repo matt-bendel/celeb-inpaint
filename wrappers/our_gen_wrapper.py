@@ -27,11 +27,11 @@ def get_gan(args):
 
     if args.resume:
         checkpoint_file_gen = pathlib.Path(
-            f'{args.checkpoint_dir}/{args.model_num}/{args.R}/generator_model.pt')
+            f'{args.checkpoint_dir}/{args.model_num}/generator_model.pt')
         checkpoint_gen = torch.load(checkpoint_file_gen, map_location=torch.device('cuda'))
 
         checkpoint_file_dis = pathlib.Path(
-            f'{args.checkpoint_dir}/{args.model_num}/{args.R}/discriminator_model.pt')
+            f'{args.checkpoint_dir}/{args.model_num}/discriminator_model.pt')
         checkpoint_dis = torch.load(checkpoint_file_dis, map_location=torch.device('cuda'))
 
         generator = build_model(args)
@@ -85,12 +85,12 @@ def save_model(args, epoch, model, optimizer, best_dev_loss, is_new_best, m_type
             'best_dev_loss': best_dev_loss,
             'exp_dir': args.exp_dir
         },
-        f=args.exp_dir / f'{model_dir}' / f'{args.R}' / f'{m_type}_model.pt'
+        f=args.exp_dir / f'{model_dir}' / f'{m_type}_model.pt'
     )
 
     if is_new_best:
-        shutil.copyfile(args.exp_dir / f'{model_dir}' / f'{args.R}' / f'{m_type}_model.pt',
-                        args.exp_dir / f'{model_dir}' / f'{args.R}' / f'{m_type}_best_model.pt')
+        shutil.copyfile(args.exp_dir / f'{model_dir}' / f'{m_type}_model.pt',
+                        args.exp_dir / f'{model_dir}' / f'{m_type}_best_model.pt')
 
 
 class GANWrapper:

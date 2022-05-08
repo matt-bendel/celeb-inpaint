@@ -29,7 +29,7 @@ def create_arg_parser():
     # DATA ARGS
     parser.add_argument('--im-size', default=128, type=int,
                         help='Image resolution')
-    parser.add_argument('--R', default=8, type=int,
+    parser.add_argument('--R', default=16, type=int,
                         help='Image resolution')
     parser.add_argument('--data-parallel', required=True, action='store_true',
                         help='If set, use multiple GPUs using data parallelism')
