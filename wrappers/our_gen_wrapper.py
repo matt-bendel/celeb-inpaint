@@ -5,10 +5,10 @@ import numpy as np
 
 
 # THIS FILE CONTAINTS UTILITY FUNCTIONS FOR OUR GAN AND A WRAPPER CLASS FOR THE GENERATOR
-def load_best_gan(args):
+def load_best_gan(args, model_num):
     from utils.prepare_models import build_model
     checkpoint_file_gen = pathlib.Path(
-        f'{args.checkpoint_dir}/generator_best_model.pt')
+        f'{args.checkpoint_dir}/{model_num}/generator_best_model.pt')
     checkpoint_gen = torch.load(checkpoint_file_gen, map_location=torch.device('cuda'))
 
     generator = build_model(args)
