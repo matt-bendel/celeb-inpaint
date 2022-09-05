@@ -15,10 +15,10 @@ class ResidualBlock(nn.Module):
         super(ResidualBlock, self).__init__()
         self.conv_block = nn.Sequential(
             nn.Conv2d(in_features, in_features, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(in_features),
+            nn.InstanceNorm2d(in_features),
             nn.PReLU(),
             nn.Conv2d(in_features, in_features, kernel_size=3, stride=1, padding=1),
-            nn.BatchNorm2d(in_features),
+            nn.InstanceNorm2d(in_features),
             nn.PReLU()
         )
         self.conv_1x1 = nn.Conv2d(in_features, in_features, kernel_size=1)
@@ -44,7 +44,7 @@ class ConvDownBlock(nn.Module):
         # self.conv_2 = nn.Conv2d(out_chans, out_chans, kernel_size=3, padding=1)
         self.res = ResidualBlock(out_chans)
         self.conv_3 = nn.Conv2d(out_chans, out_chans, kernel_size=3, padding=1, stride=2)
-        self.bn = nn.BatchNorm2d(out_chans)
+        self.bn = nn.InstanceNorm2d(out_chans)
         self.activation = nn.PReLU()
 
     def forward(self, input):
@@ -81,12 +81,12 @@ class ConvUpBlock(nn.Module):
         self.out_chans = out_chans
 
         self.conv_1 = nn.ConvTranspose2d(in_chans // 2, in_chans // 2, kernel_size=3, padding=1, stride=2)
-        self.bn = nn.BatchNorm2d(in_chans // 2)
+        self.bn = nn.InstanceNorm2d(in_chans // 2)
         self.activation = nn.PReLU()
 
         self.layers = nn.Sequential(
             nn.Conv2d(in_chans, out_chans, kernel_size=3, padding=1),
-            nn.BatchNorm2d(out_chans),
+            nn.InstanceNorm2d(out_chans),
             nn.PReLU(),
             ResidualBlock(out_chans),
         )
@@ -108,7 +108,7 @@ class ConvUpBlock(nn.Module):
 
 
 class GeneratorModel(nn.Module):
-    def __init__(self, in_chans, out_chans, z_location=None, latent_size=None):
+    def __init__(self, in_chans, out_chans, z_location=None, latent_size=1024):
         """
         Args:
             in_chans (int): Number of channels in the input to the U-Net model.
@@ -121,8 +121,8 @@ class GeneratorModel(nn.Module):
 
         self.in_chans = in_chans
         self.out_chans = out_chans
-        self.chans = 64
-        self.num_pool_layers = 5
+        self.chans = 128
+        self.num_pool_layers = 4
         self.latent_size = latent_size
 
         num_pool_layers = self.num_pool_layers
@@ -139,41 +139,55 @@ class GeneratorModel(nn.Module):
 
         self.res_layer_1 = nn.Sequential(
             nn.Conv2d(ch, ch, kernel_size=3, padding=1),
-            nn.BatchNorm2d(ch),
+            nn.InstanceNorm2d(ch),
             nn.PReLU(),
             ResidualBlock(ch),
             ResidualBlock(ch),
             ResidualBlock(ch),
             ResidualBlock(ch),
             ResidualBlock(ch),
-            ResidualBlock(ch),
-            ResidualBlock(ch),
-            ResidualBlock(ch),
-            ResidualBlock(ch),
-            ResidualBlock(ch),
-            ResidualBlock(ch),
-            ResidualBlock(ch),
-            ResidualBlock(ch),
-            ResidualBlock(ch),
-            ResidualBlock(ch),
+            # ResidualBlock(ch),
+            # ResidualBlock(ch),
+            # ResidualBlock(ch),
+            # ResidualBlock(ch),
+            # ResidualBlock(ch),
+            # ResidualBlock(ch),
+            # ResidualBlock(ch),
+            # ResidualBlock(ch),
+            # ResidualBlock(ch),
+            # ResidualBlock(ch),
         )
 
         self.conv = nn.Sequential(
             nn.Conv2d(ch, ch, kernel_size=3, padding=1),
-            nn.BatchNorm2d(ch),
+            nn.InstanceNorm2d(ch),
             nn.PReLU(),
-            # nn.Conv2d(ch, ch, kernel_size=3, padding=1),
-            # nn.BatchNorm2d(ch),
-            # nn.PReLU()
         )
+        #
+        # self.conv = nn.Sequential(
+        #     nn.Conv2d(ch*2, ch, kernel_size=3, padding=1),
+        #     nn.InstanceNorm2d(ch),
+        #     nn.PReLU(),
+        # )
+        #
+        # self.middle_z_grow_conv = nn.Sequential(
+        #     nn.Conv2d(128, 256, kernel_size=(3, 3), padding=1),
+        #     nn.LeakyReLU(negative_slope=0.2),
+        #     nn.Conv2d(256, 1024, kernel_size=(3, 3), padding=1),
+        #     nn.LeakyReLU(negative_slope=0.2),
+        # )
+        # self.middle_z_grow_linear = nn.Sequential(
+        #     nn.Linear(512, 128 * 24 * 24),
+        #     nn.LeakyReLU(negative_slope=0.2),
+        # )
 
         self.up_sample_layers = nn.ModuleList()
         for i in range(num_pool_layers - 1):
-            if i > 0:
-                self.up_sample_layers += [ConvUpBlock(ch * 2, ch // 2)]
-                ch //= 2
-            else:
-                self.up_sample_layers += [ConvUpBlock(ch * 2, ch)]
+            # if i > 0:
+            self.up_sample_layers += [ConvUpBlock(ch * 2, ch // 2)]
+            ch //= 2
+            # else:
+            #     self.up_sample_layers += [ConvUpBlock(ch * 2, ch)]
 
 
         self.up_sample_layers += [ConvUpBlock(ch * 2, ch)]
@@ -182,7 +196,7 @@ class GeneratorModel(nn.Module):
             nn.Conv2d(ch // 2, out_chans, kernel_size=1),
         )
 
-    def forward(self, input):
+    def forward(self, input, mid_z=None):
         """
         Args:
             input (torch.Tensor): Input tensor of shape [batch_size, self.in_chans, height, width]
@@ -197,9 +211,12 @@ class GeneratorModel(nn.Module):
             output, skip_out = layer(output)
             stack.append(skip_out)
 
-        output = self.res_layer_1(output)
+        # output = self.res_layer_1(output)
+        # z_out = self.middle_z_grow_linear(mid_z)
+        # z_out = torch.reshape(z_out, (output.shape[0], 128, 24, 24))
+        # z_out = self.middle_z_grow_conv(z_out)
+        # output = self.conv(torch.cat([output, z_out], dim=1))
         output = self.conv(output)
-        # output = self.res_layer(output)
 
         # Apply up-sampling layers
         for layer in self.up_sample_layers:

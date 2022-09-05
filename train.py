@@ -14,7 +14,7 @@ from wrappers.our_gen_wrapper import get_gan, save_model
 from data_loaders.prepare_data import create_data_loaders
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
-
+from mail import send_mail
 
 GLOBAL_LOSS_DICT = {
     'g_loss': [],
@@ -98,7 +98,7 @@ def generate_gif(args, type, ind):
     for i in range(8):
         images.append(iio.imread(f'gif_{type}_{i}.png'))
 
-    iio.mimsave(f'variation_gif_{args.R}_ind.gif', images, duration=0.25)
+    iio.mimsave(f'variation_gif.gif', images, duration=0.25)
 
     for i in range(8):
         os.remove(f'gif_{type}_{i}.png')
@@ -109,6 +109,26 @@ def train(args):
 
     args.in_chans = 3
     args.out_chans = 3
+
+    std_mult = 1
+    std_mults = [std_mult]
+    psnr_diffs = []
+
+    if args.resume:
+        std_mults = []
+        psnr_diffs = []
+        with open("std_weights.txt", "r") as file1:
+            for line in file1.readlines():
+                for i in line.split(","):
+                    std_mults.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+
+        with open("psnr_diffs.txt", "r") as file1:
+            for line in file1.readlines():
+                for i in line.split(","):
+                    psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+
+        std_mult = std_mults[-1]
+        print(std_mult)
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
 
@@ -171,14 +191,11 @@ def train(args):
             x = x * std[:, :, None, None] + mean[:, :, None, None]
             avg_recon = avg_recon * std[:, :, None, None] + mean[:, :, None, None]
 
-            std_weight = np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            var_weight = 0.01
-            adv_weight = 1e-4 if args.L1 else 1e-3 if args.MSE else 1
+            std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
+            adv_weight = 1e-2
             g_loss = - adv_weight * torch.mean(gen_pred_loss)
-            g_loss += F.l1_loss(avg_recon, x) if args.L1 else 0
-            g_loss += - std_weight * torch.mean(torch.std(gens, dim=1), dim=(0, 1, 2, 3)) if args.L1 else 0
-            g_loss += F.mse_loss(avg_recon, x) if args.MSE else 0
-            g_loss += -var_weight * torch.mean(torch.var(gens, dim=1, unbiased=True), dim=(0, 1, 2, 3)) if args.VAR else 0
+            g_loss += F.l1_loss(avg_recon, x)
+            g_loss += - std_weight * torch.mean(torch.std(gens, dim=1), dim=(0, 1, 2, 3))
 
             g_loss.backward()
             opt_G.step()
@@ -194,6 +211,7 @@ def train(args):
 
         losses = {
             'psnr': [],
+            'psnr_1': [],
             'ssim': []
         }
 
@@ -264,9 +282,10 @@ def train(args):
 
                     generate_gif(args, 'image', ind)
 
+        psnr_diff = np.abs((np.mean(losses['psnr_1']) + 2.5) - np.mean(losses['psnr']))
         ssim_loss = np.mean(losses['ssim'])
         best_model = ssim_loss > best_loss
-        best_loss = ssim_loss if ssim_loss > best_loss else best_loss
+        best_loss = ssim_loss if ssim_loss > best_loss and (psnr_diff < 0.15) else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
@@ -276,8 +295,39 @@ def train(args):
         save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
         print(save_str_2)
 
+        send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif.gif")
+
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', args.model_num)
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', args.model_num)
+
+        mu_0 = 1e-2
+        std_mult += mu_0 * (np.mean(losses['psnr_1']) + 2.5 - np.mean(losses['psnr']))
+        std_mults.append(std_mult)
+        psnr_diffs.append(np.mean(losses['psnr_1']) + 2.5 - np.mean(losses['psnr']))
+
+        file = open("std_weights.txt", "w+")
+
+        # Saving the 2D array in a text file
+        content = str(std_mults)
+        file.write(content)
+        file.close()
+
+        file = open("psnr_diffs.txt", "w+")
+
+        # Saving the 2D array in a text file
+        content = str(psnr_diffs)
+        file.write(content)
+        file.close()
+
+    std_mult_str = ""
+    for val in std_mults:
+        std_mult_str += f"{val},"
+
+    psnr_diff_str = ""
+    for val in psnr_diffs:
+        psnr_diff_str += f"{val},"
+
+    send_mail(f"Std. Dev. Reward Weights - {adv_mult} adv. weight", f"{std_mult_str}\n\n\n{psnr_diff_str}")
 
 
 if __name__ == '__main__':
@@ -297,14 +347,10 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    if not args.MSE and not args.L1:
-        args.model_num = 1
-    elif args.MSE and not args.VAR:
-        args.model_num = 2
-    elif args.MSE and args.VAR:
-        args.model_num = 3
-    else:
-        args.model_num = 4
-
-    print(f'MODEL NUM: {args.model_num}')
-    train(args)
+    try:
+        train(args)
+    except KeyboardInterrupt:
+        exit()
+    except Exception as e:
+        print(e)
+        send_mail("TRAINING CRASH", "Log in to see cause.")

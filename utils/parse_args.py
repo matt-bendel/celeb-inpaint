@@ -7,15 +7,10 @@ def create_arg_parser():
     # CREATE THE PARSER
     parser = Args()
 
-    # ABLATION ARGS
-    parser.add_argument('--MSE', action='store_true', help='Whether or not only loss is adversarial')
-    parser.add_argument('--VAR', action='store_true', help='Whether or not only loss is adversarial')
-    parser.add_argument('--L1', action='store_true', help='Whether or not to use supervised loss')
-
     # GAN ARGS
     parser.add_argument('--num-iters-discriminator', type=int, default=1,
                         help='Number of iterations of the discriminator')
-    parser.add_argument('--num-z', type=int, default=8,
+    parser.add_argument('--num-z', type=int, default=2,
                         help='Number of z values to use during training.')
     parser.add_argument('--latent-size', type=int, default=512, help='Size of latent vector for z location 2')
 
@@ -46,7 +41,5 @@ def create_arg_parser():
                              '"--checkpoint" should be set with this')
     parser.add_argument('--checkpoint-dir', type=str,
                         help='Path to an existing checkpoint. Used along with "--resume"')
-    parser.add_argument('--model-num', type=int, default=0,
-                        help='Which device to train on. Use idx of cuda device or -1 for CPU')
 
     return parser
