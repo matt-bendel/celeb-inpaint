@@ -110,7 +110,7 @@ def train(args):
     args.in_chans = 3
     args.out_chans = 3
 
-    std_mult = 0.75
+    std_mult = 1
     std_mults = [std_mult]
     psnr_diffs = []
 
@@ -235,6 +235,7 @@ def train(args):
                 for j in range(y.size(0)):
                     losses['ssim'].append(ssim(x[j].cpu().numpy(), avg[j].cpu().numpy()))
                     losses['psnr'].append(psnr(x[j].cpu().numpy(), avg[j].cpu().numpy()))
+                    losses['psnr_1'].append(psnr(x[j].cpu().numpy(), (gens[j, 0] * std[j, :, None, None] + mean[j, :, None, None]).cpu().numpy()))
 
                 if i == 0:
                     ind = 0
@@ -299,7 +300,7 @@ def train(args):
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', 0)
 
-        mu_0 = 1e-4
+        mu_0 = 1e-2
         std_mult += mu_0 * (np.mean(losses['psnr_1']) + 2.5 - np.mean(losses['psnr']))
         std_mults.append(std_mult)
         psnr_diffs.append(np.mean(losses['psnr_1']) + 2.5 - np.mean(losses['psnr']))
