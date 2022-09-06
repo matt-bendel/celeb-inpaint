@@ -111,9 +111,10 @@ class GANWrapper:
         return torch.where(torch.abs(masked_ims) > 0 + 1e-8, masked_ims, samples)
 
     def __call__(self, y, noise_var=1):
-        num_vectors = y.size(0)
-        z = self.get_noise(num_vectors, noise_var)
-        samples = self.gen(torch.cat([y, z], dim=1))
+        # num_vectors = y.size(0)
+        # z = self.get_noise(num_vectors, noise_var)
+        # samples = self.gen(torch.cat([y, z], dim=1))
+        samples = self.gen(y)
         samples = self.data_consistency(samples, y)
 
         return samples

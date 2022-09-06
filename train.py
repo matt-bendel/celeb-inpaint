@@ -147,6 +147,7 @@ def train(args):
             x = x.cuda()
             mean = mean.cuda()
             std = std.cuda()
+            fake_pred = False
 
             for j in range(args.num_iters_discriminator):
                 for param in D.parameters():
@@ -154,8 +155,8 @@ def train(args):
 
                 x_hat = G(y)
 
-                real_pred = D(input=x, y=y)
-                fake_pred = D(input=x_hat, y=y)
+                real_pred = D(input=x, label=y)
+                fake_pred = D(input=x_hat, label=y)
 
                 # Gradient penalty
                 gradient_penalty = compute_gradient_penalty(D, x.data, x_hat.data, args, y.data)
@@ -174,12 +175,12 @@ def train(args):
             for z in range(args.num_z):
                 gens[:, z, :, :, :] = G(y)
 
-            fake_pred = torch.zeros(size=(y.shape[0], args.num_z, 30, 30), device=args.device)
+            fake_pred = torch.zeros(size=(y.shape[0], args.num_z, fake_pred.shape[-1], fake_pred.shape[-1]), device=args.device)
             for k in range(y.shape[0]):
                 cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
                 cond[0, :, :, :] = y[k, :, :, :]
                 cond = cond.repeat(args.num_z, 1, 1, 1)
-                temp = D(input=gens[k], y=cond)
+                temp = D(input=gens[k], label=cond)
                 fake_pred[k, :, :, :] = temp[:, 0, :, :]
 
             avg_recon = torch.mean(gens, dim=1)

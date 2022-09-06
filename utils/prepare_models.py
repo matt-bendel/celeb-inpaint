@@ -1,22 +1,24 @@
 import torch
 
 from models.generators.our_gen import GeneratorModel
-from models.discriminators.patch_disc import PatchDisc
+from models.generators.stylegan import StyleGAN
+from models.discriminators.patch_disc_2 import PatchDisc
 
 
 def build_model(args):
-    model = GeneratorModel(
-        in_chans=args.in_chans + 2,
-        out_chans=args.out_chans,
-        latent_size=args.latent_size
-    ).to(torch.device('cuda'))
+    # model = GeneratorModel(
+    #     in_chans=args.in_chans + 2,
+    #     out_chans=args.out_chans,
+    #     latent_size=args.latent_size
+    # ).to(torch.device('cuda'))
+    model = StyleGAN().to(torch.device('cuda'))
 
     return model
 
 
 def build_discriminator(args):
     model = PatchDisc(
-        input_nc=args.in_chans*2
+        # input_nc=args.in_chans*2
     ).to(torch.device('cuda'))
 
     return model
