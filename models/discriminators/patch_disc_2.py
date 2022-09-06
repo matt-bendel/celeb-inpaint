@@ -1,3 +1,6 @@
+import torch
+from torch import nn
+
 class PatchDisc(nn.Module):
     # initializers
     def __init__(self, d=64):
