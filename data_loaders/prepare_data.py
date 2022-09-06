@@ -48,8 +48,8 @@ class DataTransform:
 def create_datasets(args):
     transform = transforms.Compose([transforms.ToTensor(), DataTransform(args)])
     dataset = datasets.ImageFolder('/storage/celebA-HQ/celeba_hq_128', transform=transform)
-    train_data, dev_data, test_data = torch.utils.data.random_split(
-        dataset, [25000, 2500, 2500],
+    train_data, dev_data, test_data, _ = torch.utils.data.random_split(
+        dataset, [1000, 2500, 2500, 24000],
         generator=torch.Generator().manual_seed(0)
     )
 
