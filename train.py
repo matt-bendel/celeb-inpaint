@@ -98,7 +98,7 @@ def generate_gif(args, type, ind):
     for i in range(8):
         images.append(iio.imread(f'gif_{type}_{i}.png'))
 
-    iio.mimsave(f'variation_gif.gif', images, duration=0.25)
+    iio.mimsave(f'variation_gif_{ind}.gif', images, duration=0.25)
 
     for i in range(8):
         os.remove(f'gif_{type}_{i}.png')
@@ -253,6 +253,14 @@ def train(args):
 
                     place = 1
 
+                    for r in range(8):
+                        gif_im(x[ind, :, :, :], gens[ind, r, :, :, :] * std[ind, :, None, None] + mean[ind, :, None, None], place, 'image')
+                        place += 1
+
+                    generate_gif(args, 'image', ind)
+
+                    place = 1
+                    ind = 2
                     for r in range(8):
                         gif_im(x[ind, :, :, :], gens[ind, r, :, :, :] * std[ind, :, None, None] + mean[ind, :, None, None], place, 'image')
                         place += 1
