@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from utils.stylegan_nets import ToRGB, DoubleConv, ConvBlock, ToMRI
+from utils.stylegan_nets import ToRGB, DoubleConv, ConvBlock
 
 
 class StyleGAN(nn.Module):
