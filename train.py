@@ -110,7 +110,7 @@ def train(args):
     args.in_chans = 3
     args.out_chans = 3
 
-    std_mult = 1
+    std_mult = 0.75
     std_mults = [std_mult]
     psnr_diffs = []
 
@@ -299,7 +299,7 @@ def train(args):
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', 0)
 
-        mu_0 = 1e-2
+        mu_0 = 1e-4
         std_mult += mu_0 * (np.mean(losses['psnr_1']) + 2.5 - np.mean(losses['psnr']))
         std_mults.append(std_mult)
         psnr_diffs.append(np.mean(losses['psnr_1']) + 2.5 - np.mean(losses['psnr']))
