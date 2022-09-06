@@ -174,13 +174,13 @@ def train(args):
             for z in range(args.num_z):
                 gens[:, z, :, :, :] = G(y)
 
-            fake_pred = torch.zeros(size=(y.shape[0], args.num_z), device=args.device)
+            fake_pred = torch.zeros(size=(y.shape[0], args.num_z, 94, 94), device=args.device)
             for k in range(y.shape[0]):
                 cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
                 cond[0, :, :, :] = y[k, :, :, :]
                 cond = cond.repeat(args.num_z, 1, 1, 1)
                 temp = D(input=gens[k], y=cond)
-                fake_pred[k] = temp[:, 0]
+                fake_pred[k, :, :, :] = temp[:, 0, :, :]
 
             avg_recon = torch.mean(gens, dim=1)
 
@@ -193,7 +193,7 @@ def train(args):
 
             std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
             adv_weight = 1e-2
-            g_loss = - adv_weight * torch.mean(gen_pred_loss)
+            g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += F.l1_loss(avg_recon, x)
             g_loss += - std_weight * torch.mean(torch.std(gens, dim=1), dim=(0, 1, 2, 3))
 
@@ -224,9 +224,9 @@ def train(args):
                 y = y.to(args.device)
                 x = x.to(args.device)
 
-                gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
+                gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
-                for z in range(args.num_z):
+                for z in range(8):
                     gens[:, z, :, :, :] = G(y)
 
                 avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
