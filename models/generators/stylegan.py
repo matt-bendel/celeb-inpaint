@@ -113,4 +113,4 @@ class Decoder(nn.Module):
             else:
                 out = conv_block(out, mid_input=residual, noise_std=noise_std)
             trgb_out = trgb(out, skip=trgb_out)
-        return
+        return trgb_out
