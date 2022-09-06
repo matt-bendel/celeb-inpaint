@@ -297,8 +297,8 @@ def train(args):
 
         send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif.gif")
 
-        save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', args.model_num)
-        save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', args.model_num)
+        save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
+        save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', 0)
 
         mu_0 = 1e-2
         std_mult += mu_0 * (np.mean(losses['psnr_1']) + 2.5 - np.mean(losses['psnr']))

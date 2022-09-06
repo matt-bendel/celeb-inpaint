@@ -5,7 +5,7 @@ import numpy as np
 
 
 # THIS FILE CONTAINTS UTILITY FUNCTIONS FOR OUR GAN AND A WRAPPER CLASS FOR THE GENERATOR
-def load_best_gan(args, model_num):
+def load_best_gan(args, model_num=0):
     from utils.prepare_models import build_model
     checkpoint_file_gen = pathlib.Path(
         f'{args.checkpoint_dir}/generator_best_model.pt')
