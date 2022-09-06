@@ -1,7 +1,7 @@
 import torch
 
 from models.generators.our_gen import GeneratorModel
-from models.discriminators.patch_disc import DiscriminatorModel
+from models.discriminators.patch_disc import PatchDisc
 
 
 def build_model(args):
@@ -15,7 +15,7 @@ def build_model(args):
 
 
 def build_discriminator(args):
-    model = DiscriminatorModel(
+    model = PatchDisc(
         input_nc=args.in_chans*2
     ).to(torch.device('cuda'))
 
