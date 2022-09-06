@@ -4,7 +4,7 @@ from torch import nn
 class PatchDisc(nn.Module):
     # initializers
     def __init__(self, d=64):
-        super(discriminator, self).__init__()
+        super(PatchDisc, self).__init__()
         self.conv1 = nn.Conv2d(6, d, 4, 2, 1)
         self.conv2 = nn.Conv2d(d, d * 2, 4, 2, 1)
         self.conv2_bn = nn.BatchNorm2d(d * 2)
