@@ -253,8 +253,8 @@ def train(args):
 
                     place = 1
 
-                    for r in range(args.num_z):
-                        gif_im(x[ind, :, :, :], gens[ind, r, :, :, :] * std[0, :, None, None] + mean[0, :, None, None], place, 'image')
+                    for r in range(8):
+                        gif_im(x[ind, :, :, :], gens[ind, r, :, :, :] * std[ind, :, None, None] + mean[ind, :, None, None], place, 'image')
                         place += 1
 
                     generate_gif(args, 'image', ind)
