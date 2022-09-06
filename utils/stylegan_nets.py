@@ -1,3 +1,8 @@
+from torch import nn
+import torch
+import math
+from torch.nn import functional as F
+
 class EqualConv2d(nn.Module):
     def __init__(self, in_channel, out_channel, kernel_size, sampling='none'):
         super().__init__()
