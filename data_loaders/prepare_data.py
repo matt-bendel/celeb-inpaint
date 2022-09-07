@@ -34,6 +34,7 @@ class DataTransform:
         plt.savefig(f'mask_{self.args.R}.png')
         plt.close()
         self.mask = torch.tensor(np.reshape(arr, (128, 128)), dtype=torch.float).repeat(3, 1, 1)
+        torch.save(self.mask, 'mast.pt')
 
     def __call__(self, gt_im):
         mean = torch.tensor([0.5, 0.5, 0.5])
