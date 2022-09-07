@@ -161,8 +161,7 @@ def train(args):
                 # Gradient penalty
                 gradient_penalty = compute_gradient_penalty(D, x.data, x_hat.data, args, y.data)
 
-                d_loss = torch.mean(fake_pred) - torch.mean(
-                    real_pred) + 10 * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
+                d_loss = fake_pred.mean() - real_pred.mean() + 10 * gradient_penalty + 0.001 * (real_pred ** 2).mean()
 
                 d_loss.backward()
                 opt_D.step()
