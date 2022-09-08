@@ -95,7 +95,7 @@ class Unet_Discriminator(nn.Module):
         # Architecture
         self.arch = D_unet_arch(self.ch, self.attention , out_channel_multiplier = self.out_channel_multiplier  )[resolution]
 
-        self.unconditional = kwargs["unconditional"]
+        self.unconditional = True
 
         # Which convs, batchnorms, and linear layers to use
         # No option to turn off SN in D right now
@@ -162,7 +162,7 @@ class Unet_Discriminator(nn.Module):
         # Embedding for projection discrimination
         #if not kwargs["agnostic_unet"] and not kwargs["unconditional"]:
         #    self.embed = self.which_embedding(self.n_classes, self.arch['out_channels'][-1]+extra)
-        if not kwargs["unconditional"]:
+        if not self.unconditional:
             self.embed_middle = self.which_embedding(self.n_classes, 16*self.ch)
             self.embed = self.which_embedding(self.n_classes, self.arch['out_channels'][-1])
 
