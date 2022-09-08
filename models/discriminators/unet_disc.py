@@ -1,6 +1,7 @@
 from torch import nn
 import torch
 import math
+import functools
 from torch.nn import functional as F
 
 # Discriminator architecture, same paradigm as G's above
