@@ -129,9 +129,16 @@ class Bias(nn.Module):
     def forward(self, x, **kwargs):
         return x + self.bias
 
+class InstanceNormKwargs(nn.Module):
+    def __init__(self, channels):
+        super().__init__()
+        self.instance_norm = torch.nn.InstanceNorm2d(channels, affine=True),
+
+    def forward(self, x, **kwargs):
+        return self.instance_norm(x)
 
 norms_factory = {
-    'instance': lambda channels: torch.nn.InstanceNorm2d(channels, affine=True),
+    'instance': lambda channels: InstanceNormKwargs(channels),
     'batch': lambda channels: torch.nn.BatchNorm2d(channels, affine=True),
     'bias': lambda channels: Bias(channels)
 }
