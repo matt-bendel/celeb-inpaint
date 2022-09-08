@@ -1,3 +1,7 @@
+import torch
+from torch import nn
+from torch.nn import functional as F
+
 class GeneratorBlock(nn.Module):
     def __init__(self, latent_dim, input_channels=3, filters=3, upsample=True, upsample_rgb=True, rgba=False):
         super().__init__()
