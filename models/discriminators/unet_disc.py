@@ -714,7 +714,7 @@ class Unet_Discriminator(nn.Module):
         h = torch.cat([input, label], dim=1)
 
         residual_features = []
-        residual_features.append(x)
+        residual_features.append(input)
         # Loop over blocks
 
         for index, blocklist in enumerate(self.blocks[:-1]):
