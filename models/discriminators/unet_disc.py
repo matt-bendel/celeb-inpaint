@@ -3,7 +3,7 @@ import torch
 import math
 import functools
 from torch.nn import functional as F
-from models.discriminators import layers
+import layers
 
 # Discriminator architecture, same paradigm as G's above
 def D_arch(ch=64, attention='64',ksize='333333', dilation='111111'):
