@@ -96,7 +96,7 @@ class Discriminator(nn.Module):
         blocks = []
         filters = [num_init_filters] + [(network_capacity) * (2 ** i) for i in range(num_layers + 1)]
 
-        set_fmap_max = partial(min, fmap_max)
+        set_fmap_max = 512
         filters = list(map(set_fmap_max, filters))
         filters[-1] = filters[-2]
 
