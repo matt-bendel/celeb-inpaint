@@ -158,14 +158,11 @@ def train(args):
                 real_pred = D(input=x, label=y)
                 fake_pred = D(input=x_hat, label=y)
 
-                print(fake_pred.shape)
-                exit()
-
                 # Gradient penalty
                 gradient_penalty = compute_gradient_penalty(D, x.data, x_hat.data, args, y.data)
+                real_pred_sq = real_pred ** 2
 
-                d_loss = torch.mean(fake_pred) - torch.mean(
-                    real_pred) + 10 * gradient_penalty + 0.001 * torch.mean(real_pred ** 2)
+                d_loss = fake_pred.mean() - real_pred.mean() + 10 * gradient_penalty + 0.001 * real_pred_sq.mean()
 
                 d_loss.backward()
                 opt_D.step()

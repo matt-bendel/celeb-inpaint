@@ -3,7 +3,7 @@ import torch
 from models.generators.our_gen import GeneratorModel
 from models.generators.stylegan import StyleGAN
 from models.discriminators.patch_disc_2 import PatchDisc
-from models.generators.stylegan2 import Discriminator
+from models.discriminators.unet_disc import Unet_Discriminator
 
 
 def build_model(args):
@@ -18,7 +18,7 @@ def build_model(args):
 
 
 def build_discriminator(args):
-    model = Discriminator(
+    model = Unet_Discriminator(
         # input_nc=args.in_chans*2
     ).to(torch.device('cuda'))
 
