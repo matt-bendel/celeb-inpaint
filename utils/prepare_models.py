@@ -3,7 +3,7 @@ import torch
 from models.generators.our_gen import GeneratorModel
 from models.generators.stylegan import StyleGAN
 from models.discriminators.patch_disc_2 import PatchDisc
-from models.generators.stylegan2 import Generator, Discriminator
+from models.generators.stylegan2 import Discriminator
 
 
 def build_model(args):
@@ -12,7 +12,7 @@ def build_model(args):
     #     out_chans=args.out_chans,
     #     latent_size=args.latent_size
     # ).to(torch.device('cuda'))
-    model = Generator().to(torch.device('cuda'))
+    model = StyleGANå().to(torch.device('cuda'))
 
     return model
 
