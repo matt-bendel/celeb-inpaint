@@ -64,9 +64,9 @@ class ToRGB(nn.Module):
         else:
             self.upsample = None
         self.conv = []
-        self.conv.extend([ConvLayer(in_channels, in_channels, 3, norm_type='bias', noise_injection_type='none')] * (
+        self.conv.extend([ConvLayer(in_channels, in_channels, 3, norm_type='instance', noise_injection_type='none')] * (
                 num_layers - 1))
-        self.conv.append(ConvLayer(in_channels, 3, 1, activation=False, norm_type='bias', noise_injection_type='none'))
+        self.conv.append(ConvLayer(in_channels, 3, 1, activation=False, norm_type='instance', noise_injection_type='none'))
         self.conv = nn.Sequential(*self.conv)
 
     def forward(self, x, skip):
