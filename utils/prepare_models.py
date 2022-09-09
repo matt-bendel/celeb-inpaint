@@ -18,7 +18,7 @@ def build_model(args):
 
 
 def build_discriminator(args):
-    model = Unet_Discriminator(
+    model = PatchDisc(
         # input_nc=args.in_chans*2
     ).to(torch.device('cuda'))
 
