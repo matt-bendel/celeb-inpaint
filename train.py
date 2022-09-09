@@ -296,7 +296,7 @@ def train(args):
         save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
         print(save_str_2)
 
-        if (epoch + 1) % 1 == 0:
+        if (epoch + 1) % 5 == 0:
             send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif_2.gif")
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
