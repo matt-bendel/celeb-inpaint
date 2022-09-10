@@ -138,7 +138,7 @@ def get_metrics(args, G, test_loader):
 
                     for r in range(32):
                         gif_im(x[j, :, :, :],
-                               gens[j, r, :, :, :] * std[ind, :, None, None] + mean[ind, :, None, None], place,
+                               gens[j, r, :, :, :] * std[j, :, None, None] + mean[j, :, None, None], place,
                                'image')
                         place += 1
 
