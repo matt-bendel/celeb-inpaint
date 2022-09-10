@@ -15,8 +15,8 @@ from data_loaders.prepare_data import create_data_loaders
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from wrappers.our_gen_wrapper import load_best_gan
-from evaluation_scripts.cfid.embeddings import InceptionEmbedding
-from evaluation_scripts.cfid.cfid_metric import CFIDMetric
+# from evaluation_scripts.cfid.embeddings import InceptionEmbedding
+# from evaluation_scripts.cfid.cfid_metric import CFIDMetric
 
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
@@ -114,19 +114,19 @@ def get_metrics(args, G, test_loader):
     print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"])}')
 
 
-def get_cfid(args, G, test_loader):
-    print("GETTING INCEPTION EMBEDDING")
-    inception_embedding = InceptionEmbedding(parallel=True)
-
-    print("GETTING DATA LOADERS")
-    cfid_metric = CFIDMetric(gan=G,
-                             loader=test_loader,
-                             image_embedding=inception_embedding,
-                             condition_embedding=inception_embedding,
-                             cuda=True,
-                             args=args)
-
-    print('CFID: ', cfid_metric.get_cfid_torch())
+# def get_cfid(args, G, test_loader):
+#     print("GETTING INCEPTION EMBEDDING")
+#     inception_embedding = InceptionEmbedding(parallel=True)
+#
+#     print("GETTING DATA LOADERS")
+#     cfid_metric = CFIDMetric(gan=G,
+#                              loader=test_loader,
+#                              image_embedding=inception_embedding,
+#                              condition_embedding=inception_embedding,
+#                              cuda=True,
+#                              args=args)
+#
+#     print('CFID: ', cfid_metric.get_cfid_torch())
 
 
 if __name__ == '__main__':
