@@ -88,8 +88,7 @@ def get_metrics(args, G, test_loader):
         G.update_gen_status(val=True)
         with torch.no_grad():
             x, y, mean, std = data[0]
-            print(y.shape)
-            exit()
+
             mean = mean.cuda()
             std = std.cuda()
             y = y.to(args.device)
@@ -128,8 +127,8 @@ def get_metrics(args, G, test_loader):
                     fig.suptitle(f'Test Example {fig_count}')
                     ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     ax1.set_title('GT')
-                    ax1.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax1.set_title('y')
+                    ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax2.set_title('y')
                     ax3.imshow(avg[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     ax3.set_title('Avg. Recon')
                     plt.savefig(f'test_ims/im_{fig_count}.png')
