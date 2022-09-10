@@ -62,17 +62,17 @@ def gif_im(true, gen_im, index, type, disc_num=False):
     plt.close(fig)
 
 
-def generate_gif(args, type, ind):
+def generate_gif(args, type, ind, num):
     images = []
-    for i in range(32):
+    for i in range(num):
         images.append(iio.imread(f'gif_{type}_{i}.png'))
 
     iio.mimsave(f'variation_gif_{ind}.gif', images, duration=0.25)
 
-    for i in range(32):
+    for i in range(num):
         os.remove(f'gif_{type}_{i}.png')
 
-def get_metrics(args, G, test_loader):
+def get_metrics(args, G, test_loader, num_code):
     losses = {
         'psnr': [],
         'ssim': []
@@ -94,9 +94,9 @@ def get_metrics(args, G, test_loader):
             y = y.to(args.device)
             x = x.to(args.device)
 
-            gens = torch.zeros(size=(y.size(0), 32, args.in_chans, args.im_size, args.im_size),
+            gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
-            for z in range(32):
+            for z in range(num_code):
                 gens[:, z, :, :, :] = G(y)
 
             avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
@@ -114,35 +114,33 @@ def get_metrics(args, G, test_loader):
                     losses['psnr'] = []
                     losses['ssim'] = []
 
-                    num_rows = 1
-                    num_cols = 3
+                    if num_code == 32:
+                        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+                        ax1.set_xticks([])
+                        ax1.set_yticks([])
+                        ax2.set_xticks([])
+                        ax2.set_yticks([])
+                        ax3.set_xticks([])
+                        ax3.set_yticks([])
+                        fig.suptitle(f'Test Example {fig_count}')
+                        ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                        ax1.set_title('GT')
+                        ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                        ax2.set_title('y')
+                        ax3.imshow(avg[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                        ax3.set_title('Avg. Recon')
+                        plt.savefig(f'test_ims/im_{fig_count}.png')
+                        plt.close(fig)
 
-                    fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-                    ax1.set_xticks([])
-                    ax1.set_yticks([])
-                    ax2.set_xticks([])
-                    ax2.set_yticks([])
-                    ax3.set_xticks([])
-                    ax3.set_yticks([])
-                    fig.suptitle(f'Test Example {fig_count}')
-                    ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax1.set_title('GT')
-                    ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax2.set_title('y')
-                    ax3.imshow(avg[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax3.set_title('Avg. Recon')
-                    plt.savefig(f'test_ims/im_{fig_count}.png')
-                    plt.close(fig)
+                        place = 1
 
-                    place = 1
+                        for r in range(num_code):
+                            gif_im(x[j, :, :, :],
+                                   gens[j, r, :, :, :] * std[j, :, None, None] + mean[j, :, None, None], place,
+                                   'image')
+                            place += 1
 
-                    for r in range(32):
-                        gif_im(x[j, :, :, :],
-                               gens[j, r, :, :, :] * std[j, :, None, None] + mean[j, :, None, None], place,
-                               'image')
-                        place += 1
-
-                    generate_gif(args, 'image', fig_count)
+                        generate_gif(args, 'image', fig_count, num_code)
 
 
     print('RESULTS')
@@ -188,5 +186,7 @@ if __name__ == '__main__':
     G = load_best_gan(args)
 
     _, _, test_loader = create_data_loaders(args)
-    get_metrics(args, G, test_loader)
+    vals = [1, 2, 4, 8, 16, 32]
+    for val in vals:
+        get_metrics(args, G, test_loader, val)
     # get_cfid(args, G, test_loader)
