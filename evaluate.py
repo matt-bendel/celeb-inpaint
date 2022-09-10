@@ -46,6 +46,31 @@ def ssim(
 
     return ssim
 
+def gif_im(true, gen_im, index, type, disc_num=False):
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    ax1.set_xticks([])
+    ax1.set_yticks([])
+    ax2.set_xticks([])
+    ax2.set_yticks([])
+    fig.suptitle('Dev Example')
+    ax1.imshow(true.cpu().numpy().transpose(1, 2, 0))
+    ax1.set_title('GT')
+    ax2.imshow(gen_im.cpu().numpy().transpose(1, 2, 0))
+    ax2.set_title(f'Z {index}')
+
+    plt.savefig(f'gif_{type}_{index - 1}.png')
+    plt.close(fig)
+
+
+def generate_gif(args, type, ind):
+    images = []
+    for i in range(32):
+        images.append(iio.imread(f'gif_{type}_{i}.png'))
+
+    iio.mimsave(f'variation_gif_{ind}.gif', images, duration=0.25)
+
+    for i in range(32):
+        os.remove(f'gif_{type}_{i}.png')
 
 def get_metrics(args, G, test_loader):
     losses = {
@@ -63,6 +88,8 @@ def get_metrics(args, G, test_loader):
         G.update_gen_status(val=True)
         with torch.no_grad():
             x, y, mean, std = data[0]
+            print(y.shape)
+            exit()
             mean = mean.cuda()
             std = std.cuda()
             y = y.to(args.device)
@@ -107,6 +134,16 @@ def get_metrics(args, G, test_loader):
                     ax3.set_title('Avg. Recon')
                     plt.savefig(f'test_ims/im_{fig_count}.png')
                     plt.close(fig)
+
+                    place = 1
+
+                    for r in range(32):
+                        gif_im(x[j, :, :, :],
+                               gens[j, r, :, :, :] * std[ind, :, None, None] + mean[ind, :, None, None], place,
+                               'image')
+                        place += 1
+
+                    generate_gif(args, 'image', fig_count)
 
 
     print('RESULTS')
