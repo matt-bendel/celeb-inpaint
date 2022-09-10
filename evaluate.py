@@ -67,7 +67,7 @@ def generate_gif(args, type, ind, num):
     for i in range(num):
         images.append(iio.imread(f'gif_{type}_{i}.png'))
 
-    iio.mimsave(f'variation_gif_{ind}.gif', images, duration=0.25)
+    iio.mimsave(f'test_ims/variation_gif_{ind}.gif', images, duration=0.25)
 
     for i in range(num):
         os.remove(f'gif_{type}_{i}.png')
