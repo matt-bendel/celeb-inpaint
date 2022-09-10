@@ -58,6 +58,7 @@ def get_metrics(args, G, test_loader):
     }
 
     total = 0
+    fig_count = 0
     for i, data in enumerate(test_loader):
         G.update_gen_status(val=True)
         with torch.no_grad():
@@ -67,23 +68,46 @@ def get_metrics(args, G, test_loader):
             y = y.to(args.device)
             x = x.to(args.device)
 
-            gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
+            gens = torch.zeros(size=(y.size(0), 32, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
-            for z in range(128):
+            for z in range(32):
                 gens[:, z, :, :, :] = G(y)
 
             avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
             x = x * std[:, :, None, None] + mean[:, :, None, None]
+            y_unnorm = y * std[:, :, None, None] + mean[:, :, None, None]
 
             for j in range(y.size(0)):
                 total += 1
                 losses['ssim'].append(ssim(x[j].cpu().numpy(), avg[j].cpu().numpy()))
                 losses['psnr'].append(psnr(x[j].cpu().numpy(), avg[j].cpu().numpy()))
-                if total % 100 == 0:
+                if total % 50 == 0:
+                    fig_count += 1
                     means['psnr'].append(np.mean(losses['psnr']))
                     means['ssim'].append(np.mean(losses['ssim']))
                     losses['psnr'] = []
                     losses['ssim'] = []
+
+                    num_rows = 1
+                    num_cols = 3
+
+                    fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
+                    ax1.set_xticks([])
+                    ax1.set_yticks([])
+                    ax2.set_xticks([])
+                    ax2.set_yticks([])
+                    ax3.set_xticks([])
+                    ax3.set_yticks([])
+                    fig.suptitle(f'Test Example {fig_count}')
+                    ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax1.set_title('GT')
+                    ax1.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax1.set_title('y')
+                    ax3.imshow(avg[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax3.set_title('Avg. Recon')
+                    plt.savefig(f'test_ims/im_{fig_count}.png')
+                    plt.close(fig)
+
 
     print('RESULTS')
     print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"])}')
@@ -122,17 +146,6 @@ if __name__ == '__main__':
     np.random.seed(0)
     torch.manual_seed(0)
 
-    if not args.MSE and not args.L1:
-        args.model_num = 1
-    elif args.MSE and not args.VAR:
-        args.model_num = 2
-    elif args.MSE and args.VAR:
-        args.model_num = 3
-    else:
-        args.model_num = 4
-
-    print(f'MODEL NUM: {args.model_num}')
-
     args.in_chans = 3
     args.out_chans = 3
 
@@ -140,4 +153,4 @@ if __name__ == '__main__':
 
     _, _, test_loader = create_data_loaders(args)
     get_metrics(args, G, test_loader)
-    get_cfid(args, G, test_loader)
+    # get_cfid(args, G, test_loader)
