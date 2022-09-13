@@ -25,11 +25,10 @@ class DataTransform:
         np.random.seed(0)
 
         total = 128 * 128
-        n = total // self.args.R
+        # n = total // self.args.R
 
-        arr = np.zeros(total)
-        arr[:n] = 1
-        np.random.shuffle(arr)
+        arr = np.zeros((128, 128))
+        arr[128 // 4: 3 *128//4, 128 // 4: 3 *128//4] = 1
         plt.imshow(np.reshape(arr, (128, 128)), cmap='viridis')
         plt.savefig(f'mask_{self.args.R}.png')
         plt.close()
@@ -42,7 +41,7 @@ class DataTransform:
         gt = (gt_im - mean[:, None, None]) / std[:, None, None]
         masked_im = gt * self.mask
 
-        return gt, masked_im, mean, std
+        return gt, masked_im, mean, std, self.mask
 
 
 

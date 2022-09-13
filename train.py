@@ -142,7 +142,7 @@ def train(args):
 
         for i, data in enumerate(train_loader):
             G.update_gen_status(val=False)
-            x, y, mean, std = data[0]
+            x, y, mean, std, mask = data[0]
             y = y.cuda()
             x = x.cuda()
             mean = mean.cuda()
@@ -153,7 +153,7 @@ def train(args):
                 for param in D.parameters():
                     param.grad = None
 
-                x_hat = G(y)
+                x_hat = G(y, x=x, mask=mask)
 
                 real_pred = D(input=x, label=y)
                 fake_pred = D(input=x_hat, label=y)
@@ -173,7 +173,7 @@ def train(args):
             gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(args.num_z):
-                gens[:, z, :, :, :] = G(y)
+                gens[:, z, :, :, :] = G(yG, x=x, mask=mask)
 
             fake_pred = torch.zeros(size=(y.shape[0], args.num_z, fake_pred.shape[-1], fake_pred.shape[-1]), device=args.device)
             for k in range(y.shape[0]):
@@ -193,7 +193,7 @@ def train(args):
             avg_recon = avg_recon * std[:, :, None, None] + mean[:, :, None, None]
 
             std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-5
+            adv_weight = 1e-3
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += F.l1_loss(avg_recon, x)
             g_loss += - std_weight * torch.mean(torch.std(gens, dim=1), dim=(0, 1, 2, 3))
@@ -219,16 +219,17 @@ def train(args):
         for i, data in enumerate(dev_loader):
             G.update_gen_status(val=True)
             with torch.no_grad():
-                x, y, mean, std = data[0]
+                x, y, mean, std, mask = data[0]
                 mean = mean.cuda()
                 std = std.cuda()
+                mask = mask.cuda()
                 y = y.to(args.device)
                 x = x.to(args.device)
 
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y)
+                    gens[:, z, :, :, :] = G(y, x=x, mask=mask)
 
                 avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
                 x = x * std[:, :, None, None] + mean[:, :, None, None]
