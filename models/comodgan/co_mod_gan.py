@@ -166,7 +166,7 @@ class G_synthesis_co_mod_gan(nn.Module):
         self.make_encoder = make_encoder
 
         # Main layers.
-        c_in = num_channels+1
+        c_in = num_channels*2
         self.E = self.make_encoder(channel_in=c_in)
 
         # Single convolution layer with all the bells and whistles.
