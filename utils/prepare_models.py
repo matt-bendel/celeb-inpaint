@@ -13,7 +13,7 @@ def build_model(args):
     #     out_chans=args.out_chans,
     #     latent_size=args.latent_size
     # ).to(torch.device('cuda'))
-    model = StyleGAN().to(torch.device('cuda'))
+    model = Generator(128).to(torch.device('cuda'))
 
     return model
 
