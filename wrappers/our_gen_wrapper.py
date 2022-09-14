@@ -114,7 +114,7 @@ class GANWrapper:
         # num_vectors = y.size(0)
         # z = self.get_noise(num_vectors, noise_var)
         # samples = self.gen(torch.cat([y, z], dim=1))
-        samples = self.gen(x, mask, [torch.randn(batch, 512, device=y.device)], return_latents=False)
+        samples = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False)
         # samples = self.data_consistency(samples, y)
 
         return samples
