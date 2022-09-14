@@ -262,7 +262,7 @@ class G_synthesis_co_mod_gan(nn.Module):
             block = getattr(self, 'G_%dx%d' % (2**res, 2**res))
             x, y = block(x, y, dlatents_in, x_global, E_features)
         raw_out = y
-        images_out = y * masks_in + images_in * (1-masks_in)
+        images_out = y * (1 - masks_in) + images_in
         return images_out, raw_out
 
 #----------------------------------------------------------------------------
