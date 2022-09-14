@@ -146,7 +146,7 @@ class G_synthesis_co_mod_gan(nn.Module):
                     Es.append(
                             (
                                 '%dx%d_0' % (2**res, 2**res),
-                                E_fromrgb(res, channel_in)
+                                E_fromrgb(res, num_channels*2)
                                 ))
                 Es.append(
                         (
@@ -167,7 +167,7 @@ class G_synthesis_co_mod_gan(nn.Module):
 
         # Main layers.
         c_in = num_channels*2
-        self.E = self.make_encoder(channel_in=c_in)
+        self.E = self.make_encoder(channel_in=6)
 
         # Single convolution layer with all the bells and whistles.
         # Building blocks for main layers.
