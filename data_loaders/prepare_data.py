@@ -27,8 +27,8 @@ class DataTransform:
         total = 128 * 128
         # n = total // self.args.R
 
-        arr = np.zeros((128, 128))
-        arr[128 // 4: 3 *128//4, 128 // 4: 3 *128//4] = 1
+        arr = np.ones((128, 128))
+        arr[128 // 4: 3 *128//4, 128 // 4: 3 *128//4] = 0
         plt.imshow(np.reshape(arr, (128, 128)), cmap='viridis')
         plt.savefig(f'mask_{self.args.R}.png')
         plt.close()
