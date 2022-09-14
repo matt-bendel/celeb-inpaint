@@ -145,6 +145,7 @@ def train(args):
             x, y, mean, std, mask = data[0]
             y = y.cuda()
             x = x.cuda()
+            mask = mask.cuda()
             mean = mean.cuda()
             std = std.cuda()
             fake_pred = False
