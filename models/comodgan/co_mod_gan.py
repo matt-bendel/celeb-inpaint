@@ -418,7 +418,7 @@ class Discriminator(BaseNetwork):
         # stddev = stddev.repeat(group_size, 1, height, width)
         # out = torch.cat([out, stddev], 1)
         out = self.Conv4x4(out)
-        out = out.view(batch, -1)
+        out = out.view(input.size(0), -1)
         out = self.Dense0(out)
         out = self.Output(out)
         return out
