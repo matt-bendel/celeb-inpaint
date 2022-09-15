@@ -345,7 +345,7 @@ class Discriminator(BaseNetwork):
         # Building blocks for main layers.
         super().__init__()
         layers = []
-        c_in = num_channels+1
+        c_in = num_channels*2
         layers.append(
                 (
                     "ToRGB",
