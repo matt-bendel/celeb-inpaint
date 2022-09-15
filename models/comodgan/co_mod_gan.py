@@ -167,7 +167,7 @@ class G_synthesis_co_mod_gan(nn.Module):
 
         # Main layers.
         c_in = num_channels*2
-        self.E = self.make_encoder(channel_in=6)
+        self.E = self.make_encoder(channel_in=3)
 
         # Single convolution layer with all the bells and whistles.
         # Building blocks for main layers.
@@ -253,7 +253,7 @@ class G_synthesis_co_mod_gan(nn.Module):
                     Block(res))
 
     def forward(self, images_in, masks_in, dlatents_in):
-        y = torch.cat([1-masks_in - 0.5, images_in * (1-masks_in)], 1)
+        y = images_in * masks_in
         E_features = {}
         x_global, E_features = self.E((y, E_features))
         x = x_global
@@ -262,7 +262,7 @@ class G_synthesis_co_mod_gan(nn.Module):
             block = getattr(self, 'G_%dx%d' % (2**res, 2**res))
             x, y = block(x, y, dlatents_in, x_global, E_features)
         raw_out = y
-        images_out = y * (1 - masks_in) + images_in * masks_in
+        images_out = raw_out * (1 - masks_in) + images_in * masks_in
         return images_out, raw_out
 
 #----------------------------------------------------------------------------
