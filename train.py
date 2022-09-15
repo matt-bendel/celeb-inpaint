@@ -61,7 +61,9 @@ def compute_gradient_penalty(D, real_samples, fake_samples, args, y):
     # Get random interpolation between real and fake samples
     interpolates = (alpha * real_samples + ((1 - alpha) * fake_samples)).requires_grad_(True)
     d_interpolates = D(input=interpolates, label=y)
-    fake = Tensor(real_samples.shape[0], 1, d_interpolates.shape[-1], d_interpolates.shape[-1]).fill_(1.0).to(args.device)
+    # fake = Tensor(real_samples.shape[0], 1, d_interpolates.shape[-1], d_interpolates.shape[-1]).fill_(1.0).to(args.device)
+
+    fake = Tensor(real_samples.shape[0], 1).fill_(1.0).to(args.device)
     # Get gradient w.r.t. interpolates
     gradients = autograd.grad(
         outputs=d_interpolates,
@@ -176,13 +178,21 @@ def train(args):
             for z in range(args.num_z):
                 gens[:, z, :, :, :] = G(y, x=x, mask=mask)
 
-            fake_pred = torch.zeros(size=(y.shape[0], args.num_z, fake_pred.shape[-1], fake_pred.shape[-1]), device=args.device)
+            # fake_pred = torch.zeros(size=(y.shape[0], args.num_z, fake_pred.shape[-1], fake_pred.shape[-1]), device=args.device)
+            # for k in range(y.shape[0]):
+            #     cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
+            #     cond[0, :, :, :] = y[k, :, :, :]
+            #     cond = cond.repeat(args.num_z, 1, 1, 1)
+            #     temp = D(input=gens[k], label=cond)
+            #     fake_pred[k, :, :, :] = temp[:, 0, :, :]
+
+            fake_pred = torch.zeros(size=(y.shape[0], args.num_z), device=args.device)
             for k in range(y.shape[0]):
                 cond = torch.zeros(1, gens.shape[2], gens.shape[3], gens.shape[4])
                 cond[0, :, :, :] = y[k, :, :, :]
                 cond = cond.repeat(args.num_z, 1, 1, 1)
                 temp = D(input=gens[k], label=cond)
-                fake_pred[k, :, :, :] = temp[:, 0, :, :]
+                fake_pred[k] = temp[:, 0]
 
             avg_recon = torch.mean(gens, dim=1)
 

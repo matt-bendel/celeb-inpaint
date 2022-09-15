@@ -326,99 +326,99 @@ class Generator(BaseNetwork):
 #----------------------------------------------------------------------------
 # CoModGAN discriminator.
 
-# class Discriminator(BaseNetwork):
-#     def __init__(
-#             self,
-#             resolution
-#     ):
-#         fmap_base = 16 << 10
-#         fmap_decay = 1.0
-#         fmap_max = 512
-#         fmap_min = 1
-#         num_channels = 3
-#
-#         resolution_log2 = int(np.log2(resolution))
-#         assert resolution == 2**resolution_log2 and resolution >= 4
-#         def nf(stage): return np.clip(int(fmap_base / (2.0 ** (stage * fmap_decay))), fmap_min, fmap_max)
-#         #assert architecture in ['orig', 'skip', 'resnet']
-#
-#         # Building blocks for main layers.
-#         super().__init__()
-#         layers = []
-#         c_in = num_channels+1
-#         layers.append(
-#                 (
-#                     "ToRGB",
-#                     ConvLayer(
-#                         c_in,
-#                         nf(resolution_log2-1),
-#                         kernel_size=3,
-#                         activate=True)
-#                     )
-#                 )
-#
-#         class Block(nn.Module):
-#             def __init__(self, res):
-#                 super().__init__()
-#                 self.Conv0 = ConvLayer(
-#                         nf(res-1),
-#                         nf(res-1),
-#                         kernel_size=3,
-#                         activate=True)
-#                 self.Conv1_down = ConvLayer(
-#                         nf(res-1),
-#                         nf(res-2),
-#                         kernel_size=3,
-#                         downsample=True,
-#                         blur_kernel=[1,3,3,1],
-#                         activate=True)
-#                 self.Skip = ConvLayer(
-#                         nf(res-1),
-#                         nf(res-2),
-#                         kernel_size=1,
-#                         downsample=True,
-#                         blur_kernel=[1,3,3,1],
-#                         activate=False,
-#                         bias=False)
-#             def forward(self, x):
-#                 t = x
-#                 x = self.Conv0(x)
-#                 x = self.Conv1_down(x)
-#                 t = self.Skip(t)
-#                 x = (x + t) * (1/np.sqrt(2))
-#                 return x
-#         # Main layers.
-#         for res in range(resolution_log2, 2, -1):
-#             layers.append(
-#                     (
-#                         '%dx%d' % (2**res, 2**res),
-#                         Block(res)
-#                         )
-#                     )
-#         self.convs = nn.Sequential(OrderedDict(layers))
-#
-#         self.Conv4x4 = ConvLayer(nf(1), nf(1), kernel_size=3, activate=True)
-#         self.Dense0 = EqualLinear(nf(1)*4*4, nf(0), activation='fused_lrelu')
-#         self.Output = EqualLinear(nf(0), 1)
-#
-#     def forward(self, masked_ims, ims):
-#         y = torch.cat([ims, masked_ims], 1)
-#         out = self.convs(y)
-#         #print(out.shape)
-#         #pdb.set_trace()
-#         # stddev = out.view(
-#         #     group_size,
-#         #     -1,
-#         #     self.mbstd_num_features,
-#         #     channel // self.mbstd_num_features,
-#         #     height, width
-#         # )
-#         # stddev = torch.sqrt(stddev.var(0, unbiased=False) + 1e-8)
-#         # stddev = stddev.mean([2, 3, 4], keepdims=True).squeeze(2)
-#         # stddev = stddev.repeat(group_size, 1, height, width)
-#         # out = torch.cat([out, stddev], 1)
-#         out = self.Conv4x4(out)
-#         out = out.view(batch, -1)
-#         out = self.Dense0(out)
-#         out = self.Output(out)
-#         return out
+class Discriminator(BaseNetwork):
+    def __init__(
+            self,
+            resolution
+    ):
+        fmap_base = 16 << 10
+        fmap_decay = 1.0
+        fmap_max = 512
+        fmap_min = 1
+        num_channels = 3
+
+        resolution_log2 = int(np.log2(resolution))
+        assert resolution == 2**resolution_log2 and resolution >= 4
+        def nf(stage): return np.clip(int(fmap_base / (2.0 ** (stage * fmap_decay))), fmap_min, fmap_max)
+        #assert architecture in ['orig', 'skip', 'resnet']
+
+        # Building blocks for main layers.
+        super().__init__()
+        layers = []
+        c_in = num_channels+1
+        layers.append(
+                (
+                    "ToRGB",
+                    ConvLayer(
+                        c_in,
+                        nf(resolution_log2-1),
+                        kernel_size=3,
+                        activate=True)
+                    )
+                )
+
+        class Block(nn.Module):
+            def __init__(self, res):
+                super().__init__()
+                self.Conv0 = ConvLayer(
+                        nf(res-1),
+                        nf(res-1),
+                        kernel_size=3,
+                        activate=True)
+                self.Conv1_down = ConvLayer(
+                        nf(res-1),
+                        nf(res-2),
+                        kernel_size=3,
+                        downsample=True,
+                        blur_kernel=[1,3,3,1],
+                        activate=True)
+                self.Skip = ConvLayer(
+                        nf(res-1),
+                        nf(res-2),
+                        kernel_size=1,
+                        downsample=True,
+                        blur_kernel=[1,3,3,1],
+                        activate=False,
+                        bias=False)
+            def forward(self, x):
+                t = x
+                x = self.Conv0(x)
+                x = self.Conv1_down(x)
+                t = self.Skip(t)
+                x = (x + t) * (1/np.sqrt(2))
+                return x
+        # Main layers.
+        for res in range(resolution_log2, 2, -1):
+            layers.append(
+                    (
+                        '%dx%d' % (2**res, 2**res),
+                        Block(res)
+                        )
+                    )
+        self.convs = nn.Sequential(OrderedDict(layers))
+
+        self.Conv4x4 = ConvLayer(nf(1), nf(1), kernel_size=3, activate=True)
+        self.Dense0 = EqualLinear(nf(1)*4*4, nf(0), activation='fused_lrelu')
+        self.Output = EqualLinear(nf(0), 1)
+
+    def forward(self, input, label):
+        y = torch.cat([input, label], 1)
+        out = self.convs(y)
+        #print(out.shape)
+        #pdb.set_trace()
+        # stddev = out.view(
+        #     group_size,
+        #     -1,
+        #     self.mbstd_num_features,
+        #     channel // self.mbstd_num_features,
+        #     height, width
+        # )
+        # stddev = torch.sqrt(stddev.var(0, unbiased=False) + 1e-8)
+        # stddev = stddev.mean([2, 3, 4], keepdims=True).squeeze(2)
+        # stddev = stddev.repeat(group_size, 1, height, width)
+        # out = torch.cat([out, stddev], 1)
+        out = self.Conv4x4(out)
+        out = out.view(batch, -1)
+        out = self.Dense0(out)
+        out = self.Output(out)
+        return out
