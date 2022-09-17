@@ -99,9 +99,9 @@ def get_metrics(args, G, test_loader, num_code):
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(num_code):
-                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=1)
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=1)  * std[:, :, None, None] + mean[:, :, None, None]
 
-            avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
+            avg = torch.mean(gens, dim=1)
             x = x * std[:, :, None, None] + mean[:, :, None, None]
             y_unnorm = y * std[:, :, None, None] + mean[:, :, None, None]
 
@@ -140,7 +140,7 @@ def get_metrics(args, G, test_loader, num_code):
 
                         for r in range(num_code):
                             gif_im(x[j, :, :, :],
-                                   gens[j, r, :, :, :] * std[j, :, None, None] + mean[j, :, None, None], place,
+                                   gens[j, r, :, :, :], place,
                                    'image')
                             place += 1
 
