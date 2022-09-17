@@ -172,8 +172,8 @@ def train(args):
             for param in G.gen.parameters():
                 param.grad = None
 
-            x_hat = G(y, x=x, mask=mask)
-            fake_pred = D(input=x_hat, label=y, truncation=1)
+            x_hat = G(y, x=x, mask=mask, truncation=1)
+            fake_pred = D(input=x_hat, label=y)
 
             g_loss = - fake_pred.mean()
 
