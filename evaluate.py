@@ -75,7 +75,8 @@ def generate_gif(args, type, ind, num):
 def get_metrics(args, G, test_loader, num_code):
     losses = {
         'psnr': [],
-        'ssim': []
+        'ssim': [],
+        'apsd': []
     }
     means = {
         'psnr': [],
@@ -108,6 +109,7 @@ def get_metrics(args, G, test_loader, num_code):
                 total += 1
                 losses['ssim'].append(ssim(x[j].cpu().numpy(), avg[j].cpu().numpy()))
                 losses['psnr'].append(psnr(x[j].cpu().numpy(), avg[j].cpu().numpy()))
+                losses['apsd'].append(torch.std(gens[j, :, :, :, :], dim=0).mean().cpu().numpy())
                 if total % 50 == 0:
                     # continue
                     fig_count += 1
@@ -145,9 +147,10 @@ def get_metrics(args, G, test_loader, num_code):
                         generate_gif(args, 'image', fig_count, num_code)
 
 
-    print('RESULTS')
+    print(f'RESULTS for {num_code} code vectors')
     print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"]) / len(means["ssim"])}')
     print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"]) / len(means["ssim"])}')
+    print(f'APSD: {np.mean[losses["apsd"]]}')
 
 
 def get_cfid(args, G, test_loader):
