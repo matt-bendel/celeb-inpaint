@@ -110,11 +110,11 @@ class GANWrapper:
         # samples[:, :, inds[0], inds[1]] = masked_ims[:, :, inds[0], inds[1]]
         return samples * (1 - mask) + masked_ims
 
-    def __call__(self, y, noise_var=1, x=None, mask=None):
+    def __call__(self, y, noise_var=1, x=None, mask=None, truncation=None):
         # num_vectors = y.size(0)
         # z = self.get_noise(num_vectors, noise_var)
         # samples = self.gen(y)
-        samples = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False)
+        samples = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=truncation)
         # samples = self.data_consistency(samples, y, mask)
 
         return samples

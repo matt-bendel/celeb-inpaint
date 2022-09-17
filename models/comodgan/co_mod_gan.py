@@ -405,18 +405,20 @@ class Discriminator(BaseNetwork):
         y = torch.cat([input, label], 1)
         out = self.convs(y)
         #print(out.shape)
-        #pdb.set_trace()
-        # stddev = out.view(
-        #     group_size,
-        #     -1,
-        #     self.mbstd_num_features,
-        #     channel // self.mbstd_num_features,
-        #     height, width
-        # )
-        # stddev = torch.sqrt(stddev.var(0, unbiased=False) + 1e-8)
-        # stddev = stddev.mean([2, 3, 4], keepdims=True).squeeze(2)
-        # stddev = stddev.repeat(group_size, 1, height, width)
-        # out = torch.cat([out, stddev], 1)
+        # TODO: COMMENT OUT FOR US
+        pdb.set_trace()
+        stddev = out.view(
+            group_size,
+            -1,
+            self.mbstd_num_features,
+            channel // self.mbstd_num_features,
+            height, width
+        )
+        stddev = torch.sqrt(stddev.var(0, unbiased=False) + 1e-8)
+        stddev = stddev.mean([2, 3, 4], keepdims=True).squeeze(2)
+        stddev = stddev.repeat(group_size, 1, height, width)
+        out = torch.cat([out, stddev], 1)
+        # TODO: END COMMENT OUT
         out = self.Conv4x4(out)
         out = out.view(input.size(0), -1)
         out = self.Dense0(out)
