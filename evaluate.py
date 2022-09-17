@@ -185,8 +185,6 @@ if __name__ == '__main__':
     args.in_chans = 3
     args.out_chans = 3
 
-    args.truncation_psi = None
-
     G = load_best_gan(args)
 
     _, _, test_loader = create_data_loaders(args)

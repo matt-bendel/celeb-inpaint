@@ -208,7 +208,7 @@ def train(args):
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y, x=x, mask=mask)
+                    gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=1)
 
                 avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
                 x = x * std[:, :, None, None] + mean[:, :, None, None]
