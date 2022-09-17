@@ -32,6 +32,8 @@ def create_arg_parser():
     # LOGISTICAL ARGS
     parser.add_argument('--device', type=int, default=0,
                         help='Which device to train on. Use idx of cuda device or -1 for CPU')
+    parser.add_argument('--truncation-psi', default=None,
+                        help='Which device to train on. Use idx of cuda device or -1 for CPU')
     #TODO UPDATE EXPDIR
     parser.add_argument('--exp-dir', type=pathlib.Path,
                         default=pathlib.Path('/home/bendel.8/Git_Repos/celeb-inpaint/trained_models'),

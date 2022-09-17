@@ -154,14 +154,15 @@ class CFIDMetric:
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
                             total=len(self.loader)):
-            x, y, mean, std = data[0]
+            x, y, mean, std, mask = data[0]
             x = x.cuda()
             y = y.cuda()
+            mask = mask.cuda()
             mean = mean.cuda()
             std = std.cuda()
 
             with torch.no_grad():
-                recon = self.gan(y)
+                recon = self.gan(y, x=x, mask=mask, truncation=self.args.truncation_psi)
 
                 image = self._get_embed_im(recon, mean, std)
                 condition_im = self._get_embed_im(y, mean, std)

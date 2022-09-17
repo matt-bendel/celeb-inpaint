@@ -98,7 +98,7 @@ def get_metrics(args, G, test_loader, num_code):
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(num_code):
-                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None)
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=args.truncation_psi)
 
             avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
             x = x * std[:, :, None, None] + mean[:, :, None, None]
@@ -150,19 +150,19 @@ def get_metrics(args, G, test_loader, num_code):
     print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"]) / len(means["ssim"])}')
 
 
-# def get_cfid(args, G, test_loader):
-#     print("GETTING INCEPTION EMBEDDING")
-#     inception_embedding = InceptionEmbedding(parallel=True)
-#
-#     print("GETTING DATA LOADERS")
-#     cfid_metric = CFIDMetric(gan=G,
-#                              loader=test_loader,
-#                              image_embedding=inception_embedding,
-#                              condition_embedding=inception_embedding,
-#                              cuda=True,
-#                              args=args)
-#
-#     print('CFID: ', cfid_metric.get_cfid_torch())
+def get_cfid(args, G, test_loader):
+    print("GETTING INCEPTION EMBEDDING")
+    inception_embedding = InceptionEmbedding(parallel=True)
+
+    print("GETTING DATA LOADERS")
+    cfid_metric = CFIDMetric(gan=G,
+                             loader=test_loader,
+                             image_embedding=inception_embedding,
+                             condition_embedding=inception_embedding,
+                             cuda=True,
+                             args=args)
+
+    print('CFID: ', cfid_metric.get_cfid_torch())
 
 
 if __name__ == '__main__':
@@ -185,10 +185,12 @@ if __name__ == '__main__':
     args.in_chans = 3
     args.out_chans = 3
 
+    args.truncation_psi = None
+
     G = load_best_gan(args)
 
     _, _, test_loader = create_data_loaders(args)
     vals = [1, 2, 4, 8, 16, 32]
     for val in vals:
         get_metrics(args, G, test_loader, val)
-    # get_cfid(args, G, test_loader)
+    get_cfid(args, G, test_loader)
