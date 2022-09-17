@@ -160,7 +160,7 @@ class CFIDMetric:
             std = std.cuda()
 
             with torch.no_grad():
-                recon = self.gan(y, x=x, mask=mask, truncation=1)
+                recon = self.gan(y, x=x, mask=mask, truncation=None)
 
                 image = self._get_embed_im(recon, mean, std)
                 condition_im = self._get_embed_im(y, mean, std)
