@@ -404,11 +404,13 @@ class Discriminator(BaseNetwork):
     def forward(self, input, label):
         y = torch.cat([input, label], 1)
         out = self.convs(y)
+        batch, channel, height, width = out.shape
+        group_size = min(batch, 4)
         #print(out.shape)
         # TODO: COMMENT OUT FOR US
         # pdb.set_trace()
         stddev = out.view(
-            4,
+            group_size,
             -1,
             1,
             channel // 1,
@@ -416,7 +418,7 @@ class Discriminator(BaseNetwork):
         )
         stddev = torch.sqrt(stddev.var(0, unbiased=False) + 1e-8)
         stddev = stddev.mean([2, 3, 4], keepdims=True).squeeze(2)
-        stddev = stddev.repeat(4, 1, height, width)
+        stddev = stddev.repeat(group_size, 1, height, width)
         out = torch.cat([out, stddev], 1)
         # TODO: END COMMENT OUT
         out = self.Conv4x4(out)
