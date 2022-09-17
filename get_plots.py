@@ -44,17 +44,21 @@ def ssim(
 
     return ssim
 
-def gif_im(true, gen_im, index, type, disc_num=False):
-    fig, (ax1, ax2) = plt.subplots(1, 2)
+def gif_im(true, y, gen_im_ours, gen_im_comod, index, type, disc_num=False):
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4)
     ax1.set_xticks([])
     ax1.set_yticks([])
     ax2.set_xticks([])
     ax2.set_yticks([])
     fig.suptitle('Dev Example')
     ax1.imshow(true.cpu().numpy().transpose(1, 2, 0))
-    ax1.set_title('GT')
-    ax2.imshow(gen_im.cpu().numpy().transpose(1, 2, 0))
-    ax2.set_title(f'Z {index}')
+    ax1.set_title('x')
+    ax2.imshow(y.cpu().numpy().transpose(1, 2, 0))
+    ax2.set_title('y')
+    ax3.imshow(gen_im_ours.cpu().numpy().transpose(1, 2, 0))
+    ax3.set_title(f'cGAN (Ours) Z {index}')
+    ax4.imshow(gen_im_comod.cpu().numpy().transpose(1, 2, 0))
+    ax4.set_title(f'cGAN (CoModGAN, \psi=1) Z {index}')
 
     plt.savefig(f'gif_{type}_{index - 1}.png')
     plt.close(fig)
@@ -70,20 +74,13 @@ def generate_gif(args, type, ind, num):
     for i in range(num):
         os.remove(f'gif_{type}_{i}.png')
 
-def get_metrics(args, G, test_loader, num_code):
-    losses = {
-        'psnr': [],
-        'ssim': []
-    }
-    means = {
-        'psnr': [],
-        'ssim': []
-    }
-
+def get_plots(args, G_ours, G_comod, test_loader):
     total = 0
     fig_count = 0
+    num_code = 32
     for i, data in enumerate(test_loader):
-        G.update_gen_status(val=True)
+        G_ours.update_gen_status(val=True)
+        G_comod.update_gen_status(val=True)
         with torch.no_grad():
             x, y, mean, std, mask = data[0]
 
@@ -93,59 +90,55 @@ def get_metrics(args, G, test_loader, num_code):
             y = y.to(args.device)
             x = x.to(args.device)
 
-            gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
+            gens_ours = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
+            gens_comod_psi_1 = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
+                                    device=args.device)
             for z in range(num_code):
-                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None)
+                gens_ours[:, z, :, :, :] = G_ours(y, x=x, mask=mask, truncation=None) * std[:, :, None, None] + mean[:, :, None, None]
+                gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=1) * std[:, :, None, None] + mean[:, :, None, None]
 
-            avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
+            avg_ours = torch.mean(gens_ours, dim=1)
+            avg_comod_psi_1 = torch.mean(gens_comod_psi_1, dim=1)
             x = x * std[:, :, None, None] + mean[:, :, None, None]
             y_unnorm = y * std[:, :, None, None] + mean[:, :, None, None]
 
             for j in range(y.size(0)):
                 total += 1
-                losses['ssim'].append(ssim(x[j].cpu().numpy(), avg[j].cpu().numpy()))
-                losses['psnr'].append(psnr(x[j].cpu().numpy(), avg[j].cpu().numpy()))
-                if total % 50 == 0:
-                    continue
+
+                if total % 100 == 0:
                     fig_count += 1
-                    means['psnr'].append(np.mean(losses['psnr']))
-                    means['ssim'].append(np.mean(losses['ssim']))
-                    losses['psnr'] = []
-                    losses['ssim'] = []
 
-                    if num_code == 32:
-                        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-                        ax1.set_xticks([])
-                        ax1.set_yticks([])
-                        ax2.set_xticks([])
-                        ax2.set_yticks([])
-                        ax3.set_xticks([])
-                        ax3.set_yticks([])
-                        fig.suptitle(f'Test Example {fig_count}')
-                        ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                        ax1.set_title('GT')
-                        ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                        ax2.set_title('y')
-                        ax3.imshow(avg[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                        ax3.set_title('Avg. Recon')
-                        plt.savefig(f'test_ims/im_{fig_count}.png')
-                        plt.close(fig)
+                    fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4)
+                    ax1.set_xticks([])
+                    ax1.set_yticks([])
+                    ax2.set_xticks([])
+                    ax2.set_yticks([])
+                    ax3.set_xticks([])
+                    ax3.set_yticks([])
+                    ax4.set_xticks([])
+                    ax4.set_yticks([])
+                    fig.suptitle(f'Test Example {fig_count}')
+                    ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax1.set_title('x')
+                    ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax2.set_title('y')
+                    ax3.imshow(avg_ours[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax3.set_title('Avg. Recon (ours)')
+                    ax4.imshow(avg_comod_psi_1[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    ax4.set_title('Avg. Recon (CoModGAN, \psi = 1)')
+                    plt.savefig(f'test_ims/im_{fig_count}.png')
+                    plt.close(fig)
 
-                        place = 1
+                    place = 1
 
-                        for r in range(num_code):
-                            gif_im(x[j, :, :, :],
-                                   gens[j, r, :, :, :] * std[j, :, None, None] + mean[j, :, None, None], place,
-                                   'image')
-                            place += 1
+                    for r in range(num_code):
+                        gif_im(x[j, :, :, :], y[j, :, :, :],
+                               gens_ours[j, r, :, :, :], gens_comod_psi_1[j, r, :, :, :], place,
+                               'image')
+                        place += 1
 
-                        generate_gif(args, 'image', fig_count, num_code)
-
-
-    print('RESULTS')
-    print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"]) / len(means["ssim"])}')
-    print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"]) / len(means["ssim"])}')
+                    generate_gif(args, 'image', fig_count, num_code)
 
 
 if __name__ == '__main__':
@@ -168,10 +161,12 @@ if __name__ == '__main__':
     args.in_chans = 3
     args.out_chans = 3
 
-    G = load_best_gan(args)
+    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_ours'
+    G_ours = load_best_gan(args)
+
+    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_psi_1'
+    G_comod = load_best_gan(args)
 
     _, _, test_loader = create_data_loaders(args)
-    vals = [1, 2, 4, 8, 16, 32]
-    for val in vals:
-        get_metrics(args, G, test_loader, val)
-    # get_cfid(args, G, test_loader)
+
+    get_plots(args, G_ours, G_comod, test_loader)
