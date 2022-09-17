@@ -195,7 +195,7 @@ if __name__ == '__main__':
 
     _, _, test_loader = create_data_loaders(args)
     get_cfid(args, G, test_loader)
-    # vals = [1, 2, 4, 8, 16, 32]
-    vals = [32]
+    vals = [1, 2, 4, 8, 16, 32]
+    # vals = [32]
     for val in vals:
         get_metrics(args, G, test_loader, val)
