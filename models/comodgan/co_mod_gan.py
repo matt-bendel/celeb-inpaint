@@ -406,7 +406,7 @@ class Discriminator(BaseNetwork):
         out = self.convs(y)
         #print(out.shape)
         # TODO: COMMENT OUT FOR US
-        pdb.set_trace()
+        # pdb.set_trace()
         stddev = out.view(
             4,
             -1,
