@@ -15,8 +15,8 @@ from data_loaders.prepare_data import create_data_loaders
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from wrappers.our_gen_wrapper import load_best_gan
-# from evaluation_scripts.cfid.embeddings import InceptionEmbedding
-# from evaluation_scripts.cfid.cfid_metric import CFIDMetric
+from evaluation_scripts.cfid.embeddings import InceptionEmbedding
+from evaluation_scripts.cfid.cfid_metric import CFIDMetric
 
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
