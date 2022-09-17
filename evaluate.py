@@ -109,7 +109,7 @@ def get_metrics(args, G, test_loader, num_code):
                 losses['ssim'].append(ssim(x[j].cpu().numpy(), avg[j].cpu().numpy()))
                 losses['psnr'].append(psnr(x[j].cpu().numpy(), avg[j].cpu().numpy()))
                 if total % 50 == 0:
-                    continue
+                    # continue
                     fig_count += 1
                     means['psnr'].append(np.mean(losses['psnr']))
                     means['ssim'].append(np.mean(losses['ssim']))
