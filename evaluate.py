@@ -193,7 +193,8 @@ if __name__ == '__main__':
     G = load_best_gan(args)
 
     _, _, test_loader = create_data_loaders(args)
+    get_cfid(args, G, test_loader)
+    exit()
     vals = [1, 2, 4, 8, 16, 32]
     for val in vals:
         get_metrics(args, G, test_loader, val)
-    get_cfid(args, G, test_loader)
