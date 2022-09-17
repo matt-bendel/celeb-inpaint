@@ -121,6 +121,7 @@ def get_metrics(args, G, test_loader, num_code):
                     losses['ssim'] = []
 
                     if num_code == 32:
+                        continue
                         fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
                         ax1.set_xticks([])
                         ax1.set_yticks([])
@@ -150,8 +151,8 @@ def get_metrics(args, G, test_loader, num_code):
 
 
     print(f'RESULTS for {num_code} code vectors')
-    print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"]) / len(means["ssim"])}')
-    print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"]) / len(means["ssim"])}')
+    print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"]) / np.sqrt(len(means["ssim"]))}')
+    print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"]) / np.sqrt(len(means["ssim"]))}')
     print(f'APSD: {np.mean(losses["apsd"])}')
 
 
@@ -194,7 +195,7 @@ if __name__ == '__main__':
 
     _, _, test_loader = create_data_loaders(args)
     get_cfid(args, G, test_loader)
-    exit()
-    vals = [1, 2, 4, 8, 16, 32]
+    # vals = [1, 2, 4, 8, 16, 32]
+    vals = [32]
     for val in vals:
         get_metrics(args, G, test_loader, val)
