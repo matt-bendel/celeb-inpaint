@@ -56,9 +56,9 @@ def gif_im(true, y, gen_im_ours, gen_im_comod, index, type, disc_num=False):
     ax2.imshow(y.cpu().numpy().transpose(1, 2, 0))
     ax2.set_title('y')
     ax3.imshow(gen_im_ours.cpu().numpy().transpose(1, 2, 0))
-    ax3.set_title(f'cGAN (Ours) Z {index}')
+    ax3.set_title(f'Ours Z {index}')
     ax4.imshow(gen_im_comod.cpu().numpy().transpose(1, 2, 0))
-    ax4.set_title(f'cGAN (CoModGAN, \psi=1) Z {index}')
+    ax4.set_title(f'CoModGAN Z {index}')
 
     plt.savefig(f'gif_{type}_{index - 1}.png')
     plt.close(fig)
