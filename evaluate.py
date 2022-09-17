@@ -87,17 +87,18 @@ def get_metrics(args, G, test_loader, num_code):
     for i, data in enumerate(test_loader):
         G.update_gen_status(val=True)
         with torch.no_grad():
-            x, y, mean, std = data[0]
+            x, y, mean, std, mask = data[0]
 
             mean = mean.cuda()
             std = std.cuda()
+            mask = mask.cuda()
             y = y.to(args.device)
             x = x.to(args.device)
 
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(num_code):
-                gens[:, z, :, :, :] = G(y)
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None)
 
             avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
             x = x * std[:, :, None, None] + mean[:, :, None, None]
@@ -108,6 +109,7 @@ def get_metrics(args, G, test_loader, num_code):
                 losses['ssim'].append(ssim(x[j].cpu().numpy(), avg[j].cpu().numpy()))
                 losses['psnr'].append(psnr(x[j].cpu().numpy(), avg[j].cpu().numpy()))
                 if total % 50 == 0:
+                    continue
                     fig_count += 1
                     means['psnr'].append(np.mean(losses['psnr']))
                     means['ssim'].append(np.mean(losses['ssim']))
@@ -144,8 +146,8 @@ def get_metrics(args, G, test_loader, num_code):
 
 
     print('RESULTS')
-    print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"])}')
-    print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"])}')
+    print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"]) / len(means["ssim"])}')
+    print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"]) / len(means["ssim"])}')
 
 
 # def get_cfid(args, G, test_loader):
