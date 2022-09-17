@@ -124,9 +124,9 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     ax2.set_title('y')
                     ax3.imshow(avg_ours[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax3.set_title('Avg. Recon (ours)')
+                    ax3.set_title('Ours')
                     ax4.imshow(avg_comod_psi_1[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax4.set_title('Avg. Recon (CoModGAN, \psi = 1)')
+                    ax4.set_title('CoModGAN')
                     plt.savefig(f'test_ims/im_{fig_count}.png')
                     plt.close(fig)
 
