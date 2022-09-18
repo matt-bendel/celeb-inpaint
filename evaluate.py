@@ -120,35 +120,6 @@ def get_metrics(args, G, test_loader, num_code):
                     losses['psnr'] = []
                     losses['ssim'] = []
 
-                    if num_code == 32:
-                        continue
-                        fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
-                        ax1.set_xticks([])
-                        ax1.set_yticks([])
-                        ax2.set_xticks([])
-                        ax2.set_yticks([])
-                        ax3.set_xticks([])
-                        ax3.set_yticks([])
-                        fig.suptitle(f'Test Example {fig_count}')
-                        ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                        ax1.set_title('GT')
-                        ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                        ax2.set_title('y')
-                        ax3.imshow(avg[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                        ax3.set_title('Avg. Recon')
-                        plt.savefig(f'test_ims/im_{fig_count}.png')
-                        plt.close(fig)
-
-                        place = 1
-
-                        for r in range(num_code):
-                            gif_im(x[j, :, :, :],
-                                   gens[j, r, :, :, :], place,
-                                   'image')
-                            place += 1
-
-                        generate_gif(args, 'image', fig_count, num_code)
-
 
     print(f'RESULTS for {num_code} code vectors')
     print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"]) / np.sqrt(len(means["ssim"]))}')

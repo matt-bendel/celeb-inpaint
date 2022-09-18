@@ -133,7 +133,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     place = 1
 
                     for r in range(num_code):
-                        gif_im(x[j, :, :, :], y[j, :, :, :],
+                        gif_im(x[j, :, :, :], y_unnorm[j, :, :, :],
                                gens_ours[j, r, :, :, :], gens_comod_psi_1[j, r, :, :, :], place,
                                'image')
                         place += 1
