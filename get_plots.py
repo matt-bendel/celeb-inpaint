@@ -100,7 +100,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                                     device=args.device)
             for z in range(num_code):
                 gens_ours[:, z, :, :, :] = G_ours(y, x=x, mask=mask, truncation=None) * std[:, :, None, None] + mean[:, :, None, None]
-                gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=1) * std[:, :, None, None] + mean[:, :, None, None]
+                gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=None) * std[:, :, None, None] + mean[:, :, None, None]
 
             avg_ours = torch.mean(gens_ours, dim=1)
             avg_comod_psi_1 = torch.mean(gens_comod_psi_1, dim=1)
@@ -165,10 +165,10 @@ if __name__ == '__main__':
     args.in_chans = 3
     args.out_chans = 3
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_ours'
+    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_ours_1e-5'
     G_ours = load_best_gan(args)
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_psi_1'
+    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_psi_0'
     G_comod = load_best_gan(args)
 
     _, _, test_loader = create_data_loaders(args)
