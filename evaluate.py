@@ -17,6 +17,7 @@ from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from wrappers.our_gen_wrapper import load_best_gan
 from evaluation_scripts.cfid.embeddings import InceptionEmbedding
 from evaluation_scripts.cfid.cfid_metric import CFIDMetric
+from evaluation_scripts.fid.fid_metric import FIDMetric
 
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
@@ -127,7 +128,7 @@ def get_metrics(args, G, test_loader, num_code):
     print(f'APSD: {np.mean(losses["apsd"])}')
 
 
-def get_cfid(args, G, test_loader):
+def get_cfid(args, G, test_loader, num_samps):
     print("GETTING INCEPTION EMBEDDING")
     inception_embedding = InceptionEmbedding(parallel=True)
 
@@ -137,10 +138,26 @@ def get_cfid(args, G, test_loader):
                              image_embedding=inception_embedding,
                              condition_embedding=inception_embedding,
                              cuda=True,
-                             args=args)
+                             args=args,
+                             num_samps=num_samps)
 
+    print(f'{num_samps}-CFID')
     print('CFID: ', cfid_metric.get_cfid_torch())
 
+def get_fid(args, G, test_loader, train_loader):
+    print("GETTING INCEPTION EMBEDDING")
+    inception_embedding = InceptionEmbedding(parallel=True)
+
+    print("GETTING DATA LOADERS")
+    fid_metric = FIDMetric(gan=G,
+                            ref_loader=train_loader,
+                             loader=test_loader,
+                             image_embedding=inception_embedding,
+                             condition_embedding=inception_embedding,
+                             cuda=True,
+                             args=args)
+
+    print('FID: ', fid_metric.get_fid())
 
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
@@ -164,8 +181,9 @@ if __name__ == '__main__':
 
     G = load_best_gan(args)
 
-    _, _, test_loader = create_data_loaders(args)
-    get_cfid(args, G, test_loader)
+    train_loader, _, test_loader = create_data_loaders(args)
+    get_cfid(args, G, test_loader, 1)
+    get_cfid(args, G, test_loader, 32)
     vals = [1, 2, 4, 8, 16, 32]
     # vals = [32]
     for val in vals:
