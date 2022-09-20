@@ -204,7 +204,7 @@ def train(args):
             avg_recon = avg_recon * std[:, :, None, None] + mean[:, :, None, None]
 
             std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-4
+            adv_weight = 1e-6
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += F.l1_loss(avg_recon, x)
             g_loss += - std_weight * torch.mean(torch.std(gens, dim=1), dim=(0, 1, 2, 3))
@@ -342,7 +342,7 @@ def train(args):
     for val in psnr_diffs:
         psnr_diff_str += f"{val},"
 
-    send_mail(f"Std. Dev. Reward Weights - {adv_mult} adv. weight", f"{std_mult_str}\n\n\n{psnr_diff_str}")
+    send_mail(f"Std. Dev. Reward Weights - adv. weight", f"{std_mult_str}\n\n\n{psnr_diff_str}")
 
 
 if __name__ == '__main__':
