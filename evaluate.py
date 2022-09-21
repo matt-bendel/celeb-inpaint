@@ -182,9 +182,11 @@ if __name__ == '__main__':
     G = load_best_gan(args)
 
     train_loader, _, test_loader = create_data_loaders(args)
-    get_cfid(args, G, test_loader, 1)
+    # get_cfid(args, G, test_loader, 1)
     get_cfid(args, G, test_loader, 32)
-    vals = [1, 2, 4, 8, 16, 32]
-    # vals = [32]
+    get_fid(args, G, test_loader, train_loader)
+    exit()
+    # vals = [1, 2, 4, 8, 16, 32]
+    vals = [32]
     for val in vals:
         get_metrics(args, G, test_loader, val)
