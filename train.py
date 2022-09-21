@@ -251,7 +251,7 @@ def train(args):
                     losses['psnr'].append(psnr(x[j].cpu().numpy(), avg[j].cpu().numpy()))
                     losses['psnr_1'].append(psnr(x[j].cpu().numpy(), (gens[j, 0] * std[j, :, None, None] + mean[j, :, None, None]).cpu().numpy()))
 
-                if i == 0:
+                if i == -1:
                     ind = 0
                     fig, (ax1, ax2) = plt.subplots(1, 2)
                     ax1.set_xticks([])
