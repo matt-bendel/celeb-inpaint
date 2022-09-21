@@ -227,7 +227,7 @@ class FIDMetric:
                 condition = self._get_embed_im(y, mean, std)
 
                 img_e = self.image_embedding(image)
-                cond_e = self.condition_embedding(condition_im)
+                cond_e = self.condition_embedding(condition)
 
                 if self.cuda:
                     image_embed.append(img_e)
