@@ -226,12 +226,15 @@ class FIDMetric:
                 image = self._get_embed_im(x, mean, std)
                 condition = self._get_embed_im(y, mean, std)
 
+                img_e = self.image_embedding(image)
+                cond_e = self.condition_embedding(condition_im)
+
                 if self.cuda:
-                    image_embed.append(image)
-                    cond_embed.append(condition)
+                    image_embed.append(img_e)
+                    cond_embed.append(cond_e)
                 else:
-                    image_embed.append(image.cpu().numpy())
-                    cond_embed.append(condition.cpu().numpy())
+                    image_embed.append(img_e.cpu().numpy())
+                    cond_embed.append(cond_e.cpu().numpy())
 
         if self.cuda:
             image_embed = torch.cat(image_embed, dim=0)
