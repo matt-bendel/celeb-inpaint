@@ -310,12 +310,13 @@ def train(args):
         save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
         print(save_str_2)
         print(f"AVG 1-PSNR: {np.mean(losses['psnr_1'])}")
-        exit()
+
         if (epoch + 1) % 5 == 0:
             send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif_2.gif")
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', 0)
+        exit()
 
         mu_0 = 2e-2
         std_mult += mu_0 * (np.mean(losses['psnr_1']) + 2.5 - np.mean(losses['psnr']))
