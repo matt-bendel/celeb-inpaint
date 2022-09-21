@@ -143,7 +143,6 @@ def train(args):
         }
 
         for i, data in enumerate(train_loader):
-            break;
             G.update_gen_status(val=False)
             x, y, mean, std, mask = data[0]
             y = y.cuda()
@@ -269,7 +268,6 @@ def train(args):
                     place = 1
 
                     for r in range(8):
-                        print("SAVE")
                         gif_im(x[ind, :, :, :], gens[ind, r, :, :, :] * std[ind, :, None, None] + mean[ind, :, None, None], place, 'image')
                         place += 1
 
@@ -316,7 +314,7 @@ def train(args):
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', 0)
-        exit()
+        # exit()
 
         mu_0 = 2e-2
         std_mult += mu_0 * (np.mean(losses['psnr_1']) + 2.5 - np.mean(losses['psnr']))
