@@ -165,7 +165,7 @@ if __name__ == '__main__':
     args.in_chans = 3
     args.out_chans = 3
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_ours_1e-5'
+    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_ours_1e-5_nombsd_psi_0'
     G_ours = load_best_gan(args)
 
     args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_psi_0'
