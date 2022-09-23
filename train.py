@@ -296,9 +296,9 @@ def train(args):
                     plt.close(fig)
 
         psnr_diff = np.abs((np.mean(losses['psnr_1']) + 2.5) - np.mean(losses['psnr']))
-        ssim_loss = np.mean(losses['ssim'])
-        best_model = ssim_loss > best_loss
-        best_loss = ssim_loss if ssim_loss > best_loss and (psnr_diff < 0.15) else best_loss
+        psnr_loss = np.mean(losses['psnr'])
+        best_model = psnr_loss > best_loss
+        best_loss = psnr_loss if psnr_loss > best_loss and (psnr_diff < 0.15) else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
