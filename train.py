@@ -136,6 +136,9 @@ def train(args):
 
     train_loader, dev_loader, test_loader = create_data_loaders(args)
 
+    if args.resume:
+        start_epoch += 1
+
     for epoch in range(start_epoch, args.num_epochs):
         batch_loss = {
             'g_loss': [],
