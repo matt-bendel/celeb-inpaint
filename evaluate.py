@@ -100,7 +100,7 @@ def get_metrics(args, G, test_loader, num_code):
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(num_code):
-                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None)  * std[:, :, None, None] + mean[:, :, None, None]
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=1)  * std[:, :, None, None] + mean[:, :, None, None]
 
             avg = torch.mean(gens, dim=1)
             x = x * std[:, :, None, None] + mean[:, :, None, None]
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     get_cfid(args, G, test_loader, 32)
     get_fid(args, G, test_loader, train_loader)
     # exit()
-    vals = [1, 2, 4, 8, 16, 32]
-    # vals = [32]
+    # vals = [1, 2, 4, 8, 16, 32]
+    vals = [32]
     for val in vals:
         get_metrics(args, G, test_loader, val)
