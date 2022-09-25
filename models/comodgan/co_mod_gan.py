@@ -397,9 +397,9 @@ class Discriminator(BaseNetwork):
                     )
         self.convs = nn.Sequential(OrderedDict(layers))
         # TODO: OURS:
-        self.Conv4x4 = ConvLayer(nf(1), nf(1), kernel_size=3, activate=True)
-
-        # self.Conv4x4 = ConvLayer(nf(1)+1, nf(1), kernel_size=3, activate=True)
+        # self.Conv4x4 = ConvLayer(nf(1), nf(1), kernel_size=3, activate=True)
+        #
+        self.Conv4x4 = ConvLayer(nf(1)+1, nf(1), kernel_size=3, activate=True)
         self.Dense0 = EqualLinear(nf(1)*4*4, nf(0), activation='fused_lrelu')
         self.Output = EqualLinear(nf(0), 1)
 
