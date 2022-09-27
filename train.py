@@ -324,6 +324,8 @@ def train(args):
 
         cfid = cfid_metric.get_cfid_torch()
 
+        del cfid_metric
+
         best_model = cfid < best_loss and (psnr_diff < 0.15)
         best_loss = cfid if cfid < best_loss and (psnr_diff < 0.15) else best_loss
 
