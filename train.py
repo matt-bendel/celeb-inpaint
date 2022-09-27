@@ -339,6 +339,7 @@ def train(args):
         save_str_2 = f"[Avg PSNR: {np.mean(losses['psnr']):.2f}] [Avg SSIM: {np.mean(losses['ssim']):.4f}]"
         print(save_str_2)
         print(f"AVG 1-PSNR: {np.mean(losses['psnr_1'])}")
+        print(f"CFID: {cfid:.2f}")
 
         if (epoch + 1) % 5 == 0:
             send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {cfid:.2f}", file_name="variation_gif_2.gif")
