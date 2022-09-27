@@ -315,7 +315,7 @@ def train(args):
         psnr_loss = np.mean(losses['psnr'])
 
         cfid_metric = CFIDMetric(gan=G,
-                                 loader=test_loader,
+                                 loader=dev_loader,
                                  image_embedding=inception_embedding,
                                  condition_embedding=inception_embedding,
                                  cuda=True,
