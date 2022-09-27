@@ -115,10 +115,13 @@ def train(args):
     std_mult = 1
     std_mults = [std_mult]
     psnr_diffs = []
+    cfids = []
 
     if args.resume:
         std_mults = []
         psnr_diffs = []
+        cfids = []
+
         with open("std_weights.txt", "r") as file1:
             for line in file1.readlines():
                 for i in line.split(","):
@@ -129,12 +132,22 @@ def train(args):
                 for i in line.split(","):
                     psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
 
+        with open("cfids.txt", "r") as file1:
+            for line in file1.readlines():
+                for i in line.split(","):
+                    cfids.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+
         std_mult = std_mults[-1]
         print(std_mult)
 
     G, D, opt_G, opt_D, best_loss, start_epoch = get_gan(args)
 
+    print("GETTING INCEPTION EMBEDDING")
+    inception_embedding = InceptionEmbedding(parallel=True)
+
     train_loader, dev_loader, test_loader = create_data_loaders(args)
+
+    best_loss = 100000
 
     if args.resume:
         start_epoch += 1
@@ -159,7 +172,7 @@ def train(args):
                 for param in D.parameters():
                     param.grad = None
 
-                x_hat = G(y, x=x, mask=mask, truncation=1)
+                x_hat = G(y, x=x, mask=mask, truncation=0)
 
                 real_pred = D(input=x, label=y)
                 fake_pred = D(input=x_hat, label=y)
@@ -179,7 +192,7 @@ def train(args):
             gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(args.num_z):
-                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=1)
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=0)
 
             # fake_pred = torch.zeros(size=(y.shape[0], args.num_z, fake_pred.shape[-1], fake_pred.shape[-1]), device=args.device)
             # for k in range(y.shape[0]):
@@ -243,7 +256,7 @@ def train(args):
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=1)
+                    gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=0)
 
                 avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
                 x = x * std[:, :, None, None] + mean[:, :, None, None]
@@ -300,8 +313,19 @@ def train(args):
 
         psnr_diff = np.abs((np.mean(losses['psnr_1']) + 2.5) - np.mean(losses['psnr']))
         psnr_loss = np.mean(losses['psnr'])
-        best_model = psnr_loss > best_loss
-        best_loss = psnr_loss if psnr_loss > best_loss and (psnr_diff < 0.15) else best_loss
+
+        cfid_metric = CFIDMetric(gan=G,
+                                 loader=test_loader,
+                                 image_embedding=inception_embedding,
+                                 condition_embedding=inception_embedding,
+                                 cuda=True,
+                                 args=args,
+                                 num_samps=1)
+
+        cfid = cfid_metric.get_cfid_torch()
+
+        best_model = cfid < best_loss and (psnr_diff < 0.15)
+        best_loss = cfid if cfid < best_loss and (psnr_diff < 0.15) else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
@@ -313,7 +337,7 @@ def train(args):
         print(f"AVG 1-PSNR: {np.mean(losses['psnr_1'])}")
 
         if (epoch + 1) % 5 == 0:
-            send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}", file_name="variation_gif_2.gif")
+            send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {cfid:.2f}", file_name="variation_gif_2.gif")
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', 0)
@@ -338,6 +362,13 @@ def train(args):
         file.write(content)
         file.close()
 
+        file = open("cfids.txt", "w+")
+
+        # Saving the 2D array in a text file
+        content = str(cfids)
+        file.write(content)
+        file.close()
+
     std_mult_str = ""
     for val in std_mults:
         std_mult_str += f"{val},"
@@ -346,7 +377,11 @@ def train(args):
     for val in psnr_diffs:
         psnr_diff_str += f"{val},"
 
-    send_mail(f"Std. Dev. Reward Weights - adv. weight", f"{std_mult_str}\n\n\n{psnr_diff_str}")
+    cfid_str = ""
+    for val in cfids:
+        cfid_str += f"{val},"
+
+    send_mail(f"Std. Dev. Reward Weights - adv. weight", f"{std_mult_str}\n\n\n{psnr_diff_str}\n\n\n{cfid_str}")
 
 
 if __name__ == '__main__':
