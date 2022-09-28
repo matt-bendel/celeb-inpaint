@@ -325,6 +325,19 @@ def train(args):
                                  num_samps=1)
 
         cfid = cfid_metric.get_cfid_torch()
+        cfids.append(cfid)
+
+        cfid_metric = CFIDMetric(gan=G,
+                                 loader=test_loader,
+                                 image_embedding=inception_embedding,
+                                 condition_embedding=inception_embedding,
+                                 cuda=True,
+                                 args=args,
+                                 num_samps=1)
+
+        cfid_test = cfid_metric.get_cfid_torch()
+
+        print(f"TEST CFID: {cfid_test}")
 
         del cfid_metric
 
@@ -342,7 +355,7 @@ def train(args):
         print(f"CFID: {cfid:.2f}")
 
         if (epoch + 1) % 5 == 0:
-            send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {cfid:.2f}", file_name="variation_gif_2.gif")
+            send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {cfid:.2f}\nTEST CFID: {cfid_test:.2f}", file_name="variation_gif_2.gif")
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', 0)
