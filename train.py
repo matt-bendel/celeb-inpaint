@@ -341,8 +341,8 @@ def train(args):
 
         del cfid_metric
 
-        best_model = cfid < best_loss and (psnr_diff < 0.15)
-        best_loss = cfid if cfid < best_loss and (psnr_diff < 0.15) else best_loss
+        best_model = cfid < best_loss and (psnr_diff < 0.26)
+        best_loss = cfid if cfid < best_loss and (psnr_diff < 0.26) else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
@@ -354,8 +354,8 @@ def train(args):
         print(f"AVG 1-PSNR: {np.mean(losses['psnr_1'])}")
         print(f"CFID: {cfid:.2f}")
 
-        if (epoch + 1) % 5 == 0:
-            send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {cfid:.2f}\nTEST CFID: {cfid_test:.2f}", file_name="variation_gif_2.gif")
+        # if (epoch + 1) % 5 == 0:
+        send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {cfid:.2f}\nTEST CFID: {cfid_test:.2f}", file_name="variation_gif_2.gif")
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', 0)
