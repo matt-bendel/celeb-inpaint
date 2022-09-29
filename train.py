@@ -134,10 +134,10 @@ def train(args):
                 for i in line.split(","):
                     psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
 
-        with open("cfids.txt", "r") as file1:
-            for line in file1.readlines():
-                for i in line.split(","):
-                    cfids.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+        # with open("cfids.txt", "r") as file1:
+        #     for line in file1.readlines():
+        #         for i in line.split(","):
+        #             cfids.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
 
         std_mult = std_mults[-1]
         print(std_mult)
@@ -325,7 +325,7 @@ def train(args):
                                  num_samps=1)
 
         cfid = cfid_metric.get_cfid_torch()
-        cfids.append(cfid)
+        cfids.append(cfid[0])
 
         cfid_metric = CFIDMetric(gan=G,
                                  loader=test_loader,
