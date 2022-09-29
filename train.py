@@ -134,10 +134,10 @@ def train(args):
                 for i in line.split(","):
                     psnr_diffs.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
 
-        # with open("cfids.txt", "r") as file1:
-        #     for line in file1.readlines():
-        #         for i in line.split(","):
-        #             cfids.append(float(i.strip().replace('[', '').replace(']', '').replace(' ', '')))
+        with open("cfids.txt", "r") as file1:
+            for line in file1.readlines():
+                for i in line.split(","):
+                    cfids.append(float(i.strip().replace('array(', '').replace(')', '').replace('[', '').replace(']', '').replace(' ', '')))
 
         std_mult = std_mults[-1]
         print(std_mult)
@@ -153,6 +153,7 @@ def train(args):
 
     if args.resume:
         start_epoch += 1
+        best_loss = best_loss
 
     for epoch in range(start_epoch, args.num_epochs):
         batch_loss = {
@@ -325,7 +326,7 @@ def train(args):
                                  num_samps=1)
 
         cfid = cfid_metric.get_cfid_torch()
-        cfids.append(cfid[0])
+        cfids.append(cfid)
 
         cfid_metric = CFIDMetric(gan=G,
                                  loader=test_loader,
