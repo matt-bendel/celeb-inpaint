@@ -175,7 +175,7 @@ def train(args):
                 for param in D.parameters():
                     param.grad = None
 
-                x_hat = G(y, x=x, mask=mask, truncation=0)
+                x_hat = G(y, x=x, mask=mask, truncation=None)
 
                 real_pred = D(input=x, label=y)
                 fake_pred = D(input=x_hat, label=y)
@@ -195,7 +195,7 @@ def train(args):
             gens = torch.zeros(size=(y.size(0), args.num_z, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(args.num_z):
-                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=0)
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None)
 
             # fake_pred = torch.zeros(size=(y.shape[0], args.num_z, fake_pred.shape[-1], fake_pred.shape[-1]), device=args.device)
             # for k in range(y.shape[0]):
@@ -259,7 +259,7 @@ def train(args):
                 gens = torch.zeros(size=(y.size(0), 8, args.in_chans, args.im_size, args.im_size),
                                    device=args.device)
                 for z in range(8):
-                    gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=0)
+                    gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None)
 
                 avg = torch.mean(gens, dim=1) * std[:, :, None, None] + mean[:, :, None, None]
                 x = x * std[:, :, None, None] + mean[:, :, None, None]
