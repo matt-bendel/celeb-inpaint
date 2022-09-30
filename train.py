@@ -223,7 +223,7 @@ def train(args):
             avg_recon = avg_recon * std[:, :, None, None] + mean[:, :, None, None]
 
             std_weight = std_mult * np.sqrt(2 / (np.pi * args.num_z * (args.num_z + 1)))
-            adv_weight = 1e-5
+            adv_weight = 2e-5
             g_loss = - adv_weight * gen_pred_loss.mean()
             g_loss += F.l1_loss(avg_recon, x)
             g_loss += - std_weight * torch.mean(torch.std(gens, dim=1), dim=(0, 1, 2, 3))
@@ -328,17 +328,17 @@ def train(args):
         cfid = cfid_metric.get_cfid_torch()
         cfids.append(cfid)
 
-        # cfid_metric = CFIDMetric(gan=G,
-        #                          loader=test_loader,
-        #                          image_embedding=inception_embedding,
-        #                          condition_embedding=inception_embedding,
-        #                          cuda=True,
-        #                          args=args,
-        #                          num_samps=1)
-        #
-        # cfid_test = cfid_metric.get_cfid_torch()
-        #
-        # print(f"TEST CFID: {cfid_test}")
+        cfid_metric = CFIDMetric(gan=G,
+                                 loader=test_loader,
+                                 image_embedding=inception_embedding,
+                                 condition_embedding=inception_embedding,
+                                 cuda=True,
+                                 args=args,
+                                 num_samps=1)
+
+        cfid_test = cfid_metric.get_cfid_torch()
+
+        print(f"TEST CFID: {cfid_test}")
 
         del cfid_metric
 
