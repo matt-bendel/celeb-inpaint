@@ -149,11 +149,11 @@ def train(args):
 
     train_loader, dev_loader, test_loader = create_data_loaders(args)
 
-    best_loss = 100000
-
     if args.resume:
         start_epoch += 1
         best_loss = best_loss
+    else:
+        best_loss = 100000
 
     print(best_loss)
 
