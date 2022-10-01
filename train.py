@@ -155,6 +155,8 @@ def train(args):
         start_epoch += 1
         best_loss = best_loss
 
+    print(best_loss)
+
     for epoch in range(start_epoch, args.num_epochs):
         batch_loss = {
             'g_loss': [],
