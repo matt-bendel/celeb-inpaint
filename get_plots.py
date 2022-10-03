@@ -114,15 +114,13 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     fig_count += 1
 
                     fig = plt.figure()
-                    plt.set_xticks([])
-                    plt.set_yticks([])
+                    plt.axis('off')
                     plt.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     plt.savefig(f'test_ims/original_{fig_count}.png', bbox_inches='tight')
                     plt.close(fig)
 
                     fig = plt.figure()
-                    plt.set_xticks([])
-                    plt.set_yticks([])
+                    plt.axis('off')
                     plt.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     plt.savefig(f'test_ims/masked_{fig_count}.png', bbox_inches='tight')
                     plt.close(fig)
