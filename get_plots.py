@@ -131,7 +131,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     # ax3.set_title('Ours')
                     # ax4.imshow(avg_comod_psi_1[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     # ax4.set_title('CoModGAN')
-                    plt.savefig(f'test_ims/original_and_masked_{fig_count}.png')
+                    plt.savefig(f'test_ims/original_and_masked_{fig_count}.png',bbox_inches='tight')
                     plt.close(fig)
 
                     place = 1
@@ -146,7 +146,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
                     fig.text(0.5, 0.04, 'Ours', ha='center', fontweight='bold')
-                    plt.savefig(f'test_ims/5_recons_ours_{fig_count}')
+                    plt.savefig(f'test_ims/5_recons_ours_{fig_count}',bbox_inches='tight')
                     plt.close(fig)
 
                     fig = plt.figure()
@@ -159,7 +159,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
                     fig.text(0.5, 0.04, 'CoModGAN', ha='center', fontweight='bold')
-                    plt.savefig(f'test_ims/5_recons_comodgan_{fig_count}')
+                    plt.savefig(f'test_ims/5_recons_comodgan_{fig_count}',bbox_inches='tight')
                     plt.close(fig)
 
 
