@@ -145,6 +145,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax.set_yticks([])
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy())
 
+                    plt.xlabel('Ours')
                     plt.savefig(f'test_ims/5_recons_ours_{fig_count}')
                     plt.close(fig)
 
@@ -157,6 +158,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax.set_yticks([])
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy())
 
+                    plt.xlabel('CoModGAN')
                     plt.savefig(f'test_ims/5_recons_comodgan_{fig_count}')
                     plt.close(fig)
 
