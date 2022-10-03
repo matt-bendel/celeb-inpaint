@@ -124,9 +124,9 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     # ax4.set_yticks([])
                     # fig.suptitle(f'Test Example {fig_count}')
                     ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax1.set_xlabel('Original')
+                    ax1.set_xlabel('Original', fontweight='bold')
                     ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax2.set_xlabel('Masked')
+                    ax2.set_xlabel('Masked', fontweight='bold')
                     # ax3.imshow(avg_ours[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     # ax3.set_title('Ours')
                     # ax4.imshow(avg_comod_psi_1[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
@@ -145,7 +145,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax.set_yticks([])
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.xlabel('Ours')
+                    fig.supxlabel('Ours', fontweight='bold')
                     plt.savefig(f'test_ims/5_recons_ours_{fig_count}')
                     plt.close(fig)
 
@@ -158,7 +158,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax.set_yticks([])
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.xlabel('CoModGAN')
+                    fig.supxlabel('CoModGAN', fontweight='bold')
                     plt.savefig(f'test_ims/5_recons_comodgan_{fig_count}')
                     plt.close(fig)
 
