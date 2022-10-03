@@ -113,26 +113,39 @@ def get_plots(args, G_ours, G_comod, test_loader):
                 if total % 100 == 0:
                     fig_count += 1
 
-                    fig, (ax1, ax2) = plt.subplots(2, 1)
-                    ax1.set_xticks([])
-                    ax1.set_yticks([])
-                    ax2.set_xticks([])
-                    ax2.set_yticks([])
+                    fig = plt.figure()
+                    plt.set_xticks([])
+                    plt.set_yticks([])
+                    plt.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    plt.savefig(f'test_ims/original_{fig_count}.png', bbox_inches='tight')
+                    plt.close(fig)
+
+                    fig = plt.figure()
+                    plt.set_xticks([])
+                    plt.set_yticks([])
+                    plt.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    plt.savefig(f'test_ims/masked_{fig_count}.png', bbox_inches='tight')
+                    plt.close(fig)
+
+                    # fig, ax1 = plt.subplots(1, 1)
+                    # ax1.set_xticks([])
+                    # ax1.set_yticks([])
+                    # ax2.set_xticks([])
+                    # ax2.set_yticks([])
                     # ax3.set_xticks([])
                     # ax3.set_yticks([])
                     # ax4.set_xticks([])
                     # ax4.set_yticks([])
                     # fig.suptitle(f'Test Example {fig_count}')
-                    ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax1.set_xlabel('Original', fontweight='bold')
-                    ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax2.set_xlabel('Masked', fontweight='bold')
+                    # ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    # ax1.set_xlabel('Original', fontweight='bold')
+                    # ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    # ax2.set_xlabel('Masked', fontweight='bold')
                     # ax3.imshow(avg_ours[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     # ax3.set_title('Ours')
                     # ax4.imshow(avg_comod_psi_1[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
                     # ax4.set_title('CoModGAN')
-                    plt.savefig(f'test_ims/original_and_masked_{fig_count}.png',bbox_inches='tight')
-                    plt.close(fig)
+
 
                     place = 1
 
@@ -143,8 +156,8 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax = fig.add_subplot(1, 5, r+1)
                         ax.set_xticks([])
                         ax.set_yticks([])
-                        if r == 2:
-                            ax.set_xlabel('Ours',fontweight='bold')
+                        # if r == 2:
+                        #     ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
                     plt.savefig(f'test_ims/5_recons_ours_{fig_count}',bbox_inches='tight')
@@ -157,8 +170,8 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax = fig.add_subplot(1, 5, r+1)
                         ax.set_xticks([])
                         ax.set_yticks([])
-                        if r == 2:
-                            ax.set_xlabel('CoModGAN',fontweight='bold')
+                        # if r == 2:
+                        #     ax.set_xlabel('CoModGAN',fontweight='bold')
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
                     plt.savefig(f'test_ims/5_recons_comodgan_{fig_count}',bbox_inches='tight')
