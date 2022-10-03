@@ -1,6 +1,7 @@
 import random
 import os
 import torch
+import time
 
 import numpy as np
 import torch.autograd as autograd
@@ -83,6 +84,7 @@ def get_metrics(args, G, test_loader, num_code):
         'psnr': [],
         'ssim': []
     }
+    times = []
 
     total = 0
     fig_count = 0
@@ -100,7 +102,10 @@ def get_metrics(args, G, test_loader, num_code):
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(num_code):
+                start = time.time()
                 gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None)  * std[:, :, None, None] + mean[:, :, None, None]
+                elapsed = time.time() - start
+                times.append(elapsed)
 
             avg = torch.mean(gens, dim=1)
             x = x * std[:, :, None, None] + mean[:, :, None, None]
@@ -126,6 +131,7 @@ def get_metrics(args, G, test_loader, num_code):
     print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"]) / np.sqrt(len(means["ssim"]))}')
     print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"]) / np.sqrt(len(means["ssim"]))}')
     print(f'APSD: {np.mean(losses["apsd"])}')
+    print(f'TIME: {np.mean(times)}')
 
 
 def get_cfid(args, G, test_loader, num_samps):
@@ -183,7 +189,7 @@ if __name__ == '__main__':
 
     train_loader, _, test_loader = create_data_loaders(args)
     get_cfid(args, G, test_loader, 1)
-    # get_cfid(args, G, test_loader, 32)
+    get_cfid(args, G, test_loader, 32)
     get_fid(args, G, test_loader, train_loader)
     # exit()
     # vals = [1, 2, 4, 8, 16, 32]
