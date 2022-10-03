@@ -143,9 +143,10 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax = fig.add_subplot(1, 5, r+1)
                         ax.set_xticks([])
                         ax.set_yticks([])
+                        if r == 2:
+                            ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    fig.suptitle('Ours', fontweight='bold', pad=-30)
                     plt.savefig(f'test_ims/5_recons_ours_{fig_count}',bbox_inches='tight')
                     plt.close(fig)
 
@@ -156,9 +157,10 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax = fig.add_subplot(1, 5, r+1)
                         ax.set_xticks([])
                         ax.set_yticks([])
+                        if r == 2:
+                            ax.set_xlabel('CoModGAN',fontweight='bold')
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    fig.suptitle('CoModGAN',fontweight='bold', pad=-30)
                     plt.savefig(f'test_ims/5_recons_comodgan_{fig_count}',bbox_inches='tight')
                     plt.close(fig)
 
