@@ -113,36 +113,61 @@ def get_plots(args, G_ours, G_comod, test_loader):
                 if total % 100 == 0:
                     fig_count += 1
 
-                    fig, (ax1, ax2, ax3, ax4) = plt.subplots(1, 4)
+                    fig, (ax1, ax2) = plt.subplots(2, 1)
                     ax1.set_xticks([])
                     ax1.set_yticks([])
                     ax2.set_xticks([])
                     ax2.set_yticks([])
-                    ax3.set_xticks([])
-                    ax3.set_yticks([])
-                    ax4.set_xticks([])
-                    ax4.set_yticks([])
-                    fig.suptitle(f'Test Example {fig_count}')
+                    # ax3.set_xticks([])
+                    # ax3.set_yticks([])
+                    # ax4.set_xticks([])
+                    # ax4.set_yticks([])
+                    # fig.suptitle(f'Test Example {fig_count}')
                     ax1.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax1.set_title('x')
+                    ax1.set_xlabel('Original')
                     ax2.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax2.set_title('y')
-                    ax3.imshow(avg_ours[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax3.set_title('Ours')
-                    ax4.imshow(avg_comod_psi_1[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    ax4.set_title('CoModGAN')
-                    plt.savefig(f'test_ims/im_{fig_count}.png')
+                    ax2.set_xlabel('Masked')
+                    # ax3.imshow(avg_ours[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    # ax3.set_title('Ours')
+                    # ax4.imshow(avg_comod_psi_1[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    # ax4.set_title('CoModGAN')
+                    plt.savefig(f'test_ims/original_and_masked_{fig_count}.png')
                     plt.close(fig)
 
                     place = 1
 
-                    for r in range(num_code):
-                        gif_im(x[j, :, :, :], y_unnorm[j, :, :, :],
-                               gens_ours[j, r, :, :, :], gens_comod_psi_1[j, r, :, :, :], place,
-                               'image')
-                        place += 1
+                    fig = plt.figure()
+                    fig.subplots_adjust(wspace=0, hspace=0.05)
 
-                    generate_gif(args, 'image', fig_count, num_code)
+                    for r in range(5):
+                        ax = fig.add_subplot(1, 5, r+1)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy())
+
+                    plt.savefig(f'test_ims/5_recons_ours_{fig_count}')
+                    plt.close(fig)
+
+                    fig = plt.figure()
+                    fig.subplots_adjust(wspace=0, hspace=0.05)
+
+                    for r in range(5):
+                        ax = fig.add_subplot(1, 5, r+1)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy())
+
+                    plt.savefig(f'test_ims/5_recons_comodgan_{fig_count}')
+                    plt.close(fig)
+
+
+                    # for r in range(num_code):
+                    #     gif_im(x[j, :, :, :], y_unnorm[j, :, :, :],
+                    #            gens_ours[j, r, :, :, :], gens_comod_psi_1[j, r, :, :, :], place,
+                    #            'image')
+                    #     place += 1
+                    #
+                    # generate_gif(args, 'image', fig_count, num_code)
 
 
 if __name__ == '__main__':
@@ -165,10 +190,10 @@ if __name__ == '__main__':
     args.in_chans = 3
     args.out_chans = 3
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_ours_1e-5_nombsd_psi_0'
+    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_ours_3e-5'
     G_ours = load_best_gan(args)
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_psi_0'
+    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_psi_1'
     G_comod = load_best_gan(args)
 
     _, _, test_loader = create_data_loaders(args)
