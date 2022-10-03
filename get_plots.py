@@ -158,7 +158,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         ax.set_yticks([])
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    fig.suptitle('CoModGAN',fontweight='bold')
+                    fig.suptitle('CoModGAN',fontweight='bold', pad=-30)
                     plt.savefig(f'test_ims/5_recons_comodgan_{fig_count}',bbox_inches='tight')
                     plt.close(fig)
 
