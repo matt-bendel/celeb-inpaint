@@ -5,6 +5,8 @@ import time
 
 import numpy as np
 import torch.autograd as autograd
+from torch.utils.data import DataLoader
+from torchvision import datasets, transforms
 import matplotlib.pyplot as plt
 # TODO: REMOVE
 import imageio as iio
@@ -72,7 +74,7 @@ def sample(self):
     sigmas_th = get_sigmas(self.config)
     sigmas = sigmas_th.cpu().numpy()
 
-    transform = transforms.Compose([transforms.ToTensor(), DataTransform(args)])
+    transform = transforms.Compose([transforms.ToTensor()])
     dataset = datasets.ImageFolder('/storage/celebA-HQ/celeba_hq_128', transform=transform)
     _, _, test_data = torch.utils.data.random_split(
         dataset, [27000, 2000, 1000],

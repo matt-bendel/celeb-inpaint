@@ -53,6 +53,9 @@ def create_datasets(args):
         generator=torch.Generator().manual_seed(0)
     )
 
+    print(test_data.imgs)
+    exit()
+
     return test_data, dev_data, train_data
 
 
