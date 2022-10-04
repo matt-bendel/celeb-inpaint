@@ -12,7 +12,7 @@ class SubsetOverride(torch.utils.data.dataset.Subset):
 
     def __getitem__(self, idx):
         if isinstance(idx, list):
-            return self.dataset[[self.indices[i] for i in idx]]
+            return self.dataset[[self.indices[i] for i in idx]], self.dataset.imgs[[self.indices[i] for i in idx]]
         return self.dataset[self.indices[idx]], self.dataset.imgs[self.indices[idx]]
 
 
