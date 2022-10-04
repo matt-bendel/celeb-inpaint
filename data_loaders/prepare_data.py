@@ -7,9 +7,8 @@ from torch.utils.data.dataset import Subset
 import matplotlib.pyplot as plt
 
 class SubsetOverride(torch.utils.data.dataset.Subset):
-    def __init__(self, subset):
+    def __init__(self, dataset, indices):
         super(SubsetOverride, self).__init__()
-        self.subset = subset
 
     def __getitem__(self, idx):
         if isinstance(idx, list):
@@ -67,7 +66,7 @@ def create_datasets(args):
         generator=torch.Generator().manual_seed(0)
     )
 
-    test_data = SubsetOverride(test_data)
+    test_data = SubsetOverride(test_data.dataset, test_data.indices)
 
     return test_data, dev_data, train_data
 
