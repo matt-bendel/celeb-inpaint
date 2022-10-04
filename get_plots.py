@@ -151,7 +151,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     fig.subplots_adjust(wspace=0, hspace=0.05)
 
                     for r in range(5):
-                        ax = fig.add_subplot(1, 5, r+1)
+                        ax = fig.add_subplot(5, 1, r+1)
                         ax.set_xticks([])
                         ax.set_yticks([])
                         # if r == 2:
@@ -165,7 +165,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     fig.subplots_adjust(wspace=0, hspace=0.05)
 
                     for r in range(5):
-                        ax = fig.add_subplot(1, 5, r+1)
+                        ax = fig.add_subplot(5, 1, r+1)
                         ax.set_xticks([])
                         ax.set_yticks([])
                         # if r == 2:
