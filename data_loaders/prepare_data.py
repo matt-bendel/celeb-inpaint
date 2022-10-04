@@ -3,7 +3,19 @@ import numpy as np
 
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
+from torch.utils.data.dataset import Subset
 import matplotlib.pyplot as plt
+
+class SubsetOverride(torch.utils.data.dataset.Subset):
+    def __init__(self, subset):
+        super(SubsetOverride, self).__init__()
+        self.subset = subset
+
+    def __getitem__(self, idx):
+        if isinstance(idx, list):
+            return self.dataset[[self.indices[i] for i in idx]]
+        return self.dataset[self.indices[idx]], self.dataset.imgs[self.indices[idx]]
+
 
 class DataTransform:
     """
@@ -35,7 +47,9 @@ class DataTransform:
         self.mask = torch.tensor(np.reshape(arr, (128, 128)), dtype=torch.float).repeat(3, 1, 1)
         torch.save(self.mask, 'mast.pt')
 
-    def __call__(self, gt_im):
+    def __call__(self, gt_im, fname=None):
+        print(fname)
+        exit()
         mean = torch.tensor([0.5, 0.5, 0.5])
         std = torch.tensor([0.5, 0.5, 0.5])
         gt = (gt_im - mean[:, None, None]) / std[:, None, None]
@@ -53,10 +67,7 @@ def create_datasets(args):
         generator=torch.Generator().manual_seed(0)
     )
 
-    print(len(train_data.dataset.imgs))
-    print(len(dev_data.dataset.imgs))
-    print(len(test_data.dataset.imgs))
-    exit()
+    test_data = SubsetOverride(test_data)
 
     return test_data, dev_data, train_data
 
