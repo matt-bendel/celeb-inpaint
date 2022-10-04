@@ -53,97 +53,97 @@ def anneal_Langevin_dynamics_inpainting(x_mod, refer_image, scorenet, sigmas, im
 
         return images
 
-def sample(self):
-    if self.config.sampling.ckpt_id is None:
-        states = torch.load(os.path.join(self.args.log_path, 'checkpoint.pth'), map_location=self.config.device)
-    else:
-        states = torch.load(os.path.join(self.args.log_path, f'checkpoint_{self.config.sampling.ckpt_id}.pth'),
-                            map_location=self.config.device)
+    def sample(self):
+        if self.config.sampling.ckpt_id is None:
+            states = torch.load(os.path.join(self.args.log_path, 'checkpoint.pth'), map_location=self.config.device)
+        else:
+            states = torch.load(os.path.join(self.args.log_path, f'checkpoint_{self.config.sampling.ckpt_id}.pth'),
+                                map_location=self.config.device)
 
-    score = get_model(self.config)
-    score = torch.nn.DataParallel(score)
+        score = get_model(self.config)
+        score = torch.nn.DataParallel(score)
 
-    score.load_state_dict(states[0], strict=True)
+        score.load_state_dict(states[0], strict=True)
 
-    if self.config.model.ema:
-        ema_helper = EMAHelper(mu=self.config.model.ema_rate)
-        ema_helper.register(score)
-        ema_helper.load_state_dict(states[-1])
-        ema_helper.ema(score)
+        if self.config.model.ema:
+            ema_helper = EMAHelper(mu=self.config.model.ema_rate)
+            ema_helper.register(score)
+            ema_helper.load_state_dict(states[-1])
+            ema_helper.ema(score)
 
-    sigmas_th = get_sigmas(self.config)
-    sigmas = sigmas_th.cpu().numpy()
+        sigmas_th = get_sigmas(self.config)
+        sigmas = sigmas_th.cpu().numpy()
 
-    transform = transforms.Compose([transforms.ToTensor()])
-    dataset = datasets.ImageFolder('/storage/celebA-HQ/celeba_hq_128', transform=transform)
-    _, _, test_data = torch.utils.data.random_split(
-        dataset, [27000, 2000, 1000],
-        generator=torch.Generator().manual_seed(0)
-    )
+        transform = transforms.Compose([transforms.ToTensor()])
+        dataset = datasets.ImageFolder('/storage/celebA-HQ/celeba_hq_128', transform=transform)
+        _, _, test_data = torch.utils.data.random_split(
+            dataset, [27000, 2000, 1000],
+            generator=torch.Generator().manual_seed(0)
+        )
 
-    test_loader = DataLoader(
-        dataset=test_data,
-        batch_size=args.batch_size,
-        num_workers=16,
-        pin_memory=True,
-        drop_last=True,
-    )
+        test_loader = DataLoader(
+            dataset=test_data,
+            batch_size=args.batch_size,
+            num_workers=16,
+            pin_memory=True,
+            drop_last=True,
+        )
 
-    score.eval()
-    times = []
+        score.eval()
+        times = []
 
-    num_samps = 32
-    for i, data in enumerate(test_loader):
-        x = data[0]
-        x = x.to(self.config.device)
-        arr = np.ones((128, 128))
-        arr[128 // 4: 3 * 128 // 4, 128 // 4: 3 * 128 // 4] = 0
-        mask = torch.tensor(np.reshape(arr, (128, 128)), dtype=torch.float).repeat(x.shape[0], 3, 1, 1).cuda()
+        num_samps = 32
+        for i, data in enumerate(test_loader):
+            x = data[0]
+            x = x.to(self.config.device)
+            arr = np.ones((128, 128))
+            arr[128 // 4: 3 * 128 // 4, 128 // 4: 3 * 128 // 4] = 0
+            mask = torch.tensor(np.reshape(arr, (128, 128)), dtype=torch.float).repeat(x.shape[0], 3, 1, 1).cuda()
 
-        for j in range(num_samps):
-            start = time()
-            width = int(np.sqrt(self.config.sampling.batch_size))
-            init_samples = torch.rand(width, width, self.config.data.channels,
-                                      self.config.data.image_size,
-                                      self.config.data.image_size,
-                                      device=self.config.device)
-            init_samples = data_transform(self.config, init_samples)
-            all_samples = anneal_Langevin_dynamics_inpainting(init_samples, x[:width, ...], score,
-                                                              sigmas,
-                                                              self.config.data.image_size, mask,
-                                                              self.config.sampling.n_steps_each,
-                                                              self.config.sampling.step_lr)
-
-            torch.save(x[:width, ...], os.path.join(self.args.image_folder, 'refer_image.pth'))
-            refer_images = x[:width, None, ...].expand(-1, width, -1, -1, -1).reshape(-1,
-                                                                                                 *x.shape[
-                                                                                                  1:])
-            save_image(refer_images, os.path.join(self.args.image_folder, 'refer_image.png'), nrow=width)
-
-            sample = all_samples[-1].view(self.config.sampling.batch_size, self.config.data.channels,
+            for j in range(num_samps):
+                start = time()
+                width = int(np.sqrt(self.config.sampling.batch_size))
+                init_samples = torch.rand(width, width, self.config.data.channels,
                                           self.config.data.image_size,
-                                          self.config.data.image_size)
+                                          self.config.data.image_size,
+                                          device=self.config.device)
+                init_samples = data_transform(self.config, init_samples)
+                all_samples = anneal_Langevin_dynamics_inpainting(init_samples, x[:width, ...], score,
+                                                                  sigmas,
+                                                                  self.config.data.image_size, mask,
+                                                                  self.config.sampling.n_steps_each,
+                                                                  self.config.sampling.step_lr)
 
-            sample = inverse_data_transform(self.config, sample)
-            print(sample.shape)
-            plt.figure()
-            plt.imshow(sample[0])
-            plt.savefig('test_sample.png')
-            plt.close()
-            exit()
+                torch.save(x[:width, ...], os.path.join(self.args.image_folder, 'refer_image.pth'))
+                refer_images = x[:width, None, ...].expand(-1, width, -1, -1, -1).reshape(-1,
+                                                                                                     *x.shape[
+                                                                                                      1:])
+                save_image(refer_images, os.path.join(self.args.image_folder, 'refer_image.png'), nrow=width)
 
-            elapsed = time() - start
-            print(elapsed)
-            times.append(elapsed)
+                sample = all_samples[-1].view(self.config.sampling.batch_size, self.config.data.channels,
+                                              self.config.data.image_size,
+                                              self.config.data.image_size)
 
-            for k in range(sample.shape[0]):
-                save_dict = {
-                    'gt': x.cpu(),
-                    'masked': x.cpu() * mask.cpu(),
-                    'x_hat': sample[k].cpu()
-                }
-                torch.save(save_dict, os.path.join('/storage/celebA-HQ/langevin_recons',
-                                            f'image_{k}_sample_{j}.pt'))
+                sample = inverse_data_transform(self.config, sample)
+                print(sample.shape)
+                plt.figure()
+                plt.imshow(sample[0])
+                plt.savefig('test_sample.png')
+                plt.close()
+                exit()
+
+                elapsed = time() - start
+                print(elapsed)
+                times.append(elapsed)
+
+                for k in range(sample.shape[0]):
+                    save_dict = {
+                        'gt': x.cpu(),
+                        'masked': x.cpu() * mask.cpu(),
+                        'x_hat': sample[k].cpu()
+                    }
+                    torch.save(save_dict, os.path.join('/storage/celebA-HQ/langevin_recons',
+                                                f'image_{k}_sample_{j}.pt'))
 
 
 _, _, test_loader = create_data_loaders(args)
