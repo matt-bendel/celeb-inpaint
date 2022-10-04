@@ -116,13 +116,13 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     fig = plt.figure()
                     plt.axis('off')
                     plt.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    plt.savefig(f'test_ims/original_{fig_count}.png', bbox_inches='tight')
+                    plt.savefig(f'test_ims_2/original_{fig_count}.png', bbox_inches='tight')
                     plt.close(fig)
 
                     fig = plt.figure()
                     plt.axis('off')
                     plt.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    plt.savefig(f'test_ims/masked_{fig_count}.png', bbox_inches='tight')
+                    plt.savefig(f'test_ims_2/masked_{fig_count}.png', bbox_inches='tight')
                     plt.close(fig)
 
                     # fig, ax1 = plt.subplots(1, 1)
@@ -158,7 +158,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         #     ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'test_ims/5_recons_ours_{fig_count}',bbox_inches='tight')
+                    plt.savefig(f'test_ims_2/5_recons_ours_{fig_count}',bbox_inches='tight')
                     plt.close(fig)
 
                     fig = plt.figure()
@@ -172,7 +172,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         #     ax.set_xlabel('CoModGAN',fontweight='bold')
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'test_ims/5_recons_comodgan_{fig_count}',bbox_inches='tight')
+                    plt.savefig(f'test_ims_2/5_recons_comodgan_{fig_count}',bbox_inches='tight')
                     plt.close(fig)
 
 

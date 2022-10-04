@@ -88,6 +88,7 @@ def sample(self):
     )
 
     score.eval()
+    times = []
 
     num_samps = 32
     for i, data in enumerate(test_loader):
@@ -95,6 +96,7 @@ def sample(self):
         x = x.to(self.config.device)
 
         for j in range(num_samps):
+            start = time()
             width = int(np.sqrt(self.config.sampling.batch_size))
             init_samples = torch.rand(width, width, self.config.data.channels,
                                       self.config.data.image_size,
@@ -124,6 +126,8 @@ def sample(self):
                                                 'image_grid_{}.png'.format(self.config.sampling.ckpt_id)))
             torch.save(sample, os.path.join(self.args.image_folder,
                                             'completion_{}.pth'.format(self.config.sampling.ckpt_id)))
+            elapsed = time() - start
+            times.append(elapsed)
 
 
 _, _, test_loader = create_data_loaders(args)
