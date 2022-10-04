@@ -110,7 +110,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
             for j in range(y.size(0)):
                 total += 1
 
-                if total % 50 == 0:
+                if total % 25 == 0:
                     fig_count += 1
 
                     fig = plt.figure()
