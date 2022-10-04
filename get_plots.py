@@ -158,7 +158,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                         #     ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'test_ims_2/5_recons_ours_{fig_count}',bbox_inches='tight')
+                    plt.savefig(f'test_ims_2/5_recons_ours_{fig_count}',bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
                     fig = plt.figure()

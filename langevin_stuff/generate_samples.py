@@ -115,8 +115,8 @@ def sample(self):
                                                               self.config.sampling.step_lr)
 
             torch.save(x[:width, ...], os.path.join(self.args.image_folder, 'refer_image.pth'))
-            refer_images = refer_images[:width, None, ...].expand(-1, width, -1, -1, -1).reshape(-1,
-                                                                                                 *refer_images.shape[
+            refer_images = x[:width, None, ...].expand(-1, width, -1, -1, -1).reshape(-1,
+                                                                                                 *x.shape[
                                                                                                   1:])
             save_image(refer_images, os.path.join(self.args.image_folder, 'refer_image.png'), nrow=width)
 
@@ -125,6 +125,13 @@ def sample(self):
                                           self.config.data.image_size)
 
             sample = inverse_data_transform(self.config, sample)
+            print(sample.shape)
+            plt.figure()
+            plt.imshow(sample[0])
+            plt.savefig('test_sample.png')
+            plt.close()
+            exit()
+
             elapsed = time() - start
             print(elapsed)
             times.append(elapsed)
