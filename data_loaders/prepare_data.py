@@ -77,7 +77,7 @@ def create_data_loaders(args):
     )
 
     test_loader = DataLoader(
-        dataset=dev_data,
+        dataset=test_data,
         batch_size=args.batch_size,
         num_workers=16,
         pin_memory=True,
