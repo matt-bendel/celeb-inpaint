@@ -52,6 +52,7 @@ class DataTransform:
     def __call__(self, gt_im, fname):
         print(fname)
         exit()
+        gt_im = transforms.ToTensor(gt_im)
         mean = torch.tensor([0.5, 0.5, 0.5])
         std = torch.tensor([0.5, 0.5, 0.5])
         gt = (gt_im - mean[:, None, None]) / std[:, None, None]
@@ -62,8 +63,8 @@ class DataTransform:
 
 
 def create_datasets(args):
-    transform = transforms.Compose([transforms.ToTensor(), DataTransform(args)])
-    dataset = datasets.ImageFolder('/storage/celebA-HQ/celeba_hq_128', transform=transform)
+    # transform = transforms.Compose([transforms.ToTensor(), DataTransform(args)])
+    dataset = datasets.ImageFolder('/storage/celebA-HQ/celeba_hq_128')
     train_data, dev_data, test_data = torch.utils.data.random_split(
         dataset, [27000, 2000, 1000],
         generator=torch.Generator().manual_seed(0)
