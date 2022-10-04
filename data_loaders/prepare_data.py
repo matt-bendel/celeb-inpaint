@@ -6,18 +6,6 @@ from torchvision import datasets, transforms
 from torch.utils.data.dataset import Subset
 import matplotlib.pyplot as plt
 
-class SubsetOverride(torch.utils.data.dataset.Subset):
-    def __init__(self, dataset, indices):
-        super(SubsetOverride, self).__init__(dataset, indices)
-
-    def __getitem__(self, idx):
-        if isinstance(idx, list):
-            fnames = self.dataset.imgs[[self.indices[i] for i in idx]]
-            fnames = [fnames[0] for i in idx]
-            return self.dataset[[self.indices[i] for i in idx]], fnames
-
-        return self.dataset[self.indices[idx]], self.dataset.imgs[self.indices[idx]][0]
-
 
 class DataTransform:
     """
@@ -49,10 +37,7 @@ class DataTransform:
         self.mask = torch.tensor(np.reshape(arr, (128, 128)), dtype=torch.float).repeat(3, 1, 1)
         torch.save(self.mask, 'mast.pt')
 
-    def __call__(self, gt_im, fname):
-        print(fname)
-        exit()
-        gt_im = transforms.ToTensor(gt_im)
+    def __call__(self, gt_im):
         mean = torch.tensor([0.5, 0.5, 0.5])
         std = torch.tensor([0.5, 0.5, 0.5])
         gt = (gt_im - mean[:, None, None]) / std[:, None, None]
@@ -63,15 +48,12 @@ class DataTransform:
 
 
 def create_datasets(args):
-    # transform = transforms.Compose([transforms.ToTensor(), DataTransform(args)])
-    transform = transforms.Compose([DataTransform(args)])
+    transform = transforms.Compose([transforms.ToTensor(), DataTransform(args)])
     dataset = datasets.ImageFolder('/storage/celebA-HQ/celeba_hq_128', transform=transform)
     train_data, dev_data, test_data = torch.utils.data.random_split(
         dataset, [27000, 2000, 1000],
         generator=torch.Generator().manual_seed(0)
     )
-
-    test_data = SubsetOverride(test_data.dataset, test_data.indices)
 
     return test_data, dev_data, train_data
 
