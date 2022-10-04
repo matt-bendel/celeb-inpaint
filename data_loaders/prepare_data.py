@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 class SubsetOverride(torch.utils.data.dataset.Subset):
     def __init__(self, dataset, indices):
-        super(SubsetOverride, self).__init__()
+        super(SubsetOverride, self).__init__(dataset, indices)
 
     def __getitem__(self, idx):
         if isinstance(idx, list):
