@@ -12,11 +12,11 @@ class SubsetOverride(torch.utils.data.dataset.Subset):
 
     def __getitem__(self, idx):
         if isinstance(idx, list):
-            print(self.dataset.imgs[[self.indices[i] for i in idx]])
-            return self.dataset[[self.indices[i] for i in idx]], self.dataset.imgs[[self.indices[i] for i in idx]]
+            fnames = self.dataset.imgs[[self.indices[i] for i in idx]]
+            fnames = [fnames[0] for i in idx]
+            return self.dataset[[self.indices[i] for i in idx]], fnames
 
-        print(self.dataset.imgs[self.indices[idx]])
-        return self.dataset[self.indices[idx]], self.dataset.imgs[self.indices[idx]]
+        return self.dataset[self.indices[idx]], self.dataset.imgs[self.indices[idx]][0]
 
 
 class DataTransform:
