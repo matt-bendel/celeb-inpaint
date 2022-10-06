@@ -148,7 +148,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     place = 1
 
                     fig = plt.figure()
-                    # fig.subplots_adjust(wspace=0, hspace=0.05)
+                    fig.subplots_adjust(wspace=0, hspace=0.05)
 
                     for r in range(5):
                         ax = fig.add_subplot(5, 1, r+1)
@@ -162,7 +162,7 @@ def get_plots(args, G_ours, G_comod, test_loader):
                     plt.close(fig)
 
                     fig = plt.figure()
-                    # fig.subplots_adjust(wspace=0, hspace=0.05)
+                    fig.subplots_adjust(wspace=0, hspace=0.05)
 
                     for r in range(5):
                         ax = fig.add_subplot(5, 1, r+1)
