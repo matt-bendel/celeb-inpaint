@@ -78,7 +78,8 @@ def get_metrics(args, num_code):
     losses = {
         'psnr': [],
         'ssim': [],
-        'apsd': []
+        'apsd': [],
+        '1-psnr': [],
     }
     means = {
         'psnr': [],
@@ -122,6 +123,11 @@ def get_metrics(args, num_code):
             plt.savefig(f'test_ims_2/5_recons_langevin_{fig_count}', bbox_inches='tight', dpi=300)
             plt.close(fig)
 
+            fig = plt.figure()
+            plt.imshow(gt.transpose(1, 2, 0))
+            plt.savefig(f'langevin_gt_{fig_count}.png')
+            plt.close(fig)
+
         if total % 50 == 0:
             # continue
             means['psnr'].append(np.mean(losses['psnr']))
@@ -134,6 +140,7 @@ def get_metrics(args, num_code):
     print(f'RESULTS for {num_code} code vectors')
     print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"]) / np.sqrt(len(means["ssim"]))}')
     print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"]) / np.sqrt(len(means["ssim"]))}')
+    print(f'1-PSNR: {np.mean(losses["1-psnr"])}')
     print(f'APSD: {np.mean(losses["apsd"])}')
 
 
