@@ -104,7 +104,7 @@ def get_metrics(args, num_code):
         losses['apsd'].append(apsd)
         losses['ssim'].append(ssim(gt, avg.cpu().numpy()))
         losses['psnr'].append(psnr(gt, avg.cpu().numpy()))
-        losses['psnr_1'].append(psnr(gt, gens[0].cpu().numpy()))
+        losses['1-psnr'].append(psnr(gt, gens[0].cpu().numpy()))
 
         if total % 25 == 0:
             fig_count += 1
