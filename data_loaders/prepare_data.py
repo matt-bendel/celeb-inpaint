@@ -83,7 +83,6 @@ def create_data_loaders(args):
         batch_size=args.batch_size,
         num_workers=16,
         pin_memory=True,
-        drop_last=True,
     )
 
     return train_loader, dev_loader, test_loader
