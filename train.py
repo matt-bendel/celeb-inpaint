@@ -344,8 +344,8 @@ def train(args):
 
         del cfid_metric
 
-        best_model = cfid < best_loss and (psnr_diff < 0.26)
-        best_loss = cfid if cfid < best_loss and (psnr_diff < 0.26) else best_loss
+        best_model = cfid < best_loss and (psnr_diff <= 0.25)
+        best_loss = cfid if cfid < best_loss and (psnr_diff <= 0.25) else best_loss
 
         GLOBAL_LOSS_DICT['g_loss'].append(np.mean(batch_loss['g_loss']))
         GLOBAL_LOSS_DICT['d_loss'].append(np.mean(batch_loss['d_loss']))
