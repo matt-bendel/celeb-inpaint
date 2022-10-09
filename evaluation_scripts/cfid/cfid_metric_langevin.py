@@ -150,13 +150,12 @@ class CFIDMetric:
         true_embed = []
 
         for i in range(1000):
-            recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i}_sample_0.pt')
-            x_hat = recon_object['x_hat'].cuda()
-            x = recon_object['gt'].cuda()
-            y = recon_object['masked'].cuda()
-
             with torch.no_grad():
-                for j in range(1):
+                for j in range(32):
+                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i}_sample_{j}.pt')
+                    x_hat = recon_object['x_hat'].cuda()
+                    x = recon_object['gt'].cuda()
+                    y = recon_object['masked'].cuda()
                     image = self._get_embed_im(x_hat)
                     condition_im = self._get_embed_im(y)
                     true_im = self._get_embed_im(x)

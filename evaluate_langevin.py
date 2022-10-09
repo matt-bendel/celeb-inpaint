@@ -196,7 +196,7 @@ if __name__ == '__main__':
     args.out_chans = 3
 
     train_loader, _, _ = create_data_loaders(args)
-    # get_cfid(args, 1)
+    get_cfid(args, 1)
     # get_fid(args, train_loader)
     vals = [32]
     for val in vals:
