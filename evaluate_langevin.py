@@ -99,7 +99,7 @@ def get_metrics(args, num_code):
 
         gt = recon_object['gt'].numpy()
         avg = torch.mean(gens, dim=0)
-        apsd = torch.std(gens, dim=0),mean().cpu().numpy()
+        apsd = torch.std(gens, dim=0).mean().cpu().numpy()
         losses['apsd'].append(apsd)
         losses['ssim'].append(ssim(gt, avg.cpu().numpy()))
         losses['psnr'].append(psnr(gt, avg.cpu().numpy()))
@@ -188,8 +188,8 @@ if __name__ == '__main__':
     args.out_chans = 3
 
     train_loader, _, _ = create_data_loaders(args)
-    get_cfid(args, 1)
-    get_fid(args, train_loader)
+    # get_cfid(args, 1)
+    # get_fid(args, train_loader)
     vals = [32]
     for val in vals:
         get_metrics(args, val)
