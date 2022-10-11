@@ -195,7 +195,7 @@ if __name__ == '__main__':
 
     train_loader, _, test_loader = create_data_loaders(args)
     # get_cfid(args, G, test_loader, 1)
-    get_lpips(args, G, test_loader, 1)
+    get_lpips(args, G, test_loader, 5)
     exit()
     get_cfid(args, G, test_loader, 32)
     get_fid(args, G, test_loader, train_loader)
