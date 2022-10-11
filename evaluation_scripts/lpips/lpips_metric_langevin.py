@@ -33,6 +33,7 @@ class LPIPSMetric:
 
                 dists.append(np.mean(self.model.forward(embedImg1.to("cuda:0"), embedImg2.to("cuda:0")).data.cpu().squeeze().numpy()))
 
+            print(dists)
             meta_dists.append(np.mean(dists))
 
         return np.mean(meta_dists)
