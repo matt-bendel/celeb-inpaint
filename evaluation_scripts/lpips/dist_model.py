@@ -15,7 +15,7 @@ import functools
 import skimage.transform
 from tqdm import tqdm
 
-import evaluation_scripts.lpips.networks_basic as networks
+import evaluation_scripts.lpips.network_basic as networks
 import models as util
 
 class DistModel(BaseModel):
