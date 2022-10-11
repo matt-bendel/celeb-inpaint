@@ -8,10 +8,9 @@ from torch.autograd import Variable
 import numpy as np
 from pdb import set_trace as st
 from skimage import color
-from IPython import embed
-from . import pretrained_networks as pn
+import evaluation_scripts.lpips.pretrained_networks as pn
 
-import models as util
+import evaluation_scripts.lpips as util
 
 
 def spatial_average(in_tens, keepdim=True):
