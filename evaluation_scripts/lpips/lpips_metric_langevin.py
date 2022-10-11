@@ -5,10 +5,7 @@ from evaluation_scripts.lpips.dist_model import DistModel
 from tqdm import tqdm
 
 class LPIPSMetric:
-    def __init__(self, G, data_loader):
-        self.G = G
-        self.G.update_gen_status(val=True)
-        self.loader = data_loader
+    def __init__(self):
         self.model = PerceptualLoss(model='net-lin',net='alex')
 
     def compute_lpips(self, num_runs):
