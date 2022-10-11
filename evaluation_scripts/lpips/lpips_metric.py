@@ -4,26 +4,6 @@ import torch
 import evaluation_scripts.lpips.dist_model
 from tqdm import tqdm
 
-# Load images
-with open(opt.test_list, 'r') as f:
-    for ll in f:
-        path0, path1 = ll.strip().split('\t')
-        print(path0, path1)
-        img0 = util.im2tensor(util.load_image(os.path.join(opt.path, path0+'.png')))
-        img1 = util.im2tensor(util.load_image(os.path.join(opt.path, path1+'.png')))
-
-        if opt.use_gpu:
-            img0 = img0.cuda()
-            img1 = img1.cuda()
-
-        # Compute distance
-        dist01 = model.forward(img0,img1).data.cpu().squeeze().numpy()
-        print('Distance: %.4f'%dist01)
-        dists.append(dist01)
-
-print('Average distance: %.4f'%(sum(dists)/len(dists)))
-print('Standard deviation:', np.array(dists).std())
-
 class LPIPSMetric:
     def __init__(self, G, data_loader):
         self.G = G
