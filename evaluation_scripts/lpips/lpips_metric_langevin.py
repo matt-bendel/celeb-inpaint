@@ -22,12 +22,12 @@ class LPIPSMetric:
 
                 batch_size = embedImg1.shape[0]
                 for k in range(batch_size):
-                    print(i*batch_size + k)
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i*batch_size + k}_sample_0.pt')
+                    print(j*batch_size + k)
+                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j*batch_size + k}_sample_0.pt')
                     im1 = recon_object['x_hat'].cuda()
                     embedImg1[k, :, :, :] = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
 
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i*batch_size + k}_sample_1.pt')
+                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j*batch_size + k}_sample_1.pt')
                     im2 = recon_object['x_hat'].cuda()
                     embedImg2[k, :, :, :] = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
 
