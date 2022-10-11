@@ -8,7 +8,7 @@ class LPIPSMetric:
     def __init__(self, G, data_loader):
         self.G = G
         self.G.update_gen_status(val=True)
-        self.data_loader = data_loader
+        self.loader = data_loader
         self.model = PerceptualLoss(model='net-lin',net='alex')
 
     def compute_lpips(self, num_runs):
