@@ -19,6 +19,7 @@ from wrappers.our_gen_wrapper import load_best_gan
 from evaluation_scripts.cfid.embeddings import InceptionEmbedding
 from evaluation_scripts.cfid.cfid_metric import CFIDMetric
 from evaluation_scripts.fid.fid_metric import FIDMetric
+from evaluation_scripts.lpips.lpips_metric import LPIPSMetric
 
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
@@ -165,6 +166,11 @@ def get_fid(args, G, test_loader, train_loader):
 
     print('FID: ', fid_metric.get_fid())
 
+def get_lpips(args, G, test_loader, num_runs):
+    lpips_metric = LPIPSMetric(G, test_loader)
+
+    print('LPIPS: ', lpips_metric.compute_lpips(num_runs))
+
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
     torch.backends.cudnn.benchmark = True
@@ -189,8 +195,9 @@ if __name__ == '__main__':
 
     train_loader, _, test_loader = create_data_loaders(args)
     # get_cfid(args, G, test_loader, 1)
-    get_cfid(args, G, test_loader, 32)
+    get_lpips(args, G, test_loader, 5)
     exit()
+    get_cfid(args, G, test_loader, 32)
     get_fid(args, G, test_loader, train_loader)
     # exit()
     # vals = [1, 2, 4, 8, 16, 32]
