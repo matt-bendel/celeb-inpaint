@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import torch
-import evaluation_scripts.lpips.dist_model
+from evaluation_scripts.lpips.dist_model import DistModel
 from tqdm import tqdm
 
 class LPIPSMetric:
@@ -55,7 +55,7 @@ class PerceptualLoss(torch.nn.Module):
         self.use_gpu = use_gpu
         self.spatial = spatial
         self.gpu_ids = gpu_ids
-        self.model = dist_model.DistModel()
+        self.model = DistModel()
         self.model.initialize(model=model, net=net, use_gpu=use_gpu, colorspace=colorspace, spatial=self.spatial, gpu_ids=gpu_ids)
         print('...[%s] initialized'%self.model.name())
         print('...Done')
