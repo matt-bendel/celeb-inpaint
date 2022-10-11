@@ -12,7 +12,7 @@ class LPIPSMetric:
         meta_dists = []
         for i in range(num_runs):
             dists = []
-            for j in range(8):
+            for j in range(9):
                 if j ==  7:
                     embedImg1 = torch.zeros(104, 3, 128, 128).cuda()
                     embedImg2 = torch.zeros(104, 3, 128, 128).cuda()
