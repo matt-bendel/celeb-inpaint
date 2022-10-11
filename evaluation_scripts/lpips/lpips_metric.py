@@ -28,8 +28,8 @@ class LPIPSMetric:
                 img1 = self.G(y, x=x, mask=mask, truncation=None)
                 img2 = self.G(y, x=x, mask=mask, truncation=None)
 
-                embedImg1 = torch.zeros(size=(img1.size(0), 3, 128, 128), device=self.args.device)
-                embedImg2 = torch.zeros(size=(img2.size(0), 3, 128, 128), device=self.args.device)
+                embedImg1 = torch.zeros(size=(img1.size(0), 3, 128, 128)).cuda()
+                embedImg2 = torch.zeros(size=(img2.size(0), 3, 128, 128)).cuda()
 
                 for i in range(inp.size(0)):
                     im1 = img1[i, :, :, :] * std[i, :, None, None] + mean[i, :, None, None]
