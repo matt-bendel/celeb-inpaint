@@ -31,14 +31,14 @@ class LPIPSMetric:
                 embedImg1 = torch.zeros(size=(img1.size(0), 3, 128, 128)).cuda()
                 embedImg2 = torch.zeros(size=(img2.size(0), 3, 128, 128)).cuda()
 
-                for i in range(img1.size(0)):
-                    im1 = img1[i, :, :, :] * std[i, :, None, None] + mean[i, :, None, None]
+                for l in range(img1.size(0)):
+                    im1 = img1[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
                     im1 = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
-                    embedImg1[i, :, :, :] = im1
+                    embedImg1[l, :, :, :] = im1
 
-                    im2 = img2[i, :, :, :] * std[i, :, None, None] + mean[i, :, None, None]
+                    im2 = img2[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
                     im2 = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
-                    embedImg2[i, :, :, :] = im2
+                    embedImg2[l, :, :, :] = im2
 
                 dists.append(np.mean(self.model.forward(embedImg1.to("cuda:0"), embedImg2.to("cuda:0")).data.cpu().squeeze().numpy()))
 
