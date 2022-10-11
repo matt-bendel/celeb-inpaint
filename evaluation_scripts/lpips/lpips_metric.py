@@ -40,7 +40,7 @@ class LPIPSMetric:
                     im2 = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
                     embedImg2[i, :, :, :] = im2
 
-                dists.append(model.forward(embedImg1, embedImg2).data.cpu().squeeze().numpy())
+                dists.append(self.model.forward(embedImg1, embedImg2).data.cpu().squeeze().numpy())
 
             meta_dists.append(np.mean(dists))
 
