@@ -120,7 +120,8 @@ class CFIDMetric:
                  cuda=False,
                  args=None,
                  eps=1e-6,
-                 num_samps=1):
+                 num_samps=1,
+                 truncation=None):
 
         self.gan = gan
         self.args = args
@@ -131,6 +132,7 @@ class CFIDMetric:
         self.eps = eps
         self.gen_embeds, self.cond_embeds, self.true_embeds = None, None, None
         self.num_samps = num_samps
+        self.truncatuon = truncation
 
     def _get_mvue(self, kspace, s_maps):
         return np.sum(sp.ifft(kspace, axes=(-1, -2)) * np.conj(s_maps), axis=1) / np.sqrt(
@@ -161,9 +163,11 @@ class CFIDMetric:
             mean = mean.cuda()
             std = std.cuda()
 
+            truncation_latent = self.gan.get_mean_code_vector(y, x, mask, num_latents=128)
+
             with torch.no_grad():
                 for j in range(self.num_samps):
-                    recon = self.gan(y, x=x, mask=mask, truncation=None)
+                    recon = self.gan(y, x=x, mask=mask, truncation=self.truncatuon, truncation_latent=truncation_latent)
 
                     image = self._get_embed_im(recon, mean, std)
                     condition_im = self._get_embed_im(y, mean, std)

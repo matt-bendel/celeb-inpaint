@@ -135,7 +135,7 @@ def get_metrics(args, G, test_loader, num_code):
     print(f'TIME: {np.mean(times)}')
 
 
-def get_cfid(args, G, test_loader, num_samps):
+def get_cfid(args, G, test_loader, num_samps, t):
     print("GETTING INCEPTION EMBEDDING")
     inception_embedding = InceptionEmbedding(parallel=True)
 
@@ -146,7 +146,8 @@ def get_cfid(args, G, test_loader, num_samps):
                              condition_embedding=inception_embedding,
                              cuda=True,
                              args=args,
-                             num_samps=num_samps)
+                             num_samps=num_samps,
+                             truncation=t)
 
     print(f'{num_samps}-CFID')
     print('CFID: ', cfid_metric.get_cfid_torch())
@@ -216,14 +217,17 @@ if __name__ == '__main__':
     truncations = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
     fids = []
     lpips = []
+    cfids = []
     for t in truncations:
-        lpips.append(get_lpips(args, G, test_loader, 1, t))
-        fids.append(get_fid(args, G, test_loader, train_loader, t))
+        # lpips.append(get_lpips(args, G, test_loader, 1, t))
+        # fids.append(get_fid(args, G, test_loader, train_loader, t))
+        cfids.append(get_cfid(args, G, test_loader, 1, t))
 
     for i, t in enumerate(truncations):
         print(f't: {t}')
-        print(f'fid: {fids[i]}')
-        print(f'lpips: {lpips[i]}')
+        print(f'CFID: {cfids[i]}')
+        # print(f'fid: {fids[i]}')
+        # print(f'lpips: {lpips[i]}')
 
     exit()
     # exit()
