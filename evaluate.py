@@ -137,7 +137,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
     print(f'TIME: {np.mean(times)}')
 
 
-def get_cfid(args, G, test_loader, num_samps, t):
+def get_cfid(args, G, test_loader, num_samps, t, truncation_latent=None):
     print("GETTING INCEPTION EMBEDDING")
     inception_embedding = InceptionEmbedding(parallel=True)
 
@@ -149,14 +149,15 @@ def get_cfid(args, G, test_loader, num_samps, t):
                              cuda=True,
                              args=args,
                              num_samps=num_samps,
-                             truncation=t)
+                             truncation=t,
+                             truncation_latent=truncation_latent)
 
     print(f'{num_samps}-CFID')
     cfid = cfid_metric.get_cfid_torch()
     print('CFID: ', cfid)
     return cfid
 
-def get_fid(args, G, test_loader, train_loader, t):
+def get_fid(args, G, test_loader, train_loader, t, truncation_latent=None):
     print("GETTING INCEPTION EMBEDDING")
     inception_embedding = InceptionEmbedding(parallel=True)
 
@@ -168,13 +169,14 @@ def get_fid(args, G, test_loader, train_loader, t):
                              condition_embedding=inception_embedding,
                              cuda=True,
                              args=args,
-                             truncation=t)
+                             truncation=t,
+                             truncation_latent=truncation_latent)
 
     fid = fid_metric.get_fid()
     print('FID: ', fid)
     return fid
 
-def get_lpips(args, G, test_loader, num_runs, t):
+def get_lpips(args, G, test_loader, num_runs, t, truncation_latent=None):
     lpips_metric = LPIPSMetric(G, test_loader)
     LPIPS = lpips_metric.compute_lpips(num_runs, t)
     print('LPIPS: ', LPIPS)
@@ -204,36 +206,34 @@ if __name__ == '__main__':
 
     train_loader, _, test_loader = create_data_loaders(args)
 
-    # truncation_latens = []
-    # for i, data in tqdm(enumerate(self.loader),
-    #                     desc='Computing generated distribution',
-    #                     total=len(self.loader)):
-    #     x, y, mean, std, mask = data[0]
-    #     x = x.cuda()
-    #     y = y.cuda()
-    #     mask = mask.cuda()
-    #     mean = mean.cuda()
-    #     std = std.cuda()
-    #
-    #     truncation_latents.append(G.get_mean_code_vector(y, x, mask, num_latents=128))
+    truncation_latent = None
+    for i, data in tqdm(enumerate(self.loader),
+                        desc='Computing generated distribution',
+                        total=len(self.loader)):
+        x, y, mean, std, mask = data[0]
+        x = x.cuda()
+        y = y.cuda()
+        mask = mask.cuda()
+        mean = mean.cuda()
+        std = std.cuda()
+
+        truncation_latent = torch.mean(G.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
+        break
 
     # get_cfid(args, G, test_loader, 1)
     truncations = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
     fids = []
     lpips = []
     cfids = []
-    # for t in truncations:
-        # lpips.append(get_lpips(args, G, test_loader, 1, t))
-        # fids.append(get_fid(args, G, test_loader, train_loader, t))
-        # cfids.append(get_cfid(args, G, test_loader, 1, t))
-    #
-    # for i, t in enumerate(truncations):
-    #     print(f't: {t}')
-    #     print(f'CFID: {cfids[i]}')
-        # print(f'fid: {fids[i]}')
-        # print(f'lpips: {lpips[i]}')
+    for t in truncations:
+        lpips.append(get_lpips(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
+        fids.append(get_fid(args, G, test_loader, train_loader, t, truncation_latent=truncation_latent))
+        cfids.append(get_cfid(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
 
-    # exit()
+    for i, t in enumerate(truncations):
+        print(f't: {t}, CFID: {cfids[i]}, fid: {fids[i]}, lpips: {lpips[i]}')
+
+    exit()
     # vals = [1, 2, 4, 8, 16, 32]
     vals = [32]
     for val in vals:
