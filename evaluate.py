@@ -178,7 +178,7 @@ def get_fid(args, G, test_loader, train_loader, t, truncation_latent=None):
 
 def get_lpips(args, G, test_loader, num_runs, t, truncation_latent=None):
     lpips_metric = LPIPSMetric(G, test_loader)
-    LPIPS = lpips_metric.compute_lpips(num_runs, t)
+    LPIPS = lpips_metric.compute_lpips(num_runs, t, truncation_latent)
     print('LPIPS: ', LPIPS)
     return LPIPS
 
