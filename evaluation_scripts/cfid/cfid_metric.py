@@ -165,6 +165,7 @@ class CFIDMetric:
             mean = mean.cuda()
             std = std.cuda()
 
+            truncation_latent = None
             if self.truncation_latent is not None:
                 truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
 
