@@ -165,7 +165,8 @@ class CFIDMetric:
             mean = mean.cuda()
             std = std.cuda()
 
-            truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
+            if self.truncation_latent is not None:
+                truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
 
             with torch.no_grad():
                 for j in range(self.num_samps):
