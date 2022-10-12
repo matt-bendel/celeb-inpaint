@@ -170,7 +170,7 @@ class CFIDMetric:
                 truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
 
             with torch.no_grad():
-                for j in range(self.num_samps):
+                for j in range(128):
                     recon = self.gan(y, x=x, mask=mask, truncation=self.truncatuon, truncation_latent=truncation_latent)
 
                     image = self._get_embed_im(recon, mean, std)
