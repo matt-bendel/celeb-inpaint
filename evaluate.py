@@ -75,7 +75,7 @@ def generate_gif(args, type, ind, num):
     for i in range(num):
         os.remove(f'gif_{type}_{i}.png')
 
-def get_metrics(args, G, test_loader, num_code):
+def get_metrics(args, G, test_loader, num_code, truncation=None):
     losses = {
         'psnr': [],
         'ssim': [],
@@ -100,11 +100,13 @@ def get_metrics(args, G, test_loader, num_code):
             y = y.to(args.device)
             x = x.to(args.device)
 
+            truncation_latent = G.get_mean_code_vector(y, x, mask, num_latents=128)
+
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(num_code):
                 start = time.time()
-                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None)  * std[:, :, None, None] + mean[:, :, None, None]
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent)  * std[:, :, None, None] + mean[:, :, None, None]
                 elapsed = time.time() - start
                 times.append(elapsed)
 
@@ -220,20 +222,19 @@ if __name__ == '__main__':
     fids = []
     lpips = []
     cfids = []
-    for t in truncations:
+    # for t in truncations:
         # lpips.append(get_lpips(args, G, test_loader, 1, t))
         # fids.append(get_fid(args, G, test_loader, train_loader, t))
-        cfids.append(get_cfid(args, G, test_loader, 1, t))
-
-    for i, t in enumerate(truncations):
-        print(f't: {t}')
-        print(f'CFID: {cfids[i]}')
+        # cfids.append(get_cfid(args, G, test_loader, 1, t))
+    #
+    # for i, t in enumerate(truncations):
+    #     print(f't: {t}')
+    #     print(f'CFID: {cfids[i]}')
         # print(f'fid: {fids[i]}')
         # print(f'lpips: {lpips[i]}')
 
-    exit()
     # exit()
     # vals = [1, 2, 4, 8, 16, 32]
     vals = [32]
     for val in vals:
-        get_metrics(args, G, test_loader, val)
+        get_metrics(args, G, test_loader, val, truncation=1.25)
