@@ -162,7 +162,8 @@ def get_fid(args, G, test_loader, train_loader, t):
                              image_embedding=inception_embedding,
                              condition_embedding=inception_embedding,
                              cuda=True,
-                             args=args)
+                             args=args,
+                             truncation=t)
 
     fid = fid_metric.get_fid()
     print('FID: ', fid)
@@ -197,6 +198,20 @@ if __name__ == '__main__':
     G = load_best_gan(args)
 
     train_loader, _, test_loader = create_data_loaders(args)
+
+    # truncation_latens = []
+    # for i, data in tqdm(enumerate(self.loader),
+    #                     desc='Computing generated distribution',
+    #                     total=len(self.loader)):
+    #     x, y, mean, std, mask = data[0]
+    #     x = x.cuda()
+    #     y = y.cuda()
+    #     mask = mask.cuda()
+    #     mean = mean.cuda()
+    #     std = std.cuda()
+    #
+    #     truncation_latents.append(G.get_mean_code_vector(y, x, mask, num_latents=128))
+
     # get_cfid(args, G, test_loader, 1)
     truncations = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
     fids = []
