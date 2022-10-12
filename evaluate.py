@@ -205,7 +205,7 @@ if __name__ == '__main__':
     train_loader, _, test_loader = create_data_loaders(args)
 
     truncation_latent = None
-    get_cfid(args, G, test_loader, 32, None, truncation_latent=truncation_latent)
+    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent)
     exit()
     for i, data in enumerate(test_loader):
         x, y, mean, std, mask = data[0]
