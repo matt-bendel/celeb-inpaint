@@ -11,7 +11,7 @@ class LPIPSMetric:
         self.loader = data_loader
         self.model = PerceptualLoss(model='net-lin',net='alex')
 
-    def compute_lpips(self, num_runs):
+    def compute_lpips(self, num_runs, truncation):
         meta_dists = []
         for i in range(num_runs):
             dists = []
@@ -27,8 +27,8 @@ class LPIPSMetric:
 
                 truncation_latent = self.G.get_mean_code_vector(y, x, mask, num_latents=128)
 
-                img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=truncation_latent)
-                img2 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=truncation_latent)
+                img1 = self.G(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent)
+                img2 = self.G(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent)
 
                 embedImg1 = torch.zeros(size=(img1.size(0), 3, 128, 128)).cuda()
                 embedImg2 = torch.zeros(size=(img2.size(0), 3, 128, 128)).cuda()

@@ -115,8 +115,6 @@ class GANWrapper:
         for z in range(num_latents):
             mean_latent[:, z, :] = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=True, truncation=None, truncation_latent=None)[:, 0, :]
 
-        print(mean_latent.shape)
-        exit()
         return torch.mean(mean_latent, dim=1)
 
     def __call__(self, y, noise_var=1, x=None, mask=None, truncation=None, truncation_latent=None):

@@ -120,7 +120,8 @@ class FIDMetric:
                  condition_embedding,
                  cuda=False,
                  args=None,
-                 eps=1e-6):
+                 eps=1e-6,
+                 truncation=None):
 
         self.gan = gan
         self.args = args
@@ -131,6 +132,7 @@ class FIDMetric:
         self.cuda = cuda
         self.eps = eps
         self.gen_embeds, self.cond_embeds, self.true_embeds = None, None, None
+        self.truncation = truncation
 
         self.mu_fake, self.sigma_fake = None, None
         self.mu_real, self.sigma_real = None, None
@@ -177,7 +179,7 @@ class FIDMetric:
 
             with torch.no_grad():
                 for j in range(32):
-                    recon = self.gan(y, x=x, mask=mask, truncation=None, truncation_latent=truncation_latent)
+                    recon = self.gan(y, x=x, mask=mask, truncation=self.truncation, truncation_latent=truncation_latent)
 
                     image = self._get_embed_im(recon, mean, std)
                     condition_im = self._get_embed_im(y, mean, std)

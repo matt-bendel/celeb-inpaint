@@ -151,7 +151,7 @@ def get_cfid(args, G, test_loader, num_samps):
     print(f'{num_samps}-CFID')
     print('CFID: ', cfid_metric.get_cfid_torch())
 
-def get_fid(args, G, test_loader, train_loader):
+def get_fid(args, G, test_loader, train_loader, t):
     print("GETTING INCEPTION EMBEDDING")
     inception_embedding = InceptionEmbedding(parallel=True)
 
@@ -164,12 +164,15 @@ def get_fid(args, G, test_loader, train_loader):
                              cuda=True,
                              args=args)
 
-    print('FID: ', fid_metric.get_fid())
+    fid = fid_metric.get_fid()
+    print('FID: ', fid)
+    return fid
 
-def get_lpips(args, G, test_loader, num_runs):
+def get_lpips(args, G, test_loader, num_runs, t):
     lpips_metric = LPIPSMetric(G, test_loader)
-
-    print('LPIPS: ', lpips_metric.compute_lpips(num_runs))
+    LPIPS = lpips_metric.compute_lpips(num_runs, t)
+    print('LPIPS: ', LPIPS)
+    return LPIPS
 
 if __name__ == '__main__':
     cuda = True if torch.cuda.is_available() else False
@@ -195,8 +198,12 @@ if __name__ == '__main__':
 
     train_loader, _, test_loader = create_data_loaders(args)
     # get_cfid(args, G, test_loader, 1)
-    get_lpips(args, G, test_loader, 1)
-    get_fid(args, G, test_loader, train_loader)
+    truncations = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+    fids = []
+    lpips = []
+    for t in truncations:
+        lpips.append(get_lpips(args, G, test_loader, 1, t))
+        fids.append(get_fid(args, G, test_loader, train_loader, t))
     exit()
     # exit()
     # vals = [1, 2, 4, 8, 16, 32]
