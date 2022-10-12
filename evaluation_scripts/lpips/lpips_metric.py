@@ -25,8 +25,10 @@ class LPIPSMetric:
                 mean = mean.cuda()
                 std = std.cuda()
 
-                img1 = self.G(y, x=x, mask=mask, truncation=None)
-                img2 = self.G(y, x=x, mask=mask, truncation=None)
+                truncation_latent = self.G.get_mean_code_vector(y, x, mask)
+
+                img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=truncation_latent)
+                img2 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=truncation_latent)
 
                 embedImg1 = torch.zeros(size=(img1.size(0), 3, 128, 128)).cuda()
                 embedImg2 = torch.zeros(size=(img2.size(0), 3, 128, 128)).cuda()

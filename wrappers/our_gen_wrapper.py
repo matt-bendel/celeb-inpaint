@@ -110,6 +110,13 @@ class GANWrapper:
         # samples[:, :, inds[0], inds[1]] = masked_ims[:, :, inds[0], inds[1]]
         return samples * (1 - mask) + masked_ims
 
+    def get_mean_code_vector(self, y, x, mask):
+        means = torch.zeros(y.size(0))
+        for z in range(32):
+            dlatent = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=True, truncation=None, truncation_latent=torch.randn(y.size(0), 512, device=y.device))
+            print(dlatent.shape)
+            exit()
+
     def __call__(self, y, noise_var=1, x=None, mask=None, truncation=None):
         # num_vectors = y.size(0)
         # z = self.get_noise(num_vectors, noise_var)

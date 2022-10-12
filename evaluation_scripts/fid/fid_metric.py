@@ -173,9 +173,11 @@ class FIDMetric:
             mean = mean.cuda()
             std = std.cuda()
 
+            truncation_latent = self.gan.get_mean_code_vector(y, x, mask)
+
             with torch.no_grad():
                 for j in range(32):
-                    recon = self.gan(y, x=x, mask=mask, truncation=None)
+                    recon = self.gan(y, x=x, mask=mask, truncation=None, truncation_latent=truncation_latent)
 
                     image = self._get_embed_im(recon, mean, std)
                     condition_im = self._get_embed_im(y, mean, std)
