@@ -226,7 +226,7 @@ if __name__ == '__main__':
     for t in truncations:
         lpips.append(get_lpips(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
         fids.append(get_fid(args, G, test_loader, train_loader, t, truncation_latent=truncation_latent))
-        cfids.append(get_cfid(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
+        cfids.append(get_cfid(args, G, test_loader, 32, t, truncation_latent=truncation_latent))
 
     for i, t in enumerate(truncations):
         print(f't: {t}, CFID: {cfids[i]}, fid: {fids[i]}, lpips: {lpips[i]}')
