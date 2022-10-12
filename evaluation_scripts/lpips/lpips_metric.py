@@ -25,7 +25,7 @@ class LPIPSMetric:
                 mean = mean.cuda()
                 std = std.cuda()
 
-                truncation_latent = self.G.get_mean_code_vector(y, x, mask)
+                truncation_latent = self.G.get_mean_code_vector(y, x, mask, num_latents=128)
 
                 img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=truncation_latent)
                 img2 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=truncation_latent)

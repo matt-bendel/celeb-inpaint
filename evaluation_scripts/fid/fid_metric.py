@@ -173,7 +173,7 @@ class FIDMetric:
             mean = mean.cuda()
             std = std.cuda()
 
-            truncation_latent = self.gan.get_mean_code_vector(y, x, mask)
+            truncation_latent = self.gan.get_mean_code_vector(y, x, mask, num_latents=128)
 
             with torch.no_grad():
                 for j in range(32):

@@ -110,18 +110,20 @@ class GANWrapper:
         # samples[:, :, inds[0], inds[1]] = masked_ims[:, :, inds[0], inds[1]]
         return samples * (1 - mask) + masked_ims
 
-    def get_mean_code_vector(self, y, x, mask):
-        means = torch.zeros(y.size(0))
-        for z in range(32):
-            dlatent = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=True, truncation=None, truncation_latent=torch.randn(y.size(0), 512, device=y.device))
-            print(dlatent.shape)
-            exit()
+    def get_mean_code_vector(self, y, x, mask, num_latents=32):
+        mean_latent = torch.zeros(y.size(0), num_latents, 512)
+        for z in range(num_latents):
+            mean_latent[:, z, :] = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=True, truncation=None, truncation_latent=None)[:, 0, :]
 
-    def __call__(self, y, noise_var=1, x=None, mask=None, truncation=None):
+        print(mean_latent.shape)
+        exit()
+        return torch.mean(mean_latent, dim=1)
+
+    def __call__(self, y, noise_var=1, x=None, mask=None, truncation=None, truncation_latent=None):
         # num_vectors = y.size(0)
         # z = self.get_noise(num_vectors, noise_var)
         # samples = self.gen(y)
-        samples = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=truncation, truncation_latent=torch.randn(y.size(0), 512, device=y.device))
+        samples = self.gen(x, mask, [torch.randn(y.size(0), 512, device=y.device)], return_latents=False, truncation=truncation, truncation_latent=truncation_latent)
         # samples = self.data_consistency(samples, y, mask)
 
         return samples
