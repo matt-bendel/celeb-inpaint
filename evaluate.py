@@ -100,13 +100,11 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
             y = y.to(args.device)
             x = x.to(args.device)
 
-            truncation_latent = G.get_mean_code_vector(y, x, mask, num_latents=128)
-
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                device=args.device)
             for z in range(num_code):
                 start = time.time()
-                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent)  * std[:, :, None, None] + mean[:, :, None, None]
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None, truncation_latent=None)  * std[:, :, None, None] + mean[:, :, None, None]
                 elapsed = time.time() - start
                 times.append(elapsed)
 
@@ -207,6 +205,8 @@ if __name__ == '__main__':
     train_loader, _, test_loader = create_data_loaders(args)
 
     truncation_latent = None
+    get_cfid(args, G, test_loader, 32, None, truncation_latent=truncation_latent)
+    exit()
     for i, data in enumerate(test_loader):
         x, y, mean, std, mask = data[0]
         x = x.cuda()
@@ -235,4 +235,4 @@ if __name__ == '__main__':
     # vals = [1, 2, 4, 8, 16, 32]
     vals = [32]
     for val in vals:
-        get_metrics(args, G, test_loader, val, truncation=1.25)
+        get_metrics(args, G, test_loader, val, truncation=None)
