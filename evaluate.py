@@ -207,9 +207,7 @@ if __name__ == '__main__':
     train_loader, _, test_loader = create_data_loaders(args)
 
     truncation_latent = None
-    for i, data in tqdm(enumerate(self.loader),
-                        desc='Computing generated distribution',
-                        total=len(self.loader)):
+    for i, data in enumerate(test_loader):
         x, y, mean, std, mask = data[0]
         x = x.cuda()
         y = y.cuda()
