@@ -204,6 +204,12 @@ if __name__ == '__main__':
     for t in truncations:
         lpips.append(get_lpips(args, G, test_loader, 1, t))
         fids.append(get_fid(args, G, test_loader, train_loader, t))
+
+    for i, t in enumerate(truncations):
+        print(f't: {t}')
+        print(f'fid: {fids[i]}')
+        print(f'lpips: {lpips[i]}')
+
     exit()
     # exit()
     # vals = [1, 2, 4, 8, 16, 32]
