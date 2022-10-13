@@ -161,7 +161,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         #     ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'truncation_testing/5_recons_ours_{fig_count}',bbox_inches='tight', dpi=300)
+                    plt.savefig(f'truncation_testing/5_recons_ours_{fig_count}_{truncation}',bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
                     fig = plt.figure()
@@ -175,7 +175,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         #     ax.set_xlabel('CoModGAN',fontweight='bold')
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'truncation_testing/5_recons_comodgan_{fig_count}',bbox_inches='tight', dpi=300)
+                    plt.savefig(f'truncation_testing/5_recons_comodgan_{fig_count}_{truncation}',bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
 
