@@ -223,7 +223,7 @@ if __name__ == '__main__':
         mean = mean.cuda()
         std = std.cuda()
 
-        truncation_latent = torch.mean(G.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
+        truncation_latent = torch.mean(G_ours.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
         break
 
     get_plots(args, G_ours, G_comod, test_loader, 0.25, truncation_latent)
