@@ -78,7 +78,7 @@ def generate_gif(args, type, ind, num):
     for i in range(num):
         os.remove(f'gif_{type}_{i}.png')
 
-def get_plots(args, G_ours, G_comod, test_loader):
+def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent):
     total = 0
     fig_count = 0
     num_code = 32
@@ -99,8 +99,8 @@ def get_plots(args, G_ours, G_comod, test_loader):
             gens_comod_psi_1 = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                     device=args.device)
             for z in range(num_code):
-                gens_ours[:, z, :, :, :] = G_ours(y, x=x, mask=mask, truncation=None) * std[:, :, None, None] + mean[:, :, None, None]
-                gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=None) * std[:, :, None, None] + mean[:, :, None, None]
+                gens_ours[:, z, :, :, :] = G_ours(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent) * std[:, :, None, None] + mean[:, :, None, None]
+                gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent) * std[:, :, None, None] + mean[:, :, None, None]
 
             avg_ours = torch.mean(gens_ours, dim=1)
             avg_comod_psi_1 = torch.mean(gens_comod_psi_1, dim=1)
@@ -213,4 +213,17 @@ if __name__ == '__main__':
 
     _, _, test_loader = create_data_loaders(args)
 
-    get_plots(args, G_ours, G_comod, test_loader)
+    truncation_latent = None
+
+    for i, data in enumerate(test_loader):
+        x, y, mean, std, mask = data[0]
+        x = x.cuda()
+        y = y.cuda()
+        mask = mask.cuda()
+        mean = mean.cuda()
+        std = std.cuda()
+
+        truncation_latent = torch.mean(G.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
+        break
+
+    get_plots(args, G_ours, G_comod, test_loader, None, truncation_latent)

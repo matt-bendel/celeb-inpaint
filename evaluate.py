@@ -205,8 +205,7 @@ if __name__ == '__main__':
     train_loader, _, test_loader = create_data_loaders(args)
 
     truncation_latent = None
-    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent)
-    exit()
+
     for i, data in enumerate(test_loader):
         x, y, mean, std, mask = data[0]
         x = x.cuda()
@@ -219,7 +218,7 @@ if __name__ == '__main__':
         break
 
     # get_cfid(args, G, test_loader, 1)
-    truncations = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
+    truncations = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
     fids = []
     lpips = []
     cfids = []
