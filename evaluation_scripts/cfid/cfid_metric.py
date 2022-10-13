@@ -136,10 +136,6 @@ class CFIDMetric:
         self.truncatuon = truncation
         self.truncation_latent = truncation_latent
 
-    def _get_mvue(self, kspace, s_maps):
-        return np.sum(sp.ifft(kspace, axes=(-1, -2)) * np.conj(s_maps), axis=1) / np.sqrt(
-            np.sum(np.square(np.abs(s_maps)), axis=1))
-
     def _get_embed_im(self, inp, mean, std):
         embed_ims = torch.zeros(size=(inp.size(0), 3, 128, 128),
                                 device=self.args.device)
@@ -199,37 +195,34 @@ class CFIDMetric:
             image_embed = np.concatenate(image_embed, axis=0)
             cond_embed = np.concatenate(cond_embed, axis=0)
 
-        return image_embed.to(dtype=torch.float64).t(), cond_embed.to(dtype=torch.float64).t(), true_embed.to(
-            dtype=torch.float64).t()
+        return image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(
+            dtype=torch.float64)
 
     def get_cfid_torch(self, resample=True):
         y_predict, x_true, y_true = self._get_generated_distribution()
 
         # mean estimations
         y_true = y_true.to(x_true.device)
-        m_y_predict = torch.mean(y_predict, dim=1)
-        m_x_true = torch.mean(x_true, dim=1)
-        m_y_true = torch.mean(y_true, dim=1)
+        m_y_predict = torch.mean(y_predict, dim=0)
+        m_x_true = torch.mean(x_true, dim=0)
+        m_y_true = torch.mean(y_true, dim=0)
 
-        no_m_y_true = y_true - m_y_true[:, None]
-        no_m_y_pred = y_predict - m_y_predict[:, None]
-        no_m_x_true = x_true - m_x_true[:, None]
+        no_m_y_true = y_true - m_y_true
+        no_m_y_pred = y_predict - m_y_predict
+        no_m_x_true = x_true - m_x_true
 
         m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict, m_y_true - m_y_predict)
 
-        u, s, vh = torch.linalg.svd(no_m_x_true, full_matrices=False)
+        u, s, vh = torch.linalg.svd(no_m_x_true.t(), full_matrices=False)
         v = vh.t()
-        v1 = v
+        c_dist_1 = torch.norm(torch.matmul(no_m_y_true.t() - no_m_y_pred.t(), v)) ** 2 / y_true.shape[0]
 
-        v_t_v = torch.matmul(v1, v1.t())
+        v_t_v = torch.matmul(v, vh)
+        y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred))
+        y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true))
 
-        c_dist_1 = torch.matmul(no_m_y_true - no_m_y_pred, torch.matmul(v_t_v, (no_m_y_true - no_m_y_pred).t()))
-
-        y_pred_w_v_t_v = torch.matmul(no_m_y_pred, torch.matmul(v_t_v, no_m_y_pred.t()))
-        y_true_w_v_t_v = torch.matmul(no_m_y_true, torch.matmul(v_t_v, no_m_y_true.t()))
-
-        c_y_true_given_x_true = torch.matmul(no_m_y_true, no_m_y_true.t()) - y_true_w_v_t_v
-        c_y_predict_given_x_true = torch.matmul(no_m_y_pred, no_m_y_pred.t()) - y_pred_w_v_t_v
+        c_y_true_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_true.t(), no_m_y_true) - y_true_w_v_t_v)
+        c_y_predict_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_pred.t(), no_m_y_pred) - y_pred_w_v_t_v)
 
         c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
