@@ -110,6 +110,9 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
             for j in range(y.size(0)):
                 total += 1
 
+                if fig_count == 5:
+                    break
+
                 if total % 25 == 0:
                     fig_count += 1
 
@@ -158,7 +161,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         #     ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'test_ims_2/5_recons_ours_{fig_count}',bbox_inches='tight', dpi=300)
+                    plt.savefig(f'truncation_testing/5_recons_ours_{fig_count}',bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
                     fig = plt.figure()
@@ -226,4 +229,6 @@ if __name__ == '__main__':
         truncation_latent = torch.mean(G_ours.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
         break
 
-    get_plots(args, G_ours, G_comod, test_loader, 0.25, truncation_latent)
+    truncations = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
+    for t in truncations:
+        get_plots(args, G_ours, G_comod, test_loader, t, truncation_latent)

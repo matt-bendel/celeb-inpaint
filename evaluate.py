@@ -218,14 +218,14 @@ if __name__ == '__main__':
         break
 
     # get_cfid(args, G, test_loader, 1)
-    truncations = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
+    truncations = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
     fids = []
     lpips = []
     cfids = []
     for t in truncations:
         lpips.append(get_lpips(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
         fids.append(get_fid(args, G, test_loader, train_loader, t, truncation_latent=truncation_latent))
-        cfids.append(get_cfid(args, G, test_loader, 32, t, truncation_latent=truncation_latent))
+        cfids.append(get_cfid(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
 
     for i, t in enumerate(truncations):
         print(f't: {t}, CFID: {cfids[i]}, fid: {fids[i]}, lpips: {lpips[i]}')
