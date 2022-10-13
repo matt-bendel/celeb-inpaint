@@ -151,7 +151,7 @@ def get_cfid(args, G, test_loader, num_samps, t, truncation_latent=None):
                              truncation_latent=truncation_latent)
 
     print(f'{num_samps}-CFID')
-    cfid = cfid_metric.get_cfid_torch()
+    cfid = cfid_metric.get_cfid_torch_pinv()
     print('CFID: ', cfid)
     return cfid
 
@@ -223,12 +223,13 @@ if __name__ == '__main__':
     lpips = []
     cfids = []
     for t in truncations:
-        lpips.append(get_lpips(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
-        fids.append(get_fid(args, G, test_loader, train_loader, t, truncation_latent=truncation_latent))
+        # lpips.append(get_lpips(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
+        # fids.append(get_fid(args, G, test_loader, train_loader, t, truncation_latent=truncation_latent))
         cfids.append(get_cfid(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
 
     for i, t in enumerate(truncations):
-        print(f't: {t}, CFID: {cfids[i]}, fid: {fids[i]}, lpips: {lpips[i]}')
+        # print(f't: {t}, CFID: {cfids[i]}, fid: {fids[i]}, lpips: {lpips[i]}')
+        print(f't: {t}, CFID: {cfids[i]}')
 
     exit()
     # vals = [1, 2, 4, 8, 16, 32]
