@@ -99,8 +99,8 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
             gens_comod_psi_1 = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                     device=args.device)
             for z in range(num_code):
-                gens_ours[:, z, :, :, :] = G_ours(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent) * std[:, :, None, None] + mean[:, :, None, None]
-                gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent) * std[:, :, None, None] + mean[:, :, None, None]
+                gens_ours[:, z, :, :, :] = G_ours(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent.unsqueeze(0).repeat(y.size(0), 1).cuda()) * std[:, :, None, None] + mean[:, :, None, None]
+                gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent.unsqueeze(0).repeat(y.size(0), 1).cuda()) * std[:, :, None, None] + mean[:, :, None, None]
 
             avg_ours = torch.mean(gens_ours, dim=1)
             avg_comod_psi_1 = torch.mean(gens_comod_psi_1, dim=1)
@@ -223,7 +223,7 @@ if __name__ == '__main__':
         mean = mean.cuda()
         std = std.cuda()
 
-        truncation_latent = torch.mean(G_ours.get_mean_code_vector(y, x, mask, num_latents=128), dim=0).unsqueeze(0).repeat(y.size(0), 1).cuda()
+        truncation_latent = torch.mean(G_ours.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
         break
 
     get_plots(args, G_ours, G_comod, test_loader, 0.25, truncation_latent)
