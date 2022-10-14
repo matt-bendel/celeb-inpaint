@@ -151,7 +151,7 @@ class CFIDMetric:
 
         for i in range(1000):
             with torch.no_grad():
-                for j in range(32):
+                for j in range(1):
                     recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i}_sample_{j}.pt')
                     x_hat = recon_object['x_hat'].cuda()
                     x = recon_object['gt'].cuda()
