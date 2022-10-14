@@ -223,9 +223,9 @@ if __name__ == '__main__':
         truncation_latent = torch.mean(G.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
         break
 
-    # get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=0)
+    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=0)
     get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=1)
-    # get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
+    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
 
     exit()
     # vals = [1, 2, 4, 8, 16, 32]
