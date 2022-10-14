@@ -202,6 +202,8 @@ class CFIDMetric:
             dtype=torch.float64)
 
     def _get_generated_distribution_per_y(self):
+        cfids = []
+
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
                             total=len(self.loader)):
@@ -251,10 +253,10 @@ class CFIDMetric:
                         image_embed = np.concatenate(image_embed, axis=0)
                         cond_embed = np.concatenate(cond_embed, axis=0)
 
-                    self.get_cfid_torch_def(image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(dtype=torch.float64))
+                    cfid = self.get_cfid_torch_def_pinv(image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(dtype=torch.float64))
+                    cfids.append(cfid)
 
-        return image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(
-            dtype=torch.float64)
+        return np.mean(cfids)
 
     def get_cfid_torch(self, resample=True):
         y_predict, x_true, y_true = self._get_generated_distribution()
@@ -302,9 +304,6 @@ class CFIDMetric:
         m_x_true = torch.mean(x_true, dim=1)
         m_y_true = torch.mean(y_true, dim=1)
 
-        print(m_y_true.shape)
-        print(y_true.shape)
-
         no_m_y_true = y_true - m_y_true[:, None]
         no_m_y_pred = y_predict - m_y_predict[:, None]
         no_m_x_true = x_true - m_x_true[:, None]
@@ -313,9 +312,6 @@ class CFIDMetric:
 
         u, s, vh = torch.linalg.svd(no_m_x_true, full_matrices=False)
         v = vh.t()
-        print(v.shape)
-        v = remove_zero_s_vals(s, v)
-        print(v.shape)
         v_v_t = torch.matmul(v, v.t())
 
         c_dist_1 = torch.matmul(no_m_y_true - no_m_y_pred, torch.matmul(v_v_t, no_m_y_true.t() - no_m_y_pred.t())) / y_true.shape[1]
@@ -333,9 +329,7 @@ class CFIDMetric:
 
         return cfid.cpu().numpy()
 
-    def get_cfid_torch_def(self, resample=True):
-        y_predict, x_true, y_true = self._get_generated_distribution()
-
+    def get_cfid_torch_def_pinv(self, y_predict, x_true, y_true):
         # mean estimations
         y_true = y_true.to(x_true.device)
         m_y_predict = torch.mean(y_predict, dim=0)
@@ -406,6 +400,3 @@ class CFIDMetric:
         cfid = m_dist + c_dist_1 + c_dist_2
 
         return cfid.cpu().numpy()
-
-def remove_zero_s_vals(s, v):
-    return v[:, s.abs().sum(dim=0).bool()]
