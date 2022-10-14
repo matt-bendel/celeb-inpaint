@@ -273,7 +273,7 @@ class CFIDMetric:
         v = vh.t()
         v_t_v = torch.matmul(v, vh)
 
-        c_dist_1 = torch.matmul(no_m_y_true.t() - no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_true - no_m_y_pred)) / y_true.shape[0]
+        c_dist_1 = torch.trace(torch.matmul(no_m_y_true.t() - no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_true - no_m_y_pred)) / y_true.shape[0])
 
         y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred)) / y_true.shape[0]
         y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true)) / y_true.shape[0]
