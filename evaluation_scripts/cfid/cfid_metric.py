@@ -256,8 +256,10 @@ class CFIDMetric:
     def get_cfids_debug(self):
         y_predict, x_true, y_true = self._get_generated_distribution()
 
-        self.get_cfid_torch(y_predict=y_predict,x_true=x_true,y_true=y_true)
+        cfid = self.get_cfid_torch(y_predict=y_predict,x_true=x_true,y_true=y_true)
+        print(cfid)
         cfid = self.get_cfid_torch_pinv(y_predict=y_predict,x_true=x_true,y_true=y_true)
+        print(cfid)
 
         return cfid
 
@@ -299,8 +301,6 @@ class CFIDMetric:
         print(c_dist_2_2)
 
         cfid = m_dist + c_dist_1 + c_dist_2
-
-        print(c_dist_2.cpu().numpy())
 
         return cfid.cpu().numpy()
 
