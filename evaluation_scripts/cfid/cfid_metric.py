@@ -300,9 +300,9 @@ class CFIDMetric:
         m_x_true = torch.mean(x_true, dim=1)
         m_y_true = torch.mean(y_true, dim=1)
 
-        no_m_y_true = y_true - m_y_true
-        no_m_y_pred = y_predict - m_y_predict
-        no_m_x_true = x_true - m_x_true
+        no_m_y_true = y_true - m_y_true[:, None]
+        no_m_y_pred = y_predict - m_y_predict[:, None]
+        no_m_x_true = x_true - m_x_true[:, None]
 
         m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict, m_y_true - m_y_predict)
 
