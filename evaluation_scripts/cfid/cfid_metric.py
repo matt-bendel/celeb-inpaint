@@ -309,10 +309,16 @@ class CFIDMetric:
         no_m_x_true = x_true - m_x_true[:, None]
 
         m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict, m_y_true - m_y_predict)
+        print(m_dist)
+        print(m_dist.shape)
 
         u, s, vh = torch.linalg.svd(no_m_x_true, full_matrices=False)
         v = vh.t()
         v_v_t = torch.matmul(v, v.t())
+
+        print(v_v_t.shape)
+        print(no_m_y_true.shape)
+        print(no_m_y_pred.shape)
 
         c_dist_1 = torch.matmul(no_m_y_true - no_m_y_pred, torch.matmul(v_v_t, no_m_y_true.t() - no_m_y_pred.t())) / y_true.shape[1]
         print(c_dist_1.shape)
@@ -325,8 +331,7 @@ class CFIDMetric:
 
         c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
-        print(c_dist_2.shape)
-
+        print(c_dist_2)
 
         cfid = m_dist + c_dist_1 + c_dist_2
 
