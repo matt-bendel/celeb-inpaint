@@ -253,7 +253,15 @@ class CFIDMetric:
 
         return np.mean(pinv_cfids), np.mean(svd_cfids)
 
-    def get_cfid_torch(self, resample=True):
+    def get_cfids_debug(self):
+        y_predict, x_true, y_true = self._get_generated_distribution()
+
+        self.get_cfid_torch(y_predict=y_predict,x_true=x_true,y_true=y_true)
+        cfid = self.get_cfid_torch(y_predict=y_predict,x_true=x_true,y_true=y_true)
+
+        return cfid
+
+    def get_cfid_torch(self, resample=True,y_predict=None, x_true=None, y_true = None):
         y_predict, x_true, y_true = self._get_generated_distribution()
 
         # mean estimations
@@ -405,7 +413,7 @@ class CFIDMetric:
 
         return cfid.cpu().numpy()
 
-    def get_cfid_torch_pinv(self, resample=True):
+    def get_cfid_torch_pinv(self, resample=True,y_predict=None, x_true=None, y_true = None):
         y_predict, x_true, y_true = self._get_generated_distribution()
 
         # mean estimations
@@ -445,7 +453,7 @@ class CFIDMetric:
         cfid = m_dist + c_dist1 + c_dist2
 
         print(m_dist.cpu().numpy())
-        print(c_dist_1.cpu().numpy())
-        print(c_dist_2.cpu().numpy())
+        print(c_dist1.cpu().numpy())
+        print(c_dist2.cpu().numpy())
 
         return cfid.cpu().numpy()

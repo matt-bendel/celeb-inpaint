@@ -151,6 +151,8 @@ def get_cfid(args, G, test_loader, num_samps, t, truncation_latent=None, cfid_co
                              truncation_latent=truncation_latent)
 
     print(f'{num_samps}-CFID')
+    cfid = cfid_metric.get_cfids_debug()
+    exit()
     if cfid_comp == 0:
         cfid = cfid_metric.get_cfid_torch()
         print('CFID: ', cfid)
@@ -232,7 +234,7 @@ if __name__ == '__main__':
 
     cfid_old_svd = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=0)
     # cfid_new_svd = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=1)
-    cfid_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
+    # cfid_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
     # cfid_def_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=3)
 
     # print(f'CFID OLD SVD: {cfid_old_svd}')
