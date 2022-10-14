@@ -135,7 +135,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
     print(f'TIME: {np.mean(times)}')
 
 
-def get_cfid(args, G, test_loader, num_samps, t, truncation_latent=None):
+def get_cfid(args, G, test_loader, num_samps, t, truncation_latent=None, cfid_comp=0):
     print("GETTING INCEPTION EMBEDDING")
     inception_embedding = InceptionEmbedding(parallel=True)
 
@@ -151,7 +151,13 @@ def get_cfid(args, G, test_loader, num_samps, t, truncation_latent=None):
                              truncation_latent=truncation_latent)
 
     print(f'{num_samps}-CFID')
-    cfid = cfid_metric.get_cfid_torch_pinv()
+    if cfid_comp == 0:
+        cfid = cfid_metric.get_cfid_torch()
+    elif cfid_comp==1:
+        cfid = cfid_metric.get_cfid_torch_experimental()
+    else:
+        cfid = cfid_metric.get_cfid_torch_pinv()
+
     print('CFID: ', cfid)
     return cfid
 
@@ -217,19 +223,9 @@ if __name__ == '__main__':
         truncation_latent = torch.mean(G.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
         break
 
-    # get_cfid(args, G, test_loader, 1)
-    truncations = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
-    fids = []
-    lpips = []
-    cfids = []
-    for t in truncations:
-        # lpips.append(get_lpips(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
-        # fids.append(get_fid(args, G, test_loader, train_loader, t, truncation_latent=truncation_latent))
-        cfids.append(get_cfid(args, G, test_loader, 1, t, truncation_latent=truncation_latent))
-
-    for i, t in enumerate(truncations):
-        # print(f't: {t}, CFID: {cfids[i]}, fid: {fids[i]}, lpips: {lpips[i]}')
-        print(f't: {t}, CFID: {cfids[i]}')
+    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=0)
+    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=1)
+    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
 
     exit()
     # vals = [1, 2, 4, 8, 16, 32]
