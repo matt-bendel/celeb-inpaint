@@ -285,6 +285,10 @@ class CFIDMetric:
 
         cfid = m_dist + c_dist_1 + c_dist_2
 
+        print(not m_dist.cpu().numpy())
+        print(not c_dist_1.cpu().numpy())
+        print(not c_dist_2.cpu().numpy())
+
         return cfid.cpu().numpy()
 
     def get_cfid_torch_experimental(self, resample=True):
@@ -439,5 +443,9 @@ class CFIDMetric:
             c_y_predict_given_x_true, c_y_true_given_x_true)
 
         cfid = m_dist + c_dist1 + c_dist2
+
+        print(not m_dist.cpu().numpy())
+        print(not c_dist_1.cpu().numpy())
+        print(not c_dist_2.cpu().numpy())
 
         return cfid.cpu().numpy()
