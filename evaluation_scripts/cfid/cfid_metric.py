@@ -358,8 +358,6 @@ class CFIDMetric:
         c_y_predict_given_x_true = c_y_predict_y_predict - torch.matmul(c_y_predict_x_true,
                                                                         torch.matmul(inv_c_x_true_x_true,
                                                                                      c_x_true_y_predict))
-        c_y_true_x_true_minus_c_y_predict_x_true = c_y_true_x_true - c_y_predict_x_true
-        c_x_true_y_true_minus_c_x_true_y_predict = c_x_true_y_true - c_x_true_y_predict
 
         # conditoinal mean and covariance estimations
         A = torch.matmul(inv_с_x_true_x_true, no_m_x_true.t())
@@ -368,9 +366,7 @@ class CFIDMetric:
         m_y_predict_given_x_true = m_y_predict + torch.matmul(с_y_predict_x_true, A)
 
         m_dist = torch.einsum('...k,...k->...', m_y_true_given_x_true - m_y_predict_given_x_true, m_y_true_given_x_true - m_y_predict_given_x_true)
-        c_dist1 = torch.trace(torch.matmul(torch.matmul(c_y_true_x_true_minus_c_y_predict_x_true, inv_c_x_true_x_true),
-                                           c_x_true_y_true_minus_c_x_true_y_predict))
-        c_dist2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
+        c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
 
         cfid = m_dist + c_dist_1 + c_dist_2
