@@ -285,9 +285,9 @@ class CFIDMetric:
 
         cfid = m_dist + c_dist_1 + c_dist_2
 
-        print(not m_dist.cpu().numpy())
-        print(not c_dist_1.cpu().numpy())
-        print(not c_dist_2.cpu().numpy())
+        print(m_dist.cpu().numpy())
+        print(c_dist_1.cpu().numpy())
+        print(c_dist_2.cpu().numpy())
 
         return cfid.cpu().numpy()
 
@@ -444,8 +444,8 @@ class CFIDMetric:
 
         cfid = m_dist + c_dist1 + c_dist2
 
-        print(not m_dist.cpu().numpy())
-        print(not c_dist_1.cpu().numpy())
-        print(not c_dist_2.cpu().numpy())
+        print(m_dist.cpu().numpy())
+        print(c_dist_1.cpu().numpy())
+        print(c_dist_2.cpu().numpy())
 
         return cfid.cpu().numpy()
