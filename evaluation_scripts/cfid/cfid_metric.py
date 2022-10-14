@@ -256,7 +256,7 @@ class CFIDMetric:
     def get_cfids_debug(self):
         y_predict, x_true, y_true = self._get_generated_distribution()
 
-        self.get_cfid_torch_experimental(y_predict=y_predict,x_true=x_true,y_true=y_true)
+        self.get_cfid_torch(y_predict=y_predict,x_true=x_true,y_true=y_true)
         cfid = self.get_cfid_torch_pinv(y_predict=y_predict,x_true=x_true,y_true=y_true)
 
         return cfid
@@ -289,13 +289,17 @@ class CFIDMetric:
         c_y_true_given_x_true = torch.matmul(no_m_y_true.t(), no_m_y_true) / y_true.shape[0] - y_true_w_v_t_v
         c_y_predict_given_x_true = torch.matmul(no_m_y_pred.t(), no_m_y_pred) / y_true.shape[0] - y_pred_w_v_t_v
 
-        c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
+        c_dist_2_1 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true)
+        c_dist_2_2 = - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
+
+        c_dist_2 = c_dist_2_1 + c_dist_2_2
+
+        print(c_dist_2_1)
+        print(c_dist_2_2)
 
         cfid = m_dist + c_dist_1 + c_dist_2
 
-        print(m_dist.cpu().numpy())
-        print(c_dist_1.cpu().numpy())
         print(c_dist_2.cpu().numpy())
 
         return cfid.cpu().numpy()
@@ -335,8 +339,14 @@ class CFIDMetric:
         m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict, m_y_true - m_y_predict)
         c_dist1 = torch.trace(torch.matmul(torch.matmul(c_y_true_x_true_minus_c_y_predict_x_true, inv_c_x_true_x_true),
                                             c_x_true_y_true_minus_c_x_true_y_predict))
-        c_dist2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
+        c_dist_2_1 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true)
+        c_dist_2_2 = - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
+
+        c_dist2 = c_dist_2_1 + c_dist_2_2
+
+        print(c_dist_2_1)
+        print(c_dist_2_2)
 
         cfid = m_dist + c_dist1 + c_dist2
 
