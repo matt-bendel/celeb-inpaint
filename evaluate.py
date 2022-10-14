@@ -230,10 +230,10 @@ if __name__ == '__main__':
         truncation_latent = torch.mean(G.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
         break
 
-    # cfid_old_svd = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=0)
+    cfid_old_svd = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=0)
     # cfid_new_svd = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=1)
-    # cfid_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
-    cfid_def_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=3)
+    cfid_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
+    # cfid_def_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=3)
 
     # print(f'CFID OLD SVD: {cfid_old_svd}')
     # print(f'CFID NEW SVD: {cfid_new_svd}')
