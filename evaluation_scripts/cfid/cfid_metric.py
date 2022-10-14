@@ -257,7 +257,7 @@ class CFIDMetric:
         y_predict, x_true, y_true = self._get_generated_distribution()
 
         self.get_cfid_torch(y_predict=y_predict,x_true=x_true,y_true=y_true)
-        cfid = self.get_cfid_torch(y_predict=y_predict,x_true=x_true,y_true=y_true)
+        cfid = self.get_cfid_torch_pinv(y_predict=y_predict,x_true=x_true,y_true=y_true)
 
         return cfid
 
