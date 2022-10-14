@@ -244,12 +244,12 @@ class CFIDMetric:
                         cond_embed[i * 128:1000, j, :] = cond_e
                         true_embed[i*128:1000, j, :] = true_e
 
-            for j in range(1000):
-                p_cfid = self.get_cfid_torch_def_pinv(image_embed[j].to(dtype=torch.float64), cond_embed[j].to(dtype=torch.float64), true_embed[j].to(dtype=torch.float64))
-                pinv_cfids.append(p_cfid)
+        for j in range(1000):
+            p_cfid = self.get_cfid_torch_def_pinv(image_embed[j].to(dtype=torch.float64), cond_embed[j].to(dtype=torch.float64), true_embed[j].to(dtype=torch.float64))
+            pinv_cfids.append(p_cfid)
 
-                s_cfid = self.get_cfid_torch_def_svd(image_embed[j].to(dtype=torch.float64), cond_embed[j].to(dtype=torch.float64), true_embed[j].to(dtype=torch.float64))
-                svd_cfids.append(s_cfid)
+            s_cfid = self.get_cfid_torch_def_svd(image_embed[j].to(dtype=torch.float64), cond_embed[j].to(dtype=torch.float64), true_embed[j].to(dtype=torch.float64))
+            svd_cfids.append(s_cfid)
 
         return np.mean(pinv_cfids), np.mean(svd_cfids)
 
@@ -326,8 +326,6 @@ class CFIDMetric:
         return cfid.cpu().numpy()
 
     def get_cfid_torch_def_svd(self, y_predict, x_true, y_true):
-        print("SVD")
-
         # mean estimations
         y_true = y_true.to(x_true.device)
         m_y_predict = torch.mean(y_predict, dim=0)
@@ -363,7 +361,6 @@ class CFIDMetric:
         return cfid.cpu().numpy()
 
     def get_cfid_torch_def_pinv(self, y_predict, x_true, y_true):
-        print("PINV")
         # mean estimations
         y_true = y_true.to(x_true.device)
         m_y_predict = torch.mean(y_predict, dim=0)
