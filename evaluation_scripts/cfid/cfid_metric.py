@@ -319,7 +319,7 @@ class CFIDMetric:
         no_m_x_true = x_true - m_x_true
 
         c_y_predict_x_true = torch.matmul(no_m_y_pred.t(), no_m_x_true) / y_predict.shape[0]
-        c_y_predict_y_predict = torch.matmul(no_m_y_pred.t(), no_m_y_true) / y_predict.shape[0]
+        c_y_predict_y_predict = torch.matmul(no_m_y_pred.t(), no_m_y_pred) / y_predict.shape[0]
         c_x_true_y_predict = torch.matmul(no_m_x_true.t(), no_m_y_pred) / y_predict.shape[0]
 
         c_y_true_x_true = torch.matmul(no_m_y_true.t(), no_m_x_true) / y_predict.shape[0]
@@ -349,10 +349,6 @@ class CFIDMetric:
         print(c_dist_2_2)
 
         cfid = m_dist + c_dist1 + c_dist2
-
-        print(m_dist.cpu().numpy())
-        print(c_dist1.cpu().numpy())
-        print(c_dist2.cpu().numpy())
 
         return cfid.cpu().numpy()
 
