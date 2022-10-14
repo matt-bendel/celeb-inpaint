@@ -201,6 +201,59 @@ class CFIDMetric:
         return image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(
             dtype=torch.float64)
 
+    def _get_generated_distribution_per_y(self):
+        for i, data in tqdm(enumerate(self.loader),
+                            desc='Computing generated distribution',
+                            total=len(self.loader)):
+            x, y, mean, std, mask = data[0]
+            x = x.cuda()
+            y = y.cuda()
+            mask = mask.cuda()
+            mean = mean.cuda()
+            std = std.cuda()
+
+            truncation_latent = None
+            if self.truncation_latent is not None:
+                truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
+
+            with torch.no_grad():
+                recon = self.gan(y, x=x, mask=mask, truncation=self.truncatuon, truncation_latent=truncation_latent)
+
+                for l in range(y.shape[0]):
+                    image_embed = []
+                    cond_embed = []
+                    true_embed = []
+
+                    for j in range(32):
+                        image = self._get_embed_im(recon[l, :, :, :].unsqueeze(0), mean, std)
+                        condition_im = self._get_embed_im(y[l, :, :, :].unsqueeze(0), mean, std)
+                        true_im = self._get_embed_im(x[l, :, :, :].unsqueeze(0), mean, std)
+
+                        img_e = self.image_embedding(image)
+                        cond_e = self.condition_embedding(condition_im)
+                        true_e = self.image_embedding(true_im)
+
+                        if self.cuda:
+                            true_embed.append(true_e)
+                            image_embed.append(img_e)
+                            cond_embed.append(cond_e)
+                        else:
+                            true_embed.append(true_e.cpu().numpy())
+                            image_embed.append(img_e.cpu().numpy())
+                            cond_embed.append(cond_e.cpu().numpy())
+
+                if self.cuda:
+                    true_embed = torch.cat(true_embed, dim=0)
+                    image_embed = torch.cat(image_embed, dim=0)
+                    cond_embed = torch.cat(cond_embed, dim=0)
+                else:
+                    true_embed = np.concatenate(true_embed, axis=0)
+                    image_embed = np.concatenate(image_embed, axis=0)
+                    cond_embed = np.concatenate(cond_embed, axis=0)
+
+        return image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(
+            dtype=torch.float64)
+
     def get_cfid_torch(self, resample=True):
         y_predict, x_true, y_true = self._get_generated_distribution()
 
@@ -252,6 +305,45 @@ class CFIDMetric:
         no_m_x_true = x_true - m_x_true
 
         m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict, m_y_true - m_y_predict)
+
+        u, s, vh = torch.linalg.svd(no_m_x_true, full_matrices=False)
+        v = vh.t()
+        v = remove_zero_s_vals(s, v)
+        v_v_t = torch.matmul(v, v.t())
+
+        c_dist_1 = torch.matmul(no_m_y_true - no_m_y_pred, torch.matmul(v_v_t, no_m_y_true.t() - no_m_y_pred.t())) / y_true.shape[1]
+
+        y_pred_w_v_t_v = torch.matmul(no_m_y_pred, torch.matmul(v_v_t, no_m_y_pred.t()))
+        y_true_w_v_t_v = torch.matmul(no_m_y_true, torch.matmul(v_v_t, no_m_y_true.t()))
+
+        c_y_true_given_x_true = 1 / y_true.shape[1] * (torch.matmul(no_m_y_true, no_m_y_true.t()) - y_true_w_v_t_v)
+        c_y_predict_given_x_true = 1 / y_true.shape[1] * (torch.matmul(no_m_y_pred, no_m_y_pred.t()) - y_pred_w_v_t_v)
+
+        c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
+            c_y_predict_given_x_true, c_y_true_given_x_true)
+
+        cfid = m_dist + c_dist_1 + c_dist_2
+
+        return cfid.cpu().numpy()
+
+    def get_cfid_torch_def(self, resample=True):
+        y_predict, x_true, y_true = self._get_generated_distribution()
+
+        y_true = y_true.t() # dxn
+        y_predict = y_predict.t()
+        x_true = x_true.t()
+
+        # mean estimations
+        y_true = y_true.to(x_true.device)
+        m_y_predict = torch.mean(y_predict, dim=1)
+        m_x_true = torch.mean(x_true, dim=1)
+        m_y_true = torch.mean(y_true, dim=1)
+
+        no_m_y_true = y_true - m_y_true[:, None]
+        no_m_y_pred = y_predict - m_y_predict[:, None]
+        no_m_x_true = x_true - m_x_true[:, None]
+
+        m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict[:, None], m_y_true - m_y_predict[:, None])
 
         u, s, vh = torch.linalg.svd(no_m_x_true, full_matrices=False)
         v = vh.t()
