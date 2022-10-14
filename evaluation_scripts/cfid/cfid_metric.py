@@ -202,7 +202,12 @@ class CFIDMetric:
             dtype=torch.float64)
 
     def get_generated_distribution_per_y(self):
-        cfids = []
+        svd_cfids = []
+        pinv_cfids = []
+
+        image_embed = torch.zeros(1000, 32, 2048).cuda()
+        cond_embed = torch.zeros(1000, 32, 2048).cuda()
+        true_embed = torch.zeros(1000, 32, 2048).cuda()
 
         for i, data in tqdm(enumerate(self.loader),
                             desc='Computing generated distribution',
@@ -221,42 +226,33 @@ class CFIDMetric:
             with torch.no_grad():
                 recon = self.gan(y, x=x, mask=mask, truncation=self.truncatuon, truncation_latent=truncation_latent)
 
-                for l in range(y.shape[0]):
-                    image_embed = []
-                    cond_embed = []
-                    true_embed = []
+                for j in range(32):
+                    image = self._get_embed_im(recon, mean, std)
+                    condition_im = self._get_embed_im(y, mean, std)
+                    true_im = self._get_embed_im(x, mean, std)
 
-                    for j in range(32):
-                        image = self._get_embed_im(recon[l, :, :, :].unsqueeze(0), mean, std)
-                        condition_im = self._get_embed_im(y[l, :, :, :].unsqueeze(0), mean, std)
-                        true_im = self._get_embed_im(x[l, :, :, :].unsqueeze(0), mean, std)
+                    img_e = self.image_embedding(image)
+                    cond_e = self.condition_embedding(condition_im)
+                    true_e = self.image_embedding(true_im)
 
-                        img_e = self.image_embedding(image)
-                        cond_e = self.condition_embedding(condition_im)
-                        true_e = self.image_embedding(true_im)
-
-                        if self.cuda:
-                            true_embed.append(true_e)
-                            image_embed.append(img_e)
-                            cond_embed.append(cond_e)
-                        else:
-                            true_embed.append(true_e.cpu().numpy())
-                            image_embed.append(img_e.cpu().numpy())
-                            cond_embed.append(cond_e.cpu().numpy())
-
-                    if self.cuda:
-                        true_embed = torch.cat(true_embed, dim=0)
-                        image_embed = torch.cat(image_embed, dim=0)
-                        cond_embed = torch.cat(cond_embed, dim=0)
+                    if y.size(0) == 128:
+                        image_embed[i*128:(i+1)*128, j, :] = img_e
+                        cond_embed[i*128:(i+1)*128, j, :] = cond_e
+                        true_embed[i*128:(i+1)*128, j, :] = true_e
                     else:
-                        true_embed = np.concatenate(true_embed, axis=0)
-                        image_embed = np.concatenate(image_embed, axis=0)
-                        cond_embed = np.concatenate(cond_embed, axis=0)
+                        image_embed[i * 128:1000, j, :] = img_e
+                        cond_embed[i * 128:1000, j, :] = cond_e
+                        true_embed[i*128:1000, j, :] = true_e
 
-                    cfid = self.get_cfid_torch_def_pinv(image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(dtype=torch.float64))
-                    cfids.append(cfid)
+            for j in range(1000):
+                cfid = self.get_cfid_torch_def_pinv(image_embed[j].to(dtype=torch.float64), cond_embed[j].to(dtype=torch.float64), true_embed[j].to(dtype=torch.float64))
+                pinv_cfids.append(cfid)
 
-        return np.mean(cfids)
+            for j in range(1000):
+                cfid = self.get_cfid_torch_def_svd(image_embed[j].to(dtype=torch.float64), cond_embed[j].to(dtype=torch.float64), true_embed[j].to(dtype=torch.float64))
+                svd_cfids.append(cfid)
+
+        return np.mean(pinv_cfids), np.mean(svd_cfids)
 
     def get_cfid_torch(self, resample=True):
         y_predict, x_true, y_true = self._get_generated_distribution()
@@ -340,31 +336,25 @@ class CFIDMetric:
         no_m_y_pred = y_predict - m_y_predict
         no_m_x_true = x_true - m_x_true
 
-        c_y_predict_x_true = torch.matmul(no_m_y_pred.t(), no_m_x_true) / y_predict.shape[0]
-        c_y_predict_y_predict = torch.matmul(no_m_y_pred.t(), no_m_y_true) / y_predict.shape[0]
-        c_x_true_y_predict = torch.matmul(no_m_x_true.t(), no_m_y_pred) / y_predict.shape[0]
+        u, s, vh = torch.linalg.svd(no_m_x_true.t(), full_matrices=False)
+        v = vh.t()
 
-        c_y_true_x_true = torch.matmul(no_m_y_true.t(), no_m_x_true) / y_predict.shape[0]
-        c_x_true_y_true = torch.matmul(no_m_x_true.t(), no_m_y_true) / y_predict.shape[0]
-        c_y_true_y_true = torch.matmul(no_m_y_true.t(), no_m_y_true) / y_predict.shape[0]
+        v_t_v = torch.matmul(v, vh)
+        y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred))
+        y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true))
 
-        inv_c_x_true_x_true = torch.linalg.pinv(torch.matmul(no_m_x_true.t(), no_m_x_true) / y_predict.shape[0])
+        c_y_true_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_true.t(), no_m_y_true) - y_true_w_v_t_v)
+        c_y_predict_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_pred.t(), no_m_y_pred) - y_pred_w_v_t_v)
 
-        c_y_true_given_x_true = c_y_true_y_true - torch.matmul(c_y_true_x_true,
-                                                               torch.matmul(inv_c_x_true_x_true, c_x_true_y_true))
-        c_y_predict_given_x_true = c_y_predict_y_predict - torch.matmul(c_y_predict_x_true,
-                                                                        torch.matmul(inv_c_x_true_x_true,
-                                                                                     c_x_true_y_predict))
-
-        # conditoinal mean and covariance estimations
-        A = torch.matmul(inv_c_x_true_x_true, no_m_x_true.t())
-
-        m_y_true_given_x_true = m_y_true + torch.matmul(c_y_true_x_true, A)
-        m_y_predict_given_x_true = m_y_predict + torch.matmul(c_y_predict_x_true, A)
-
-        m_dist = torch.einsum('...k,...k->...', m_y_true_given_x_true - m_y_predict_given_x_true, m_y_true_given_x_true - m_y_predict_given_x_true)
         c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
+
+        # conditoinal mean and covariance estimations
+
+        m_y_true_given_x_true = m_y_true.reshape(-1, 1) + torch.matmul(no_m_y_true.t(), v_t_v)
+        m_y_predict_given_x_true = m_y_predict.reshape(-1, 1) + torch.matmul(no_m_y_pred.t(), v_t_v)
+
+        m_dist = torch.einsum('...k,...k->...', m_y_true_given_x_true - m_y_predict_given_x_true, m_y_true_given_x_true - m_y_predict_given_x_true)
 
         cfid = m_dist + c_dist_2
 
@@ -381,15 +371,15 @@ class CFIDMetric:
         no_m_y_pred = y_predict - m_y_predict
         no_m_x_true = x_true - m_x_true
 
-        c_y_predict_x_true = torch.matmul(no_m_y_pred.t(), no_m_x_true) / y_predict.shape[0]
-        c_y_predict_y_predict = torch.matmul(no_m_y_pred.t(), no_m_y_true) / y_predict.shape[0]
-        c_x_true_y_predict = torch.matmul(no_m_x_true.t(), no_m_y_pred) / y_predict.shape[0]
+        c_y_predict_x_true = torch.matmul(no_m_y_pred.t(), no_m_x_true)
+        c_y_predict_y_predict = torch.matmul(no_m_y_pred.t(), no_m_y_true)
+        c_x_true_y_predict = torch.matmul(no_m_x_true.t(), no_m_y_pred)
 
-        c_y_true_x_true = torch.matmul(no_m_y_true.t(), no_m_x_true) / y_predict.shape[0]
-        c_x_true_y_true = torch.matmul(no_m_x_true.t(), no_m_y_true) / y_predict.shape[0]
-        c_y_true_y_true = torch.matmul(no_m_y_true.t(), no_m_y_true) / y_predict.shape[0]
+        c_y_true_x_true = torch.matmul(no_m_y_true.t(), no_m_x_true)
+        c_x_true_y_true = torch.matmul(no_m_x_true.t(), no_m_y_true)
+        c_y_true_y_true = torch.matmul(no_m_y_true.t(), no_m_y_true)
 
-        inv_c_x_true_x_true = torch.linalg.pinv(torch.matmul(no_m_x_true.t(), no_m_x_true) / y_predict.shape[0])
+        inv_c_x_true_x_true = torch.linalg.pinv(torch.matmul(no_m_x_true.t(), no_m_x_true))
 
         c_y_true_given_x_true = c_y_true_y_true - torch.matmul(c_y_true_x_true,
                                                                torch.matmul(inv_c_x_true_x_true, c_x_true_y_true))
