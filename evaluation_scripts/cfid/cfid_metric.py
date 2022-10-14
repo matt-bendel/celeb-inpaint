@@ -271,14 +271,15 @@ class CFIDMetric:
 
         u, s, vh = torch.linalg.svd(no_m_x_true.t(), full_matrices=False)
         v = vh.t()
-        c_dist_1 = torch.norm(torch.matmul(no_m_y_true.t() - no_m_y_pred.t(), v)) ** 2 / y_true.shape[0]
-
         v_t_v = torch.matmul(v, vh)
-        y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred))
-        y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true))
 
-        c_y_true_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_true.t(), no_m_y_true) - y_true_w_v_t_v)
-        c_y_predict_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_pred.t(), no_m_y_pred) - y_pred_w_v_t_v)
+        c_dist_1 = torch.matmul(no_m_y_true.t() - no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_true - no_m_y_pred)) / y_true.shape[0]
+
+        y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred)) / y_true.shape[0]
+        y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true)) / y_true.shape[0]
+
+        c_y_true_given_x_true = torch.matmul(no_m_y_true.t(), no_m_y_true) / y_true.shape[0] - y_true_w_v_t_v
+        c_y_predict_given_x_true = orch.matmul(no_m_y_pred.t(), no_m_y_pred) / y_true.shape[0] - y_pred_w_v_t_v
 
         c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
@@ -312,11 +313,11 @@ class CFIDMetric:
 
         c_dist_1 = torch.trace(torch.matmul(no_m_y_true - no_m_y_pred, torch.matmul(v_v_t, no_m_y_true.t() - no_m_y_pred.t()))) / y_true.shape[1]
 
-        y_pred_w_v_t_v = torch.matmul(no_m_y_pred, torch.matmul(v_v_t, no_m_y_pred.t()))
-        y_true_w_v_t_v = torch.matmul(no_m_y_true, torch.matmul(v_v_t, no_m_y_true.t()))
+        y_pred_w_v_t_v = torch.matmul(no_m_y_pred, torch.matmul(v_v_t, no_m_y_pred.t())) / y_true.shape[1]
+        y_true_w_v_t_v = torch.matmul(no_m_y_true, torch.matmul(v_v_t, no_m_y_true.t())) / y_true.shape[1]
 
-        c_y_true_given_x_true = 1 / y_true.shape[1] * (torch.matmul(no_m_y_true, no_m_y_true.t()) - y_true_w_v_t_v)
-        c_y_predict_given_x_true = 1 / y_true.shape[1] * (torch.matmul(no_m_y_pred, no_m_y_pred.t()) - y_pred_w_v_t_v)
+        c_y_true_given_x_true = 1 / y_true.shape[1] * torch.matmul(no_m_y_true, no_m_y_true.t()) - y_true_w_v_t_v
+        c_y_predict_given_x_true = 1 / y_true.shape[1] * torch.matmul(no_m_y_pred, no_m_y_pred.t()) - y_pred_w_v_t_v
 
         c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
@@ -340,11 +341,11 @@ class CFIDMetric:
         v = vh.t()
 
         v_t_v = torch.matmul(v, vh)
-        y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred))
-        y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true))
+        y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred)) / y_true.shape[0]
+        y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true)) / y_true.shape[0]
 
-        c_y_true_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_true.t(), no_m_y_true) - y_true_w_v_t_v)
-        c_y_predict_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_pred.t(), no_m_y_pred) - y_pred_w_v_t_v)
+        c_y_true_given_x_true = torch.matmul(no_m_y_true.t(), no_m_y_true) / y_true.shape[0] - y_true_w_v_t_v
+        c_y_predict_given_x_true = torch.matmul(no_m_y_pred.t(), no_m_y_pred) / y_true.shape[0] - y_pred_w_v_t_v
 
         c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
@@ -371,15 +372,15 @@ class CFIDMetric:
         no_m_y_pred = y_predict - m_y_predict
         no_m_x_true = x_true - m_x_true
 
-        c_y_predict_x_true = torch.matmul(no_m_y_pred.t(), no_m_x_true)
-        c_y_predict_y_predict = torch.matmul(no_m_y_pred.t(), no_m_y_true)
-        c_x_true_y_predict = torch.matmul(no_m_x_true.t(), no_m_y_pred)
+        c_y_predict_x_true = torch.matmul(no_m_y_pred.t(), no_m_x_true) / y_true.shape[0]
+        c_y_predict_y_predict = torch.matmul(no_m_y_pred.t(), no_m_y_true) / y_true.shape[0]
+        c_x_true_y_predict = torch.matmul(no_m_x_true.t(), no_m_y_pred) / y_true.shape[0]
 
-        c_y_true_x_true = torch.matmul(no_m_y_true.t(), no_m_x_true)
-        c_x_true_y_true = torch.matmul(no_m_x_true.t(), no_m_y_true)
-        c_y_true_y_true = torch.matmul(no_m_y_true.t(), no_m_y_true)
+        c_y_true_x_true = torch.matmul(no_m_y_true.t(), no_m_x_true) / y_true.shape[0]
+        c_x_true_y_true = torch.matmul(no_m_x_true.t(), no_m_y_true) / y_true.shape[0]
+        c_y_true_y_true = torch.matmul(no_m_y_true.t(), no_m_y_true) / y_true.shape[0]
 
-        inv_c_x_true_x_true = torch.linalg.pinv(torch.matmul(no_m_x_true.t(), no_m_x_true))
+        inv_c_x_true_x_true = torch.linalg.pinv(torch.matmul(no_m_x_true.t(), no_m_x_true) / y_true.shape[0])
 
         c_y_true_given_x_true = c_y_true_y_true - torch.matmul(c_y_true_x_true,
                                                                torch.matmul(inv_c_x_true_x_true, c_x_true_y_true))
