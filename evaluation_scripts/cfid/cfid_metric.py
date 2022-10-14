@@ -279,7 +279,7 @@ class CFIDMetric:
 
         u, s, vh = torch.linalg.svd(no_m_x_true.t(), full_matrices=False)
         v = vh.t()
-        v_t_v = torch.matmul(u, u.t())
+        v_t_v = torch.matmul(v, vh)
 
         c_dist_1 = torch.trace(torch.matmul(no_m_y_true.t() - no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_true - no_m_y_pred)) / y_true.shape[0])
 
@@ -346,8 +346,9 @@ class CFIDMetric:
 
         return cfid.cpu().numpy()
 
-    def get_cfid_torch_experimental(self, resample=True):
-        y_predict, x_true, y_true = self._get_generated_distribution()
+    def get_cfid_torch_experimental(self, resample=True,y_predict=None, x_true=None, y_true = None):
+        if y_true is None:
+            y_predict, x_true, y_true = self._get_generated_distribution()
 
         y_true = y_true.t() # dxn
         y_predict = y_predict.t()
@@ -355,6 +356,7 @@ class CFIDMetric:
 
         # mean estimations
         y_true = y_true.to(x_true.device)
+        print(y_true.shape)
         m_y_predict = torch.mean(y_predict, dim=1)
         m_x_true = torch.mean(x_true, dim=1)
         m_y_true = torch.mean(y_true, dim=1)
@@ -381,6 +383,10 @@ class CFIDMetric:
             c_y_predict_given_x_true, c_y_true_given_x_true)
 
         cfid = m_dist + c_dist_1 + c_dist_2
+
+        print(m_dist.cpu().numpy())
+        print(c_dist_1.cpu().numpy())
+        print(c_dist_2.cpu().numpy())
 
         return cfid.cpu().numpy()
 
