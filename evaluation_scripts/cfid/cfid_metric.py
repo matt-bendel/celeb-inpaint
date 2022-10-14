@@ -315,6 +315,7 @@ class CFIDMetric:
         v_v_t = torch.matmul(v, v.t())
 
         c_dist_1 = torch.matmul(no_m_y_true - no_m_y_pred, torch.matmul(v_v_t, no_m_y_true.t() - no_m_y_pred.t())) / y_true.shape[1]
+        print(c_dist_1.shape)
 
         y_pred_w_v_t_v = torch.matmul(no_m_y_pred, torch.matmul(v_v_t, no_m_y_pred.t()))
         y_true_w_v_t_v = torch.matmul(no_m_y_true, torch.matmul(v_v_t, no_m_y_true.t()))
@@ -324,6 +325,8 @@ class CFIDMetric:
 
         c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
+        print(c_dist_2.shape)
+
 
         cfid = m_dist + c_dist_1 + c_dist_2
 
@@ -340,20 +343,34 @@ class CFIDMetric:
         no_m_y_pred = y_predict - m_y_predict
         no_m_x_true = x_true - m_x_true
 
-        m_dist = torch.einsum('...k,...k->...', m_y_true - m_y_predict, m_y_true - m_y_predict)
+        c_y_predict_x_true = torch.matmul(no_m_y_pred.t(), no_m_x_true) / y_predict.shape[0]
+        c_y_predict_y_predict = torch.matmul(no_m_y_pred.t(), no_m_y_true) / y_predict.shape[0]
+        c_x_true_y_predict = torch.matmul(no_m_x_true.t(), no_m_y_pred) / y_predict.shape[0]
 
-        u, s, vh = torch.linalg.svd(no_m_x_true.t(), full_matrices=False)
-        v = vh.t()
-        c_dist_1 = torch.norm(torch.matmul(no_m_y_true.t() - no_m_y_pred.t(), v)) ** 2 / y_true.shape[0]
+        c_y_true_x_true = torch.matmul(no_m_y_true.t(), no_m_x_true) / y_predict.shape[0]
+        c_x_true_y_true = torch.matmul(no_m_x_true.t(), no_m_y_true) / y_predict.shape[0]
+        c_y_true_y_true = torch.matmul(no_m_y_true.t(), no_m_y_true) / y_predict.shape[0]
 
-        v_t_v = torch.matmul(v, vh)
-        y_pred_w_v_t_v = torch.matmul(no_m_y_pred.t(), torch.matmul(v_t_v, no_m_y_pred))
-        y_true_w_v_t_v = torch.matmul(no_m_y_true.t(), torch.matmul(v_t_v, no_m_y_true))
+        inv_c_x_true_x_true = torch.linalg.pinv(torch.matmul(no_m_x_true.t(), no_m_x_true) / y_predict.shape[0])
 
-        c_y_true_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_true.t(), no_m_y_true) - y_true_w_v_t_v)
-        c_y_predict_given_x_true = 1 / y_true.shape[0] * (torch.matmul(no_m_y_pred.t(), no_m_y_pred) - y_pred_w_v_t_v)
+        c_y_true_given_x_true = c_y_true_y_true - torch.matmul(c_y_true_x_true,
+                                                               torch.matmul(inv_c_x_true_x_true, c_x_true_y_true))
+        c_y_predict_given_x_true = c_y_predict_y_predict - torch.matmul(c_y_predict_x_true,
+                                                                        torch.matmul(inv_c_x_true_x_true,
+                                                                                     c_x_true_y_predict))
+        c_y_true_x_true_minus_c_y_predict_x_true = c_y_true_x_true - c_y_predict_x_true
+        c_x_true_y_true_minus_c_x_true_y_predict = c_x_true_y_true - c_x_true_y_predict
 
-        c_dist_2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
+        # conditoinal mean and covariance estimations
+        A = torch.matmul(inv_с_x_true_x_true, no_m_x_true.t())
+
+        m_y_true_given_x_true = m_y_true + torch.matmul(с_y_true_x_true, A)
+        m_y_predict_given_x_true = m_y_predict + torch.matmul(с_y_predict_x_true, A)
+
+        m_dist = torch.einsum('...k,...k->...', m_y_true_given_x_true - m_y_predict_given_x_true, m_y_true_given_x_true - m_y_predict_given_x_true)
+        c_dist1 = torch.trace(torch.matmul(torch.matmul(c_y_true_x_true_minus_c_y_predict_x_true, inv_c_x_true_x_true),
+                                           c_x_true_y_true_minus_c_x_true_y_predict))
+        c_dist2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
 
         cfid = m_dist + c_dist_1 + c_dist_2
@@ -397,6 +414,6 @@ class CFIDMetric:
         c_dist2 = torch.trace(c_y_true_given_x_true + c_y_predict_given_x_true) - 2 * trace_sqrt_product_torch(
             c_y_predict_given_x_true, c_y_true_given_x_true)
 
-        cfid = m_dist + c_dist_1 + c_dist_2
+        cfid = m_dist + c_dist1 + c_dist2
 
         return cfid.cpu().numpy()
