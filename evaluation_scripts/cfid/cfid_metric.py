@@ -262,7 +262,8 @@ class CFIDMetric:
         return cfid
 
     def get_cfid_torch(self, resample=True,y_predict=None, x_true=None, y_true = None):
-        y_predict, x_true, y_true = self._get_generated_distribution()
+        if y_true is None:
+            y_predict, x_true, y_true = self._get_generated_distribution()
 
         # mean estimations
         y_true = y_true.to(x_true.device)
@@ -414,7 +415,8 @@ class CFIDMetric:
         return cfid.cpu().numpy()
 
     def get_cfid_torch_pinv(self, resample=True,y_predict=None, x_true=None, y_true = None):
-        y_predict, x_true, y_true = self._get_generated_distribution()
+        if y_true is None:
+            y_predict, x_true, y_true = self._get_generated_distribution()
 
         # mean estimations
         y_true = y_true.to(x_true.device)
