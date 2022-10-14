@@ -201,7 +201,7 @@ class CFIDMetric:
         return image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(
             dtype=torch.float64)
 
-    def _get_generated_distribution_per_y(self):
+    def get_generated_distribution_per_y(self):
         cfids = []
 
         for i, data in tqdm(enumerate(self.loader),

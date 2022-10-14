@@ -155,8 +155,10 @@ def get_cfid(args, G, test_loader, num_samps, t, truncation_latent=None, cfid_co
         cfid = cfid_metric.get_cfid_torch()
     elif cfid_comp==1:
         cfid = cfid_metric.get_cfid_torch_experimental()
-    else:
+    elif cfid_comp ==2:
         cfid = cfid_metric.get_cfid_torch_pinv()
+    else:
+        cfid = cfid_metric.get_generated_distribution_per_y()
 
     print('CFID: ', cfid)
     return cfid
@@ -223,9 +225,14 @@ if __name__ == '__main__':
         truncation_latent = torch.mean(G.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
         break
 
-    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=0)
-    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=1)
-    get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
+    cfid_old_svd = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=0)
+    cfid_new_svd = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=1)
+    cfid_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
+    cfid_def_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=3)
+
+    print(f'CFID OLD SVD: {cfid_old_svd}')
+    print(f'CFID NEW SVD: {cfid_new_svd}')
+    print(f'CFID PINV: {cfid_pinv}')
 
     exit()
     # vals = [1, 2, 4, 8, 16, 32]
