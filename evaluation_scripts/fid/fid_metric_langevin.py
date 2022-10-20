@@ -191,15 +191,15 @@ class FIDMetric:
                     im2 = recon_object['masked'].cuda()
                     embedImg2[k, :, :, :] = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
 
-                image = im1
-                condition_im = im2
+                image = embedImg1
+                condition_im = embedImg2
 
                 img_e = self.image_embedding(image)
                 cond_e = self.condition_embedding(condition_im)
 
                 if self.cuda:
-                    image_embed.append(img_e.to('cuda:1'))
-                    cond_embed.append(cond_e.to('cuda:1'))
+                    image_embed.append(img_e)
+                    cond_embed.append(cond_e)
                 else:
                     image_embed.append(img_e.cpu().numpy())
                     cond_embed.append(cond_e.cpu().numpy())
