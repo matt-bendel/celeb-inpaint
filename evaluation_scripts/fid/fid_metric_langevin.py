@@ -171,57 +171,58 @@ class FIDMetric:
         image_embed = []
         cond_embed = []
 
-        for j in range(8):
-            print(j)
-            batch_size = 104 if j == 7 else 128
-            for i in range(32):
-                if j == 7:
-                    embedImg1 = torch.zeros(104, 3, 128, 128).cuda()
-                    embedImg2 = torch.zeros(104, 3, 128, 128).cuda()
-                else:
-                    embedImg1 = torch.zeros(128, 3, 128, 128).cuda()
-                    embedImg2 = torch.zeros(128, 3, 128, 128).cuda()
-
-                for k in range(batch_size):
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{i}.pt')
-                    im1 = recon_object['x_hat'].cuda()
-                    embedImg1[k, :, :, :] = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
-
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{i}.pt')
-                    im2 = recon_object['masked'].cuda()
-                    embedImg2[k, :, :, :] = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
-
-                image = embedImg1
-                condition_im = embedImg2
-
-                img_e = self.image_embedding(image)
-                cond_e = self.condition_embedding(condition_im)
-
-                if self.cuda:
-                    image_embed.append(img_e)
-                    cond_embed.append(cond_e)
-                else:
-                    image_embed.append(img_e.cpu().numpy())
-                    cond_embed.append(cond_e.cpu().numpy())
-
-        # for i in range(1000):
-        #     with torch.no_grad():
-        #         for j in range(32):
-        #             recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i}_sample_{j}.pt')
-        #             x_hat = recon_object['x_hat'].cuda()
-        #             y = recon_object['masked'].cuda()
-        #             image = self._get_embed_im_lan(x_hat)
-        #             condition_im = self._get_embed_im_lan(y)
+        # for j in range(8):
+        #     print(j)
+        #     batch_size = 104 if j == 7 else 128
+        #     for i in range(32):
+        #         if j == 7:
+        #             embedImg1 = torch.zeros(104, 3, 128, 128).cuda()
+        #             embedImg2 = torch.zeros(104, 3, 128, 128).cuda()
+        #         else:
+        #             embedImg1 = torch.zeros(128, 3, 128, 128).cuda()
+        #             embedImg2 = torch.zeros(128, 3, 128, 128).cuda()
         #
-        #             img_e = self.image_embedding(image)
-        #             cond_e = self.condition_embedding(condition_im)
+        #         for k in range(batch_size):
+        #             recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{i}.pt')
+        #             im1 = recon_object['x_hat'].cuda()
+        #             embedImg1[k, :, :, :] = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
         #
-        #             if self.cuda:
-        #                 image_embed.append(img_e.to('cuda:1'))
-        #                 cond_embed.append(cond_e.to('cuda:1'))
-        #             else:
-        #                 image_embed.append(img_e.cpu().numpy())
-        #                 cond_embed.append(cond_e.cpu().numpy())
+        #             recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{i}.pt')
+        #             im2 = recon_object['masked'].cuda()
+        #             embedImg2[k, :, :, :] = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
+        #
+        #         image = embedImg1
+        #         condition_im = embedImg2
+        #
+        #         img_e = self.image_embedding(image)
+        #         cond_e = self.condition_embedding(condition_im)
+        #
+        #         if self.cuda:
+        #             image_embed.append(img_e)
+        #             cond_embed.append(cond_e)
+        #         else:
+        #             image_embed.append(img_e.cpu().numpy())
+        #             cond_embed.append(cond_e.cpu().numpy())
+
+        for i in range(1000):
+            print(i)
+            with torch.no_grad():
+                for j in range(32):
+                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i}_sample_{j}.pt')
+                    x_hat = recon_object['x_hat'].cuda()
+                    y = recon_object['masked'].cuda()
+                    image = self._get_embed_im_lan(x_hat)
+                    condition_im = self._get_embed_im_lan(y)
+
+                    img_e = self.image_embedding(image)
+                    cond_e = self.condition_embedding(condition_im)
+
+                    if self.cuda:
+                        image_embed.append(img_e.to('cuda:1'))
+                        cond_embed.append(cond_e.to('cuda:1'))
+                    else:
+                        image_embed.append(img_e.cpu().numpy())
+                        cond_embed.append(cond_e.cpu().numpy())
 
         if self.cuda:
             image_embed = torch.cat(image_embed, dim=0)
