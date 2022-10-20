@@ -217,7 +217,7 @@ if __name__ == '__main__':
 
     G = load_best_gan(args)
 
-    train_loader, _, test_loader = create_data_loaders(args)
+    train_loader, val_loader, test_loader = create_data_loaders(args)
 
     truncation_latent = None
 
@@ -242,7 +242,7 @@ if __name__ == '__main__':
     # print(f'CFID PINV: {cfid_pinv}')
 
     # vals = [1, 2, 4, 8, 16, 32]
-    get_fid(args, G, test_loader, train_loader, t=None, truncation_latent=None)
+    get_fid(args, G, val_loader, train_loader, t=None, truncation_latent=None)
     exit()
     vals = [32]
     for val in vals:
