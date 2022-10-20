@@ -320,6 +320,7 @@ class FIDMetric:
             FID value.
         """
         fid = self.get_fjd(alpha=0., resample=False)
+        print(self.alpha)
         fjd = self.get_fjd(alpha=self.alpha, resample=False)
         print(f"FID: {fid}")
         print(f"FJD: {fjd}")
@@ -512,6 +513,7 @@ def torch_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
     print(diff.dot(diff))
     print(torch.trace(sigma1))
     print(torch.trace(sigma2))
+    print(tr_covmean)
 
     out = diff.dot(diff) + torch.trace(sigma1) + torch.trace(sigma2) - 2 * tr_covmean
     return out
