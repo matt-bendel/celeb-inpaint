@@ -312,7 +312,12 @@ class FIDMetric:
         Returns:
             FID value.
         """
-        fid = self.get_fjd(alpha=0., resample=resample)
+        fid = self.get_fjd(alpha=0., resample=False)
+        fjd = self.get_fjd(alpha=1, resample=False)
+
+        print(f"FID: {fid}")
+        print(f"FJD: {fjd}")
+
         return fid
 
 

@@ -202,9 +202,10 @@ if __name__ == '__main__':
     args.out_chans = 3
 
     train_loader, _, _ = create_data_loaders(args)
-    get_lpips(args, 5)
-    get_cfid(args, 1)
-    # get_fid(args, train_loader)
+    # get_lpips(args, 5)
+    # get_cfid(args, 1)
+    get_fid(args, train_loader)
+    exit()
     vals = [32]
     for val in vals:
         get_metrics(args, val)
