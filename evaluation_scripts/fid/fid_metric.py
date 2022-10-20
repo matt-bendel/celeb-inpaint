@@ -135,6 +135,7 @@ class FIDMetric:
         self.gen_embeds, self.cond_embeds, self.true_embeds = None, None, None
         self.truncation = truncation
         self.truncation_latent = truncation_latent
+        self.alpha = 0
 
         self.mu_fake, self.sigma_fake = None, None
         self.mu_real, self.sigma_real = None, None
@@ -507,6 +508,10 @@ def torch_calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
     # Run 50 itrs of newton-schulz to get the matrix sqrt of sigma1 dot sigma2
     covmean = sqrt_newton_schulz(sigma1.mm(sigma2).unsqueeze(0), 50).squeeze()
     tr_covmean = torch.trace(covmean)
+
+    print(diff.dot(diff))
+    print(torch.trace(sigma1))
+    print(torch.trace(sigma2))
 
     out = diff.dot(diff) + torch.trace(sigma1) + torch.trace(sigma2) - 2 * tr_covmean
     return out
