@@ -180,7 +180,7 @@ class FIDMetric:
             truncation_latent = None
 
             with torch.no_grad():
-                for j in range(1):
+                for j in range(128):
                     recon = self.gan(y, x=x, mask=mask, truncation=None, truncation_latent=truncation_latent)
 
                     image = self._get_embed_im(recon, mean, std)
