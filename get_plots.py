@@ -99,8 +99,8 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
             gens_comod_psi_1 = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
                                     device=args.device)
             for z in range(num_code):
-                gens_ours[:, z, :, :, :] = G_ours(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent.unsqueeze(0).repeat(y.size(0), 1).cuda()) * std[:, :, None, None] + mean[:, :, None, None]
-                gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=truncation, truncation_latent=truncation_latent.unsqueeze(0).repeat(y.size(0), 1).cuda()) * std[:, :, None, None] + mean[:, :, None, None]
+                gens_ours[:, z, :, :, :] = G_ours(y, x=x, mask=mask, truncation=None, truncation_latent=None) * std[:, :, None, None] + mean[:, :, None, None]
+                gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=None, truncation_latent=None) * std[:, :, None, None] + mean[:, :, None, None]
 
             avg_ours = torch.mean(gens_ours, dim=1)
             avg_comod_psi_1 = torch.mean(gens_comod_psi_1, dim=1)
@@ -109,9 +109,6 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
 
             for j in range(y.size(0)):
                 total += 1
-
-                if fig_count == 5:
-                    break
 
                 if total % 25 == 0:
                     fig_count += 1
@@ -161,7 +158,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         #     ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'truncation_testing/5_recons_ours_{fig_count}_{truncation}.png',bbox_inches='tight', dpi=300)
+                    plt.savefig(f'test_ims_2/5_recons_ours_{fig_count}.png',bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
                     fig = plt.figure()
@@ -175,7 +172,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         #     ax.set_xlabel('CoModGAN',fontweight='bold')
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'truncation_testing/5_recons_comodgan_{fig_count}_{truncation}.png',bbox_inches='tight', dpi=300)
+                    plt.savefig(f'test_ims_2/5_recons_comodgan_{fig_count}.png',bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
 
@@ -229,6 +226,4 @@ if __name__ == '__main__':
         truncation_latent = torch.mean(G_ours.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
         break
 
-    truncations = [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0]
-    for t in truncations:
-        get_plots(args, G_ours, G_comod, test_loader, t, truncation_latent)
+    get_plots(args, G_ours, G_comod, test_loader, None, None)
