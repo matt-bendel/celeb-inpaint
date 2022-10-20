@@ -174,7 +174,7 @@ class FIDMetric:
         for j in range(8):
             print(j)
             batch_size = 104 if j == 7 else 128
-            for j in range(32):
+            for i in range(32):
                 if j == 7:
                     embedImg1 = torch.zeros(104, 3, 128, 128).cuda()
                     embedImg2 = torch.zeros(104, 3, 128, 128).cuda()
@@ -183,11 +183,11 @@ class FIDMetric:
                     embedImg2 = torch.zeros(128, 3, 128, 128).cuda()
 
                 for k in range(batch_size):
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{j}.pt')
+                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{i}.pt')
                     im1 = recon_object['x_hat'].cuda()
                     embedImg1[k, :, :, :] = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
 
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{j}.pt')
+                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{i}.pt')
                     im2 = recon_object['masked'].cuda()
                     embedImg2[k, :, :, :] = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
 
