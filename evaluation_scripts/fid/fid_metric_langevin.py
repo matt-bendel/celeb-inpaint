@@ -172,6 +172,7 @@ class FIDMetric:
         cond_embed = []
 
         for j in range(8):
+            print(j)
             batch_size = 104 if j == 7 else 128
             for j in range(32):
                 if j == 7:
