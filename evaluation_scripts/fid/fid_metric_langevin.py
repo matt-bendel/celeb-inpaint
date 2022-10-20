@@ -187,7 +187,7 @@ class FIDMetric:
                     im1 = recon_object['x_hat'].cuda()
                     embedImg1[k, :, :, :] = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
 
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{i + 2}.pt')
+                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{j * 128 + k}_sample_{j}.pt')
                     im2 = recon_object['masked'].cuda()
                     embedImg2[k, :, :, :] = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
 
