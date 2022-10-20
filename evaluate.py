@@ -185,7 +185,7 @@ def get_fid(args, G, test_loader, train_loader, t, truncation_latent=None):
                              truncation=t,
                              truncation_latent=truncation_latent)
 
-    fid = fid_metric.get_fid()
+    fid, fjd = fid_metric.get_fid()
     print('FID: ', fid)
     return fid
 
