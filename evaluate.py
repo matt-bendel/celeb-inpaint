@@ -135,7 +135,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
     print(f'TIME: {np.mean(times)}')
 
 
-def get_cfid(args, G, test_loader, num_samps, t, truncation_latent=None, cfid_comp=0):
+def get_cfid(args, G, test_loader, num_samps, dev_loader, train_loader):
     print("GETTING INCEPTION EMBEDDING")
     inception_embedding = InceptionEmbedding(parallel=True)
 
@@ -147,26 +147,13 @@ def get_cfid(args, G, test_loader, num_samps, t, truncation_latent=None, cfid_co
                              cuda=True,
                              args=args,
                              num_samps=num_samps,
-                             truncation=t,
-                             truncation_latent=truncation_latent)
+                             truncation=None,
+                             truncation_latent=None,
+                             dev_loader=dev_loader,
+                             train_loader=train_loader)
 
-    print(f'{num_samps}-CFID')
-    cfid = cfid_metric.get_cfids_debug()
-    exit()
-    if cfid_comp == 0:
-        cfid = cfid_metric.get_cfid_torch()
-        print('CFID: ', cfid)
-    elif cfid_comp==1:
-        cfid = cfid_metric.get_cfid_torch_experimental()
-        print('CFID: ', cfid)
-    elif cfid_comp ==2:
-        cfid = cfid_metric.get_cfid_torch_pinv()
-        print('CFID: ', cfid)
-    else:
-        cfid_p, cfid_s = cfid_metric.get_generated_distribution_per_y()
-        print('CFID PINV: ', cfid_p)
-        print('CFID SVD: ', cfid_s)
-        return cfid_s
+    cfid = cfid_metric.get_cfid_torch_pinv()
+    print('CFID: ', cfid)
 
     return cfid
 
@@ -242,7 +229,10 @@ if __name__ == '__main__':
     # print(f'CFID PINV: {cfid_pinv}')
 
     # vals = [1, 2, 4, 8, 16, 32]
-    get_fid(args, G, test_loader, train_loader, t=None, truncation_latent=None)
+    # get_fid(args, G, test_loader, train_loader, t=None, truncation_latent=None)
+    get_cfid(args, G, test_loader, 32, None, None)
+    get_cfid(args, G, test_loader, 8, val_loader, None)
+    get_cfid(args, G, test_loader, 1, val_loader, train_loader)
     exit()
     vals = [32]
     for val in vals:

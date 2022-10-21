@@ -122,7 +122,9 @@ class CFIDMetric:
                  eps=1e-6,
                  num_samps=1,
                  truncation=None,
-                 truncation_latent=None):
+                 truncation_latent=None,
+                 dev_loader=None,
+                 train_loader=None,):
 
         self.gan = gan
         self.args = args
@@ -135,6 +137,8 @@ class CFIDMetric:
         self.num_samps = num_samps
         self.truncatuon = truncation
         self.truncation_latent = truncation_latent
+        self.dev_loader = dev_loader
+        self.train_loader = train_loader
 
     def _get_embed_im(self, inp, mean, std):
         embed_ims = torch.zeros(size=(inp.size(0), 3, 128, 128),
@@ -161,13 +165,13 @@ class CFIDMetric:
             mean = mean.cuda()
             std = std.cuda()
 
-            truncation_latent = None
-            if self.truncation_latent is not None:
-                truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
+            # truncation_latent = None
+            # if self.truncation_latent is not None:
+            #     truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
 
             with torch.no_grad():
-                for j in range(32):
-                    recon = self.gan(y, x=x, mask=mask, truncation=self.truncatuon, truncation_latent=truncation_latent)
+                for j in range(self.num_samps):
+                    recon = self.gan(y, x=x, mask=mask, truncation=None, truncation_latent=None)
 
                     image = self._get_embed_im(recon, mean, std)
                     condition_im = self._get_embed_im(y, mean, std)
@@ -188,6 +192,86 @@ class CFIDMetric:
                         true_embed.append(true_e.cpu().numpy())
                         image_embed.append(img_e.cpu().numpy())
                         cond_embed.append(cond_e.cpu().numpy())
+
+
+        if self.dev_loader:
+            for i, data in tqdm(enumerate(self.dev_loader),
+                                desc='Computing generated distribution',
+                                total=len(self.dev_loader)):
+                x, y, mean, std, mask = data[0]
+                x = x.cuda()
+                y = y.cuda()
+                mask = mask.cuda()
+                mean = mean.cuda()
+                std = std.cuda()
+
+                # truncation_latent = None
+                # if self.truncation_latent is not None:
+                #     truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
+
+                with torch.no_grad():
+                    for j in range(self.num_samps):
+                        recon = self.gan(y, x=x, mask=mask, truncation=None, truncation_latent=None)
+
+                        image = self._get_embed_im(recon, mean, std)
+                        condition_im = self._get_embed_im(y, mean, std)
+                        true_im = self._get_embed_im(x, mean, std)
+
+                        img_e = self.image_embedding(image)
+                        cond_e = self.condition_embedding(condition_im)
+                        true_e = self.image_embedding(true_im)
+
+                        if self.cuda:
+                            # true_embed.append(true_e.to('cuda:2'))
+                            # image_embed.append(img_e.to('cuda:1'))
+                            # cond_embed.append(cond_e.to('cuda:1'))
+                            true_embed.append(true_e)
+                            image_embed.append(img_e)
+                            cond_embed.append(cond_e)
+                        else:
+                            true_embed.append(true_e.cpu().numpy())
+                            image_embed.append(img_e.cpu().numpy())
+                            cond_embed.append(cond_e.cpu().numpy())
+
+        if self.train_loader:
+            for i, data in tqdm(enumerate(self.train_loader),
+                                desc='Computing generated distribution',
+                                total=len(self.train_loader)):
+                x, y, mean, std, mask = data[0]
+                x = x.cuda()
+                y = y.cuda()
+                mask = mask.cuda()
+                mean = mean.cuda()
+                std = std.cuda()
+
+                # truncation_latent = None
+                # if self.truncation_latent is not None:
+                #     truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
+
+                with torch.no_grad():
+                    for j in range(self.num_samps):
+                        recon = self.gan(y, x=x, mask=mask, truncation=None, truncation_latent=None)
+
+                        image = self._get_embed_im(recon, mean, std)
+                        condition_im = self._get_embed_im(y, mean, std)
+                        true_im = self._get_embed_im(x, mean, std)
+
+                        img_e = self.image_embedding(image)
+                        cond_e = self.condition_embedding(condition_im)
+                        true_e = self.image_embedding(true_im)
+
+                        if self.cuda:
+                            # true_embed.append(true_e.to('cuda:2'))
+                            # image_embed.append(img_e.to('cuda:1'))
+                            # cond_embed.append(cond_e.to('cuda:1'))
+                            true_embed.append(true_e)
+                            image_embed.append(img_e)
+                            cond_embed.append(cond_e)
+                        else:
+                            true_embed.append(true_e.cpu().numpy())
+                            image_embed.append(img_e.cpu().numpy())
+                            cond_embed.append(cond_e.cpu().numpy())
+
 
         if self.cuda:
             true_embed = torch.cat(true_embed, dim=0)
@@ -341,6 +425,11 @@ class CFIDMetric:
             c_y_predict_given_x_true, c_y_true_given_x_true)
 
         c_dist2 = c_dist_2_1 + c_dist_2_2
+
+        c_dist = c_dist1 + c_dist2
+
+        print(f"M: {m_dist.cpu().numpy()}")
+        print(f"C: {c_dist.cpu().numpy()}")
 
         cfid = m_dist + c_dist1 + c_dist2
 
