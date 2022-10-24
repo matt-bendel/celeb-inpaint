@@ -203,6 +203,7 @@ if __name__ == '__main__':
     args.out_chans = 3
 
     G = load_best_gan(args)
+    G.update_gen_status(val=True)
 
     train_loader, val_loader, test_loader = create_data_loaders(args)
 
@@ -229,10 +230,10 @@ if __name__ == '__main__':
     # print(f'CFID PINV: {cfid_pinv}')
 
     # vals = [1, 2, 4, 8, 16, 32]
-    # get_fid(args, G, test_loader, train_loader, t=None, truncation_latent=None)
-    get_cfid(args, G, test_loader, 32, None, None)
-    get_cfid(args, G, test_loader, 8, val_loader, None)
-    get_cfid(args, G, test_loader, 1, val_loader, train_loader)
+    get_fid(args, G, test_loader, train_loader, t=None, truncation_latent=None)
+    # get_cfid(args, G, test_loader, 32, None, None)
+    # get_cfid(args, G, test_loader, 8, val_loader, None)
+    # get_cfid(args, G, test_loader, 1, val_loader, train_loader)
     exit()
     vals = [32]
     for val in vals:
