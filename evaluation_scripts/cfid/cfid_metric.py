@@ -173,9 +173,6 @@ class CFIDMetric:
                 for j in range(self.num_samps):
                     recon = self.gan(y, x=x, mask=mask, truncation=None, truncation_latent=None)
 
-                    print(recon.max())
-                    print(x.max())
-                    exit()
                     image = self._get_embed_im(recon, mean, std)
                     condition_im = self._get_embed_im(y, mean, std)
                     true_im = self._get_embed_im(x, mean, std)
