@@ -327,7 +327,7 @@ def train(args):
                                  args=args,
                                  num_samps=1)
 
-        cfid = cfid_metric.get_cfid_torch()
+        cfid = cfid_metric.get_cfid_torch_pinv()
         cfids.append(cfid)
         #
         # cfid_metric = CFIDMetric(gan=G,
@@ -340,7 +340,7 @@ def train(args):
         #
         # cfid_test = cfid_metric.get_cfid_torch()
 
-        print(f"TEST CFID: {cfid_test}")
+        # print(f"TEST CFID: {cfid_test}")
 
         del cfid_metric
 
