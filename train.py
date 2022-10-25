@@ -358,7 +358,7 @@ def train(args):
         print(f"CFID: {cfid:.2f}")
 
         # if (epoch + 1) % 5 == 0:
-        send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {cfid:.2f}\nTEST CFID: {cfid_test:.2f}\nPSNR DIFF: {np.abs(psnr_diff):.2f}", file_name="variation_gif_2.gif")
+        # send_mail(f"EPOCH {epoch + 1} UPDATE", f"Metrics:\nPSNR: {np.mean(losses['psnr']):.2f}\nSSIM: {np.mean(losses['ssim']):.4f}\nCFID: {cfid:.2f}\nTEST CFID: {cfid_test:.2f}\nPSNR DIFF: {np.abs(psnr_diff):.2f}", file_name="variation_gif_2.gif")
 
         save_model(args, epoch, G.gen, opt_G, best_loss, best_model, 'generator', 0)
         save_model(args, epoch, D, opt_D, best_loss, best_model, 'discriminator', 0)
