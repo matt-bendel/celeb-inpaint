@@ -22,7 +22,7 @@ def create_arg_parser():
     parser.add_argument('--beta_2', type=float, default=0.99, help='Beta 2 for Adam')
 
     # DATA ARGS
-    parser.add_argument('--im-size', default=128, type=int,
+    parser.add_argument('--im-size', default=256, type=int,
                         help='Image resolution')
     parser.add_argument('--R', default=16, type=int,
                         help='Image resolution')

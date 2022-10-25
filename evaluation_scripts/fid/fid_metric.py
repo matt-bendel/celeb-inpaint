@@ -155,7 +155,7 @@ class FIDMetric:
         return self.alpha
 
     def _get_embed_im(self, inp, mean, std):
-        embed_ims = torch.zeros(size=(inp.size(0), 3, 128, 128),
+        embed_ims = torch.zeros(size=(inp.size(0), 3, 256, 256),
                                 device=self.args.device)
         for i in range(inp.size(0)):
             im = inp[i, :, :, :] * std[i, :, None, None] + mean[i, :, None, None]

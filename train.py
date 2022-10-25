@@ -329,16 +329,16 @@ def train(args):
 
         cfid = cfid_metric.get_cfid_torch()
         cfids.append(cfid)
-
-        cfid_metric = CFIDMetric(gan=G,
-                                 loader=test_loader,
-                                 image_embedding=inception_embedding,
-                                 condition_embedding=inception_embedding,
-                                 cuda=True,
-                                 args=args,
-                                 num_samps=1)
-
-        cfid_test = cfid_metric.get_cfid_torch()
+        #
+        # cfid_metric = CFIDMetric(gan=G,
+        #                          loader=test_loader,
+        #                          image_embedding=inception_embedding,
+        #                          condition_embedding=inception_embedding,
+        #                          cuda=True,
+        #                          args=args,
+        #                          num_samps=1)
+        #
+        # cfid_test = cfid_metric.get_cfid_torch()
 
         print(f"TEST CFID: {cfid_test}")
 

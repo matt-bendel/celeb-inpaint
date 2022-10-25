@@ -26,15 +26,15 @@ class DataTransform:
         self.args = args
         np.random.seed(0)
 
-        total = 128 * 128
+        total = 256 * 256
         # n = total // self.args.R
 
-        arr = np.ones((128, 128))
-        arr[128 // 4: 3 *128//4, 128 // 4: 3 *128//4] = 0
-        plt.imshow(np.reshape(arr, (128, 128)), cmap='viridis')
+        arr = np.ones((256, 256))
+        arr[256 // 4: 3 *256//4, 256 // 4: 3 *256//4] = 0
+        plt.imshow(np.reshape(arr, (256, 256)), cmap='viridis')
         plt.savefig(f'mask_{self.args.R}.png')
         plt.close()
-        self.mask = torch.tensor(np.reshape(arr, (128, 128)), dtype=torch.float).repeat(3, 1, 1)
+        self.mask = torch.tensor(np.reshape(arr, (256, 256)), dtype=torch.float).repeat(3, 1, 1)
         torch.save(self.mask, 'mast.pt')
 
     def __call__(self, gt_im):
@@ -49,7 +49,7 @@ class DataTransform:
 
 def create_datasets(args):
     transform = transforms.Compose([transforms.ToTensor(), DataTransform(args)])
-    dataset = datasets.ImageFolder('/storage/celebA-HQ/celeba_hq_128', transform=transform)
+    dataset = datasets.ImageFolder('/storage/celebA-HQ/celeba_hq_256', transform=transform)
     train_data, dev_data, test_data = torch.utils.data.random_split(
         dataset, [27000, 2000, 1000],
         generator=torch.Generator().manual_seed(0)

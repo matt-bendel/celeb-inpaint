@@ -13,14 +13,14 @@ def build_model(args):
     #     out_chans=args.out_chans,
     #     latent_size=args.latent_size
     # ).to(torch.device('cuda'))
-    model = Generator(128).to(torch.device('cuda'))
+    model = Generator(256).to(torch.device('cuda'))
 
     return model
 
 
 def build_discriminator(args):
     model = Discriminator(
-        128
+        256
         # input_nc=args.in_chans*2
     ).to(torch.device('cuda'))
 

@@ -141,7 +141,7 @@ class CFIDMetric:
         self.train_loader = train_loader
 
     def _get_embed_im(self, inp, mean, std):
-        embed_ims = torch.zeros(size=(inp.size(0), 3, 128, 128),
+        embed_ims = torch.zeros(size=(inp.size(0), 3, 256, 256),
                                 device=self.args.device)
         for i in range(inp.size(0)):
             im = inp[i, :, :, :] * std[i, :, None, None] + mean[i, :, None, None]
@@ -284,58 +284,6 @@ class CFIDMetric:
 
         return image_embed.to(dtype=torch.float64), cond_embed.to(dtype=torch.float64), true_embed.to(
             dtype=torch.float64)
-
-    def get_generated_distribution_per_y(self):
-        svd_cfids = []
-        pinv_cfids = []
-
-        image_embed = torch.zeros(1000, 32, 2048).cuda()
-        cond_embed = torch.zeros(1000, 32, 2048).cuda()
-        true_embed = torch.zeros(1000, 32, 2048).cuda()
-
-        for i, data in tqdm(enumerate(self.loader),
-                            desc='Computing generated distribution',
-                            total=len(self.loader)):
-            x, y, mean, std, mask = data[0]
-            x = x.cuda()
-            y = y.cuda()
-            mask = mask.cuda()
-            mean = mean.cuda()
-            std = std.cuda()
-
-            truncation_latent = None
-            if self.truncation_latent is not None:
-                truncation_latent = self.truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
-
-            with torch.no_grad():
-                recon = self.gan(y, x=x, mask=mask, truncation=self.truncatuon, truncation_latent=truncation_latent)
-
-                for j in range(32):
-                    image = self._get_embed_im(recon, mean, std)
-                    condition_im = self._get_embed_im(y, mean, std)
-                    true_im = self._get_embed_im(x, mean, std)
-
-                    img_e = self.image_embedding(image)
-                    cond_e = self.condition_embedding(condition_im)
-                    true_e = self.image_embedding(true_im)
-
-                    if y.size(0) == 128:
-                        image_embed[i*128:(i+1)*128, j, :] = img_e
-                        cond_embed[i*128:(i+1)*128, j, :] = cond_e
-                        true_embed[i*128:(i+1)*128, j, :] = true_e
-                    else:
-                        image_embed[i * 128:1000, j, :] = img_e
-                        cond_embed[i * 128:1000, j, :] = cond_e
-                        true_embed[i*128:1000, j, :] = true_e
-
-        for j in range(1000):
-            p_cfid = self.get_cfid_torch_def_pinv(image_embed[j].to(dtype=torch.float64), cond_embed[j].to(dtype=torch.float64), true_embed[j].to(dtype=torch.float64))
-            pinv_cfids.append(p_cfid)
-
-            s_cfid = self.get_cfid_torch_def_svd(image_embed[j].to(dtype=torch.float64), cond_embed[j].to(dtype=torch.float64), true_embed[j].to(dtype=torch.float64))
-            svd_cfids.append(s_cfid)
-
-        return np.mean(pinv_cfids), np.mean(svd_cfids)
 
     def get_cfids_debug(self):
         y_predict, x_true, y_true = self._get_generated_distribution()
