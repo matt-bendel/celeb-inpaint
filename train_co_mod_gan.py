@@ -15,7 +15,8 @@ from data_loaders.prepare_data import create_data_loaders
 from torch.nn import functional as F
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from mail import send_mail
-
+from evaluation_scripts.cfid.embeddings import InceptionEmbedding
+from evaluation_scripts.fid.fid_metric import FIDMetric
 GLOBAL_LOSS_DICT = {
     'g_loss': [],
     'd_loss': [],
