@@ -138,7 +138,7 @@ def train(args):
                 for param in D.parameters():
                     param.grad = None
 
-                x_hat = G(y, x=x, mask=mask, truncation=1)
+                x_hat = G(y, x=x, mask=mask, truncation=None)
 
                 real_pred = D(input=x, label=y)
                 fake_pred = D(input=x_hat, label=y)
@@ -177,6 +177,7 @@ def train(args):
         best_model = False
 
         if epoch > 50:
+            G.update_gen_status(val=True)
             fid_metric = FIDMetric(gan=G,
                                    ref_loader=train_loader,
                                    loader=dev_loader,
