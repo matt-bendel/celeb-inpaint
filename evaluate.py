@@ -172,7 +172,7 @@ def get_fid(args, G, test_loader, train_loader, t, truncation_latent=None):
                              truncation=t,
                              truncation_latent=truncation_latent)
 
-    fid, fjd = fid_metric.get_fid()
+    fid = fid_metric.get_fid()
     print('FID: ', fid)
     return fid
 
@@ -231,9 +231,9 @@ if __name__ == '__main__':
 
     # vals = [1, 2, 4, 8, 16, 32]
     get_fid(args, G, test_loader, train_loader, t=None, truncation_latent=None)
-    # get_cfid(args, G, test_loader, 32, None, None)
-    # get_cfid(args, G, test_loader, 8, val_loader, None)
-    # get_cfid(args, G, test_loader, 1, val_loader, train_loader)
+    get_cfid(args, G, test_loader, 32, None, None)
+    get_cfid(args, G, test_loader, 8, val_loader, None)
+    get_cfid(args, G, test_loader, 1, val_loader, train_loader)
     exit()
     vals = [32]
     for val in vals:

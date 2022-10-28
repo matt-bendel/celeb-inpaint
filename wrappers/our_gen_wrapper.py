@@ -69,7 +69,7 @@ def get_gan(args):
         # Optimizers
         opt_gen = torch.optim.Adam(generator.gen.parameters(), lr=args.lr, betas=(args.beta_1, args.beta_2))
         opt_dis = torch.optim.Adam(discriminator.parameters(), lr=args.lr, betas=(args.beta_1, args.beta_2))
-        best_loss = 0
+        best_loss = 100000
         start_epoch = 0
 
     return generator, discriminator, opt_gen, opt_dis, best_loss, start_epoch

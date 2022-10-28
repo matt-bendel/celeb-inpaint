@@ -320,12 +320,9 @@ class FIDMetric:
             FID value.
         """
         fid = self.get_fjd(alpha=0., resample=False)
-        print(self.alpha)
-        fjd = self.get_fjd(alpha=self.alpha, resample=False)
         print(f"FID: {fid}")
-        print(f"FJD: {fjd}")
 
-        return fid, fjd
+        return fid
 
 
 def get_embedding_statistics(embeddings, cuda=False):

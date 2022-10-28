@@ -102,8 +102,8 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                 gens_ours[:, z, :, :, :] = G_ours(y, x=x, mask=mask, truncation=None, truncation_latent=None) * std[:, :, None, None] + mean[:, :, None, None]
                 gens_comod_psi_1[:, z, :, :, :] = G_comod(y, x=x, mask=mask, truncation=None, truncation_latent=None) * std[:, :, None, None] + mean[:, :, None, None]
 
-            avg_ours = torch.mean(gens_ours, dim=1)
-            avg_comod_psi_1 = torch.mean(gens_comod_psi_1, dim=1)
+            # avg_ours = torch.mean(gens_ours, dim=1)
+            # avg_comod_psi_1 = torch.mean(gens_comod_psi_1, dim=1)
             x = x * std[:, :, None, None] + mean[:, :, None, None]
             y_unnorm = y * std[:, :, None, None] + mean[:, :, None, None]
 
@@ -113,17 +113,17 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                 if total % 25 == 0:
                     fig_count += 1
 
-                    # fig = plt.figure()
-                    # plt.axis('off')
-                    # plt.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    # plt.savefig(f'test_ims_2/original_{fig_count}.png', bbox_inches='tight', dpi=300)
-                    # plt.close(fig)
-                    #
-                    # fig = plt.figure()
-                    # plt.axis('off')
-                    # plt.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    # plt.savefig(f'test_ims_2/masked_{fig_count}.png', bbox_inches='tight', dpi=300)
-                    # plt.close(fig)
+                    fig = plt.figure()
+                    plt.axis('off')
+                    plt.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    plt.savefig(f'test_ims_2/original_{fig_count}.png', bbox_inches='tight', dpi=300)
+                    plt.close(fig)
+
+                    fig = plt.figure()
+                    plt.axis('off')
+                    plt.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    plt.savefig(f'test_ims_2/masked_{fig_count}.png', bbox_inches='tight', dpi=300)
+                    plt.close(fig)
 
                     # fig, ax1 = plt.subplots(1, 1)
                     # ax1.set_xticks([])
