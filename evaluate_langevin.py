@@ -96,7 +96,7 @@ def get_metrics(args, num_code):
         recon_object = None
 
         for z in range(num_code):
-            recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i}_sample_{z}.pt')
+            recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{i}_sample_{z}.pt')
             gens[z, :, :, :] = recon_object['x_hat']
 
         gt = recon_object['gt'].numpy()
@@ -107,7 +107,7 @@ def get_metrics(args, num_code):
         losses['psnr'].append(psnr(gt, avg.cpu().numpy()))
         losses['1-psnr'].append(psnr(gt, gens[0].cpu().numpy()))
 
-        if total % 25 == 0:
+        if (total - 1) % 25 == 0:
             fig_count += 1
 
             fig = plt.figure()
