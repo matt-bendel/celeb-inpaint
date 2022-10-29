@@ -110,7 +110,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
             for j in range(y.size(0)):
                 total += 1
 
-                if total % 25 == 0:
+                if (total - 1) % 25 == 0:
                     fig_count += 1
 
                     fig = plt.figure()
@@ -205,10 +205,10 @@ if __name__ == '__main__':
     args.in_chans = 3
     args.out_chans = 3
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_ours_1e-5_nombsd_psi_0'
+    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/cvpr_ours_256'
     G_ours = load_best_gan(args)
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/comodgan_psi_1'
+    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/cvpr_comodgan_256'
     G_comod = load_best_gan(args)
 
     _, _, test_loader = create_data_loaders(args)
