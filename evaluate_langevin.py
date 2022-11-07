@@ -159,7 +159,7 @@ def get_cfid(args, num_samps):
                              num_samps=num_samps)
 
     print(f'{num_samps}-CFID')
-    print('CFID: ', cfid_metric.get_cfid_torch())
+    print('CFID: ', cfid_metric.get_cfid_torch_pinv())
 
 def get_fid(args, train_loader):
     print("GETTING INCEPTION EMBEDDING")
