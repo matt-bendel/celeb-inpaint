@@ -114,20 +114,20 @@ def get_metrics(args, num_code):
             fig.subplots_adjust(wspace=0, hspace=0.05)
 
             for r in range(5):
-                ax = fig.add_subplot(1, 5, r + 1)
+                ax = fig.add_subplot(5, 1, r + 1)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 # if r == 2:
                 #     ax.set_xlabel('Ours',fontweight='bold')
                 ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-            plt.savefig(f'test_ims_2/5_recons_langevin_{fig_count}', bbox_inches='tight')
+            plt.savefig(f'test_ims_2/5_recons_langevin_{fig_count}',bbox_inches='tight', dpi=300)
             plt.close(fig)
-
-            fig = plt.figure()
-            plt.imshow(gt.transpose(1, 2, 0))
-            plt.savefig(f'langevin_gt_{fig_count}.png')
-            plt.close(fig)
+            #
+            # fig = plt.figure()
+            # plt.imshow(gt.transpose(1, 2, 0))
+            # plt.savefig(f'langevin_gt_{fig_count}.png')
+            # plt.close(fig)
 
         if total % 50 == 0:
             # continue
@@ -203,7 +203,7 @@ if __name__ == '__main__':
 
     train_loader, _, _ = create_data_loaders(args)
     # get_lpips(args, 5)
-    get_cfid(args, 1)
+    # get_cfid(args, 1)
     # get_fid(args, train_loader)
     # exit()
     vals = [32]
