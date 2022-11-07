@@ -150,7 +150,7 @@ class FIDMetric:
         return self.alpha
 
     def _get_embed_im(self, inp, mean, std):
-        embed_ims = torch.zeros(size=(inp.size(0), 3, 128, 128),
+        embed_ims = torch.zeros(size=(inp.size(0), 3, 256, 256),
                                 device=self.args.device)
         for i in range(inp.size(0)):
             im = inp[i, :, :, :] * std[i, :, None, None] + mean[i, :, None, None]
@@ -160,7 +160,7 @@ class FIDMetric:
         return embed_ims
 
     def _get_embed_im_lan(self, inp):
-        embed_ims = torch.zeros(size=(1, 3, 128, 128),
+        embed_ims = torch.zeros(size=(1, 3, 256, 256),
                                 device=self.args.device)
         im = 2 * (inp - torch.min(inp)) / (torch.max(inp) - torch.min(inp)) - 1
         embed_ims[0, :, :, :] = im
@@ -208,7 +208,7 @@ class FIDMetric:
             print(i)
             with torch.no_grad():
                 for j in range(32):
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i}_sample_{j}.pt')
+                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{i}_sample_{j}.pt')
                     x_hat = recon_object['x_hat'].cuda()
                     y = recon_object['masked'].cuda()
                     image = self._get_embed_im_lan(x_hat)

@@ -137,7 +137,7 @@ class CFIDMetric:
             np.sum(np.square(np.abs(s_maps)), axis=1))
 
     def _get_embed_im(self, inp):
-        embed_ims = torch.zeros(size=(1, 3, 128, 128),
+        embed_ims = torch.zeros(size=(1, 3, 256, 256),
                                 device=self.args.device)
         im = 2 * (inp - torch.min(inp)) / (torch.max(inp) - torch.min(inp)) - 1
         embed_ims[0, :, :, :] = im
@@ -152,7 +152,7 @@ class CFIDMetric:
         for i in range(1000):
             with torch.no_grad():
                 for j in range(1):
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons/image_{i}_sample_{j}.pt')
+                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{i}_sample_{j}.pt')
                     x_hat = recon_object['x_hat'].cuda()
                     x = recon_object['gt'].cuda()
                     y = recon_object['masked'].cuda()
