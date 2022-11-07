@@ -100,7 +100,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
             y = y.to(args.device)
             x = x.to(args.device)
 
-            gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, args.im_size, args.im_size),
+            gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 256, 256),
                                device=args.device)
             for z in range(num_code):
                 start = time.time()
@@ -235,6 +235,6 @@ if __name__ == '__main__':
     # get_cfid(args, G, test_loader, 8, val_loader, None)
     # get_cfid(args, G, test_loader, 1, val_loader, train_loader)
     # exit()
-    vals = [1]
+    vals = [32]
     for val in vals:
         get_metrics(args, G, test_loader, val, truncation=None)
