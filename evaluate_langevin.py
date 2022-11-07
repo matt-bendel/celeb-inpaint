@@ -92,7 +92,7 @@ def get_metrics(args, num_code):
     for i in range(1000):
         total += 1
 
-        gens = torch.zeros(size=(num_code, 3, 128, 128))
+        gens = torch.zeros(size=(num_code, 3, 256, 256))
         recon_object = None
 
         for z in range(num_code):
