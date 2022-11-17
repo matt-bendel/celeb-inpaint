@@ -159,6 +159,7 @@ class CFIDMetric:
                 true_im = torch.zeros(100, 3, 256, 256).cuda()
                 condition_im = torch.zeros(100, 3, 256, 256).cuda()
                 for j in range(100):
+                    print(j)
                     recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256_2/image_{count}.pt')
                     x_hat[j] = self._get_embed_im(recon_object['x_hat'].cuda())
                     x[j] = self._get_embed_im(recon_object['gt'].cuda())
