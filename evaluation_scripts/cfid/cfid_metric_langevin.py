@@ -6,7 +6,7 @@ import numpy as np
 import sigpy as sp
 
 from tqdm import tqdm
-
+from mail import send_mail
 
 def symmetric_matrix_square_root_torch(mat, eps=1e-10):
     """Compute square root of a symmetric matrix.
@@ -264,6 +264,8 @@ class CFIDMetric:
 
         print(f"M: {m_dist.cpu().numpy()}")
         print(f"C: {c_dist.cpu().numpy()}")
+
+        send_mail("LANGEVIN CFID RESULTS", f"M_DIST: {m_dist.cpu().numpy()}", f"C_DIST: {c_dist.cpu().numpy()}")
 
         cfid = m_dist + c_dist1 + c_dist2
 
