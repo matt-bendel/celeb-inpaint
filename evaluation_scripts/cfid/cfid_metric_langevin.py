@@ -149,30 +149,31 @@ class CFIDMetric:
         cond_embed = []
         true_embed = []
 
-        for i in range(1000):
+        for i in range(30000):
             print(i)
             with torch.no_grad():
-                for j in range(32):
-                    recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{i}_sample_{j}.pt')
-                    x_hat = recon_object['x_hat'].cuda()
-                    x = recon_object['gt'].cuda()
-                    y = recon_object['masked'].cuda()
-                    image = self._get_embed_im(x_hat)
-                    condition_im = self._get_embed_im(y)
-                    true_im = self._get_embed_im(x)
+                # for j in range(1):
+                # recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{i}_sample_{j}.pt')
+                recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{i}.pt')
+                x_hat = recon_object['x_hat'].cuda()
+                x = recon_object['gt'].cuda()
+                y = recon_object['masked'].cuda()
+                image = self._get_embed_im(x_hat)
+                condition_im = self._get_embed_im(y)
+                true_im = self._get_embed_im(x)
 
-                    img_e = self.image_embedding(image)
-                    cond_e = self.condition_embedding(condition_im)
-                    true_e = self.image_embedding(true_im)
+                img_e = self.image_embedding(image)
+                cond_e = self.condition_embedding(condition_im)
+                true_e = self.image_embedding(true_im)
 
-                    if self.cuda:
-                        true_embed.append(true_e.to('cuda:2'))
-                        image_embed.append(img_e.to('cuda:1'))
-                        cond_embed.append(cond_e.to('cuda:1'))
-                    else:
-                        true_embed.append(true_e.cpu().numpy())
-                        image_embed.append(img_e.cpu().numpy())
-                        cond_embed.append(cond_e.cpu().numpy())
+                if self.cuda:
+                    true_embed.append(true_e.to('cuda:2'))
+                    image_embed.append(img_e.to('cuda:1'))
+                    cond_embed.append(cond_e.to('cuda:1'))
+                else:
+                    true_embed.append(true_e.cpu().numpy())
+                    image_embed.append(img_e.cpu().numpy())
+                    cond_embed.append(cond_e.cpu().numpy())
 
         if self.cuda:
             true_embed = torch.cat(true_embed, dim=0)
