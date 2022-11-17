@@ -149,7 +149,7 @@ class CFIDMetric:
         cond_embed = []
         true_embed = []
 
-        for i in range(30000):
+        for i in range(25213):
             print(i)
             with torch.no_grad():
                 # for j in range(1):
