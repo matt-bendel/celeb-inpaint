@@ -155,9 +155,9 @@ class CFIDMetric:
             with torch.no_grad():
                 # for j in range(1):
                 # recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{i}_sample_{j}.pt')
-                x_hat = torch.zeros(100, 3, 256, 256).cuda()
-                x = torch.zeros(100, 3, 256, 256).cuda()
-                y = torch.zeros(100, 3, 256, 256).cuda()
+                image = torch.zeros(100, 3, 256, 256).cuda()
+                true_im = torch.zeros(100, 3, 256, 256).cuda()
+                condition_im = torch.zeros(100, 3, 256, 256).cuda()
                 for j in range(100):
                     recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256_2/image_{count}.pt')
                     x_hat[j] = self._get_embed_im(recon_object['x_hat'].cuda())
