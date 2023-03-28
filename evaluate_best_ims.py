@@ -122,7 +122,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
 
                 im_dict[str(total)] = np.mean(ssim_vals)
 
-    sorted_dict = sorted_footballers_by_goals = sorted(im_dict.items(), key=lambda x:x[1])
+    sorted_dict = sorted_footballers_by_goals = sorted(im_dict.items(), key=lambda x:x[1], reverse=True)
     print(str(dict(sorted_dict[-25:])))
 
 def get_cfid(args, G, test_loader, num_samps, dev_loader, train_loader):
