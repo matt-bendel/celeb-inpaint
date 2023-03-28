@@ -21,7 +21,7 @@ from evaluation_scripts.cfid.embeddings import InceptionEmbedding
 from evaluation_scripts.cfid.cfid_metric import CFIDMetric
 from evaluation_scripts.fid.fid_metric import FIDMetric
 from evaluation_scripts.lpips.lpips_metric import LPIPSMetric
-
+from DISTS_pytorch import DISTS
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
 ) -> np.ndarray:
@@ -91,6 +91,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
     total = 0
     fig_count = 0
     im_dict = {}
+    dists = DISTS()
     for i, data in enumerate(test_loader):
         G.update_gen_status(val=True)
         with torch.no_grad():
@@ -105,22 +106,25 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 256, 256),
                                device=args.device)
             for z in range(num_code):
-                start = time.time()
                 gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None, truncation_latent=None)  * std[:, :, None, None] + mean[:, :, None, None]
-                elapsed = time.time() - start
-                times.append(elapsed)
 
-            avg = torch.mean(gens, dim=1)
             x = x * std[:, :, None, None] + mean[:, :, None, None]
             y_unnorm = y * std[:, :, None, None] + mean[:, :, None, None]
 
+            dists_vals = np.zeros((x.size(0), num_code))
+
+            for l in range(num_code):
+                dist_vals[:, l] = dists(x, gens[:, l, :, :, :]).cpu().numpy()
+
+            dists_vals = np.mean(dists_vals, axis=1)
+
             for j in range(y.size(0)):
                 total += 1
-                ssim_vals = []
-                for l in range(num_code):
-                    ssim_vals.append(ssim(x[j].cpu().numpy(), gens[j, z].cpu().numpy()))
-
-                im_dict[str(total)] = np.mean(ssim_vals)
+                # ssim_vals = []
+                # for l in range(num_code):
+                #     ssim_vals.append(ssim(x[j].cpu().numpy(), gens[j, z].cpu().numpy()))
+                im_dict[str(total)] = dists_vals[j]
+                # im_dict[str(total)] = np.mean(ssim_vals)
 
     sorted_dict = sorted_footballers_by_goals = sorted(im_dict.items(), key=lambda x:x[1])
     print(str(dict(sorted_dict[:25])))
@@ -200,8 +204,8 @@ if __name__ == '__main__':
     train_loader, val_loader, test_loader = create_data_loaders(args)
 
 
-    get_lpips(args, G, test_loader, 1, None, truncation_latent=None)
-    exit()
+    # get_lpips(args, G, test_loader, 1, None, truncation_latent=None)
+    # exit()
 
     vals = [5]
     for val in vals:

@@ -22,7 +22,9 @@ from evaluation_scripts.fid.fid_metric import FIDMetric
 from evaluation_scripts.lpips.lpips_metric import LPIPSMetric
 
 best_ssims = [159, 220, 621, 518, 151, 33, 431, 835, 575, 649, 763, 522, 652, 343, 594, 711, 985, 972, 339, 374, 190, 590, 958, 580, 956]
-best_lpips = []
+best_lpips = [431, 781, 467, 227, 145, 931, 271, 694, 496, 826, 95, 829, 747, 992, 302, 512, 711, 625, 647, 234, 565, 594, 662, 138, 412]
+best_dists = []
+
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
 ) -> np.ndarray:
