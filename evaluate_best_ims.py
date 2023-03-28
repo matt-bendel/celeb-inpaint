@@ -123,8 +123,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
                 im_dict[str(total)] = np.mean(ssim_vals)
 
     sorted_dict = sorted(im_dict)
-    final_dict = dict(itertools.islice(sorted_dict.items(), 25))
-    print(str(final_dict))
+    print(str(sorted_dict[-25:]))
 
 def get_cfid(args, G, test_loader, num_samps, dev_loader, train_loader):
     print("GETTING INCEPTION EMBEDDING")
