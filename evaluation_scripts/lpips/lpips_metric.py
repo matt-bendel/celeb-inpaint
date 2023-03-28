@@ -48,7 +48,7 @@ class LPIPSMetric:
                     total += 1
                     im_dict[str(total)] = lpips_out[l]
 
-        sorted_dict = sorted(im_dict.items(), key=lambda x: x[1])
+        sorted_dict = sorted(im_dict.items(), key=lambda x: x[1], reverse=True)
         print(str(dict(sorted_dict[-25:])))
         # return np.mean(meta_dists)
 
