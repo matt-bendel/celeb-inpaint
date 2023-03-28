@@ -91,7 +91,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
     total = 0
     fig_count = 0
     im_dict = {}
-    dists = DISTS()
+    dists = DISTS().cuda()
     for i, data in enumerate(test_loader):
         G.update_gen_status(val=True)
         with torch.no_grad():
@@ -100,13 +100,13 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
             mean = mean.cuda()
             std = std.cuda()
             mask = mask.cuda()
-            y = y.to(args.device)
-            x = x.to(args.device)
+            y = y.cuda()
+            x = x.cuda()
 
             gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 256, 256),
                                device=args.device)
             for z in range(num_code):
-                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None, truncation_latent=None)  * std[:, :, None, None] + mean[:, :, None, None]
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None, truncation_latent=None) * std[:, :, None, None] + mean[:, :, None, None]
 
             x = x * std[:, :, None, None] + mean[:, :, None, None]
             y_unnorm = y * std[:, :, None, None] + mean[:, :, None, None]
