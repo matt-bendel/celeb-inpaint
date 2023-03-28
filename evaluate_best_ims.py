@@ -89,6 +89,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
 
     total = 0
     fig_count = 0
+    im_dict = {}
     for i, data in enumerate(test_loader):
         G.update_gen_status(val=True)
         with torch.no_grad():
@@ -114,26 +115,15 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
 
             for j in range(y.size(0)):
                 total += 1
-                losses['ssim'].append(ssim(x[j].cpu().numpy(), avg[j].cpu().numpy()))
-                losses['psnr'].append(psnr(x[j].cpu().numpy(), avg[j].cpu().numpy()))
-                y_gens = gens[j, :, :, :, :]
-                std_tensor = torch.std(y_gens, dim=0)
-                losses['apsd'].append(std_tensor.mean().cpu().numpy())
-                if total % 50 == 0:
-                    # continue
-                    fig_count += 1
-                    means['psnr'].append(np.mean(losses['psnr']))
-                    means['ssim'].append(np.mean(losses['ssim']))
-                    losses['psnr'] = []
-                    losses['ssim'] = []
+                ssim_vals = []
+                for l in range(num_code):
+                    ssim_vals.append(ssim(x[j].cpu().numpy(), gens[j, z].cpu().numpy()))
 
+                im_dict[str(total)] = np.mean(ssim_vals)
 
-    print(f'RESULTS for {num_code} code vectors')
-    print(f'SSIM: {np.mean(means["ssim"])} \\pm {np.std(means["ssim"]) / np.sqrt(len(means["ssim"]))}')
-    print(f'PSNR: {np.mean(means["psnr"])} \\pm {np.std(means["psnr"]) / np.sqrt(len(means["ssim"]))}')
-    print(f'APSD: {np.mean(losses["apsd"])}')
-    print(f'TIME: {np.mean(times)}')
-
+    sorted_dict = sorted(im_dict)
+    final_dict = dict(itertools.islice(test_dict.items(), 25))
+    print(str(final_dict))
 
 def get_cfid(args, G, test_loader, num_samps, dev_loader, train_loader):
     print("GETTING INCEPTION EMBEDDING")
@@ -209,34 +199,6 @@ if __name__ == '__main__':
 
     train_loader, val_loader, test_loader = create_data_loaders(args)
 
-    # truncation_latent = None
-    #
-    # for i, data in enumerate(test_loader):
-    #     x, y, mean, std, mask = data[0]
-    #     x = x.cuda()
-    #     y = y.cuda()
-    #     mask = mask.cuda()
-    #     mean = mean.cuda()
-    #     std = std.cuda()
-    #
-    #     truncation_latent = torch.mean(G.get_mean_code_vector(y, x, mask, num_latents=128), dim=0)
-    #     break
-
-    # cfid_old_svd = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=0)
-    # cfid_new_svd = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=1)
-    # cfid_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=2)
-    # cfid_def_pinv = get_cfid(args, G, test_loader, 1, None, truncation_latent=truncation_latent, cfid_comp=3)
-
-    # print(f'CFID OLD SVD: {cfid_old_svd}')
-    # print(f'CFID NEW SVD: {cfid_new_svd}')
-    # print(f'CFID PINV: {cfid_pinv}')
-
-    # vals = [1, 2, 4, 8, 16, 32]
-    # get_fid(args, G, test_loader, train_loader, t=None, truncation_latent=None)
-    # get_cfid(args, G, test_loader, 32, None, None)
-    # get_cfid(args, G, test_loader, 8, val_loader, None)
-    # get_cfid(args, G, test_loader, 1, val_loader, train_loader)
-    # exit()
-    vals = [32]
+    vals = [5]
     for val in vals:
         get_metrics(args, G, test_loader, val, truncation=None)
