@@ -21,6 +21,8 @@ from evaluation_scripts.cfid.cfid_metric import CFIDMetric
 from evaluation_scripts.fid.fid_metric import FIDMetric
 from evaluation_scripts.lpips.lpips_metric import LPIPSMetric
 
+best_ssims = [159, 220, 621, 518, 151, 33, 431, 835, 575, 649, 763, 522, 652, 343, 594, 711, 985, 972, 339, 374, 190, 590, 958, 580, 956]
+best_lpips = []
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
 ) -> np.ndarray:

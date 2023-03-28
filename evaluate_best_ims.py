@@ -199,6 +199,10 @@ if __name__ == '__main__':
 
     train_loader, val_loader, test_loader = create_data_loaders(args)
 
+
+    get_lpips(args, G, test_loader, 1, None, truncation_latent=None)
+    exit()
+
     vals = [5]
     for val in vals:
         get_metrics(args, G, test_loader, val, truncation=None)

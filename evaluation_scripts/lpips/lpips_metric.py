@@ -13,8 +13,11 @@ class LPIPSMetric:
 
     def compute_lpips(self, num_runs, truncation, truncation_latent):
         meta_dists = []
-        for i in range(num_runs):
+        im_dict = {}
+
+        for i in range(1):
             dists = []
+            total = 0
             for j, data in tqdm(enumerate(self.loader),
                                 desc='Computing generated distribution',
                                 total=len(self.loader)):
@@ -25,28 +28,28 @@ class LPIPSMetric:
                 mean = mean.cuda()
                 std = std.cuda()
 
-                t_l = truncation_latent.unsqueeze(0).repeat(y.size(0), 1)
-
-                img1 = self.G(y, x=x, mask=mask, truncation=truncation, truncation_latent=t_l)
-                img2 = self.G(y, x=x, mask=mask, truncation=truncation, truncation_latent=t_l)
+                img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
 
                 embedImg1 = torch.zeros(size=(img1.size(0), 3, 128, 128)).cuda()
-                embedImg2 = torch.zeros(size=(img2.size(0), 3, 128, 128)).cuda()
 
                 for l in range(img1.size(0)):
                     im1 = img1[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
                     im1 = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
                     embedImg1[l, :, :, :] = im1
 
-                    im2 = img2[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
+                    im2 = x[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
                     im2 = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
                     embedImg2[l, :, :, :] = im2
 
-                dists.append(np.mean(self.model.forward(embedImg1.to("cuda:0"), embedImg2.to("cuda:0")).data.cpu().squeeze().numpy()))
+                lpips_out = self.model.forward(embedImg1.to("cuda:0"), embedImg2.to("cuda:0")).data.cpu().squeeze().numpy()
 
-            meta_dists.append(np.mean(dists))
+                for l in range(lpips_out.shape[0]):
+                    total += 1
+                    im_dict[str(total)] = lpips_out[l]
 
-        return np.mean(meta_dists)
+        sorted_dict = sorted(im_dict.items(), key=lambda x: x[1])
+        print(str(dict(sorted_dict[-25:])))
+        # return np.mean(meta_dists)
 
 
 class PerceptualLoss(torch.nn.Module):
