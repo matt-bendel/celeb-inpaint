@@ -114,7 +114,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
             dists_vals = np.zeros((x.size(0), num_code))
 
             for l in range(num_code):
-                dist_vals[:, l] = dists(x, gens[:, l, :, :, :]).cpu().numpy()
+                dists_vals[:, l] = dists(x, gens[:, l, :, :, :]).cpu().numpy()
 
             dists_vals = np.mean(dists_vals, axis=1)
 
