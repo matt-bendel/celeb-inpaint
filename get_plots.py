@@ -114,19 +114,19 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
             for j in range(y.size(0)):
                 total += 1
 
-                if total in best_lpips:
+                if total in best_dists:
                     fig_count += 1
 
                     fig = plt.figure()
                     plt.axis('off')
                     plt.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    plt.savefig(f'neurips_plots/lpips/original_{fig_count}.png', bbox_inches='tight', dpi=300)
+                    plt.savefig(f'neurips_plots/dists/original_{fig_count}.png', bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
                     fig = plt.figure()
                     plt.axis('off')
                     plt.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    plt.savefig(f'neurips_plots/lpips/masked_{fig_count}.png', bbox_inches='tight', dpi=300)
+                    plt.savefig(f'neurips_plots/dists/masked_{fig_count}.png', bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
                     # fig, ax1 = plt.subplots(1, 1)
@@ -162,7 +162,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         #     ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'neurips_plots/lpips/5_recons_ours_{fig_count}.png',bbox_inches='tight', dpi=300)
+                    plt.savefig(f'neurips_plots/dists/5_recons_ours_{fig_count}.png',bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
                     fig = plt.figure()
@@ -176,7 +176,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         #     ax.set_xlabel('CoModGAN',fontweight='bold')
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'neurips_plots/lpips/5_recons_comodgan_{fig_count}.png',bbox_inches='tight', dpi=300)
+                    plt.savefig(f'neurips_plots/dists/5_recons_comodgan_{fig_count}.png',bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
 
