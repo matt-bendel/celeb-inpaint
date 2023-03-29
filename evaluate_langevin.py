@@ -93,6 +93,9 @@ def get_metrics(args, num_code):
 
     total = 0
     fig_count = 0
+    ssim_fig_count = 0
+    lpips_fig_count = 0
+    dists_fig_count = 0
     for i in range(1000):
         total += 1
 
@@ -112,7 +115,7 @@ def get_metrics(args, num_code):
         losses['1-psnr'].append(psnr(gt, gens[0].cpu().numpy()))
 
         if total in best_ssims:
-            fig_count += 1
+            ssim_fig_count += 1
 
             fig = plt.figure()
             fig.subplots_adjust(wspace=0, hspace=0.05)
@@ -125,11 +128,11 @@ def get_metrics(args, num_code):
                 #     ax.set_xlabel('Ours',fontweight='bold')
                 ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-            plt.savefig(f'neurips_plots/ssim/5_recons_langevin_{fig_count}',bbox_inches='tight', dpi=300)
+            plt.savefig(f'neurips_plots/ssim/5_recons_langevin_{ssim_fig_count}',bbox_inches='tight', dpi=300)
             plt.close(fig)
 
         if total in best_lpips:
-            fig_count += 1
+            lpips_fig_count += 1
 
             fig = plt.figure()
             fig.subplots_adjust(wspace=0, hspace=0.05)
@@ -142,11 +145,11 @@ def get_metrics(args, num_code):
                 #     ax.set_xlabel('Ours',fontweight='bold')
                 ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-            plt.savefig(f'neurips_plots/lpips/5_recons_langevin_{fig_count}',bbox_inches='tight', dpi=300)
+            plt.savefig(f'neurips_plots/lpips/5_recons_langevin_{lpips_fig_count}',bbox_inches='tight', dpi=300)
             plt.close(fig)
 
         if total in best_dists:
-            fig_count += 1
+            dists_fig_count += 1
 
             fig = plt.figure()
             fig.subplots_adjust(wspace=0, hspace=0.05)
@@ -159,7 +162,7 @@ def get_metrics(args, num_code):
                 #     ax.set_xlabel('Ours',fontweight='bold')
                 ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-            plt.savefig(f'neurips_plots/dists/5_recons_langevin_{fig_count}',bbox_inches='tight', dpi=300)
+            plt.savefig(f'neurips_plots/dists/5_recons_langevin_{dists_fig_count}',bbox_inches='tight', dpi=300)
             plt.close(fig)
             #
             # fig = plt.figure()
