@@ -105,7 +105,9 @@ class LPIPSMetric:
                     newEmbed1[new_count, :, :, :] = embedImg1[valid_idx, :, :, :]
                     newEmbed2[new_count, :, :, :] = embedImg2[valid_idx, :, :, :]
 
-                recons = newRecons
+                recons = recons.repeat(len(valid_inds), 1, 1, 1, 1)
+                recons[:, k, :, :, :] = newRecons
+
                 lpips_vals[:, k] = self.model.forward(newEmbed1.to("cuda:0"), newEmbed2.to("cuda:0")).data.cpu().squeeze().numpy()
 
             for l in range(lpips_vals.shape[0]):
