@@ -118,13 +118,15 @@ class LPIPSMetric:
                 fig = plt.figure()
                 fig.subplots_adjust(wspace=0, hspace=0.05)
 
+                fig_idx = 0
                 for plot_idx in idx:
-                    ax = fig.add_subplot(1, 5, plot_idx + 1)
+                    ax = fig.add_subplot(1, 5, fig_idx + 1)
                     ax.set_xticks([])
                     ax.set_yticks([])
                     # if r == 2:
                     #     ax.set_xlabel('Ours',fontweight='bold')
                     ax.imshow(recons[l, plot_idx, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    fig_idx += 1
 
                 plt.savefig(f'neurips_plots/lpips/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
                 plt.close(fig)
