@@ -116,14 +116,12 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
             for l in range(num_code):
                 dists_vals[:, l] = dists(x, gens[:, l, :, :, :]).cpu().numpy()
 
-            dists_vals = np.max(dists_vals, axis=1)
-
             for j in range(y.size(0)):
                 total += 1
                 # ssim_vals = []
                 # for l in range(num_code):
                 #     ssim_vals.append(ssim(x[j].cpu().numpy(), gens[j, z].cpu().numpy()))
-                im_dict[total] = dists_vals[j]
+                im_dict[total] = np.max(dists_vals[j, :])
                 # im_dict[str(total)] = np.mean(ssim_vals)
 
     # sorted_dict = sorted(im_dict.items(), key=lambda x:x[1], reverse=True)
