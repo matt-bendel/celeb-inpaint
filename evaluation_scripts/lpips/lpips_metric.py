@@ -80,12 +80,17 @@ class LPIPSMetric:
 
                     valid_inds = []
                     for l in range(img1.size(0)):
-                        total += 1
-                        if total not in sorted_dict.keys():
-                            continue
+                        if k == 0:
+                            total += 1
+
+                            if total not in sorted_dict:
+                                continue
+                            else:
+                                print("Valid!")
+                                valid_inds.append(l)
                         else:
-                            print("Valid!")
-                            valid_inds.append(l)
+                            if l not in valid_inds:
+                                continue
 
                         im1 = img1[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
                         im1 = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
@@ -103,6 +108,7 @@ class LPIPSMetric:
                     newEmbed2 = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
                     newRecons = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
                     lpips_vals = np.repeat(lpips_vals, len(valid_inds), axis=0)
+                    print(lpips_vals.shape)
 
                     new_count = 0
                     for valid_idx in valid_inds:
