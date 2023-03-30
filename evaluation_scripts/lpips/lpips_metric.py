@@ -119,7 +119,7 @@ class LPIPSMetric:
                 fig.subplots_adjust(wspace=0, hspace=0.05)
 
                 for plot_idx in idx:
-                    ax = fig.add_subplot(1, 5, r + 1)
+                    ax = fig.add_subplot(1, 5, plot_idx + 1)
                     ax.set_xticks([])
                     ax.set_yticks([])
                     # if r == 2:
