@@ -56,7 +56,7 @@ class LPIPSMetric:
         # TODO: CONVERT TO DICT
         total = 0
         fig_count = 0
-        with torch.no_grad()L
+        with torch.no_grad():
             for j, data in tqdm(enumerate(self.loader),
                                 desc='Computing generated distribution',
                                 total=len(self.loader)):
