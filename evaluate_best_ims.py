@@ -174,7 +174,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
             newX = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
             newGens = torch.zeros(len(valid_inds), num_code, 3, 256, 256).cuda()
 
-            dists_vals = np.repeat(lpips_vals, len(valid_inds), axis=0)
+            dists_vals = np.repeat(dists_vals, len(valid_inds), axis=0)
 
             new_count = 0
             for valid_idx in valid_inds:
