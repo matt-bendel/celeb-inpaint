@@ -27,26 +27,29 @@ class LPIPSMetric:
                 mask = mask.cuda()
                 mean = mean.cuda()
                 std = std.cuda()
+                samp_count = 10
+                lpips_vals = np.zeros((y.size(0), samp_count))
 
-                img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
+                for k in range(samp_count):
+                    img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
 
-                embedImg1 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
-                embedImg2 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
+                    embedImg1 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
+                    embedImg2 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
 
-                for l in range(img1.size(0)):
-                    im1 = img1[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
-                    im1 = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
-                    embedImg1[l, :, :, :] = im1
+                    for l in range(img1.size(0)):
+                        im1 = img1[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
+                        im1 = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
+                        embedImg1[l, :, :, :] = im1
 
-                    im2 = x[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
-                    im2 = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
-                    embedImg2[l, :, :, :] = im2
+                        im2 = x[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
+                        im2 = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
+                        embedImg2[l, :, :, :] = im2
 
-                lpips_out = self.model.forward(embedImg1.to("cuda:0"), embedImg2.to("cuda:0")).data.cpu().squeeze().numpy()
+                    lpips_vals[:, k] = self.model.forward(embedImg1.to("cuda:0"), embedImg2.to("cuda:0")).data.cpu().squeeze().numpy()
 
-                for l in range(lpips_out.shape[0]):
+                for l in range(lpips_vals.shape[0]):
                     total += 1
-                    im_dict[str(total)] = lpips_out[l]
+                    im_dict[str(total)] = np.max(lpips_vals[l, :])
 
         sorted_dict = sorted(im_dict.items(), key=lambda x: x[1], reverse=True)
         print(str(dict(sorted_dict[-25:])))
