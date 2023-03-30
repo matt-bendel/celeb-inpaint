@@ -108,8 +108,8 @@ class LPIPSMetric:
                     newEmbed1 = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
                     newEmbed2 = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
                     newRecons = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
-                    lpips_vals = np.repeat(lpips_vals, len(valid_inds), axis=0)
-                    print(lpips_vals.shape)
+                    if k == 0:
+                        lpips_vals = np.repeat(lpips_vals, len(valid_inds), axis=0)
 
                     new_count = 0
                     for valid_idx in valid_inds:
