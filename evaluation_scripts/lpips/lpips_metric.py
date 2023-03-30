@@ -56,85 +56,87 @@ class LPIPSMetric:
         # TODO: CONVERT TO DICT
         total = 0
         fig_count = 0
-        for j, data in tqdm(enumerate(self.loader),
-                            desc='Computing generated distribution',
-                            total=len(self.loader)):
-            x, y, mean, std, mask = data[0]
-            x = x.cuda()
-            y = y.cuda()
-            mask = mask.cuda()
-            mean = mean.cuda()
-            std = std.cuda()
-            samp_count = 32
-            recons = torch.zeros(1, samp_count, 3, 256, 256).cuda()
-            lpips_vals = np.zeros((1, samp_count))
+        with torch.no_grad()L
+            for j, data in tqdm(enumerate(self.loader),
+                                desc='Computing generated distribution',
+                                total=len(self.loader)):
+                x, y, mean, std, mask = data[0]
+                x = x.cuda()
+                y = y.cuda()
+                mask = mask.cuda()
+                mean = mean.cuda()
+                std = std.cuda()
+                samp_count = 32
+                recons = torch.zeros(1, samp_count, 3, 256, 256).cuda()
+                lpips_vals = np.zeros((1, samp_count))
 
-            for k in range(samp_count):
-                img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
+                for k in range(samp_count):
+                    img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
 
-                embedImg1 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
-                embedImg2 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
+                    embedImg1 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
+                    embedImg2 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
 
-                valid_inds = []
-                for l in range(img1.size(0)):
-                    total += 1
-                    if total not in sorted_dict.keys():
+                    valid_inds = []
+                    for l in range(img1.size(0)):
+                        total += 1
+                        if total not in sorted_dict.keys():
+                            continue
+                        else:
+                            valid_inds.append(l)
+
+                        im1 = img1[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
+                        im1 = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
+                        embedImg1[l, :, :, :] = im1
+
+                        im2 = x[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
+                        im2 = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
+                        embedImg2[l, :, :, :] = im2
+
+                    if len(valid_inds) == 0:
                         continue
-                    else:
-                        valid_inds.append(l)
 
-                    im1 = img1[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
-                    im1 = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
-                    embedImg1[l, :, :, :] = im1
+                    newEmbed1 = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
+                    newEmbed2 = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
+                    newRecons = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
+                    lpips_vals = np.repeat(lpips_vals, len(valid_inds), axis=0)
 
-                    im2 = x[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
-                    im2 = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
-                    embedImg2[l, :, :, :] = im2
+                    new_count = 0
+                    for valid_idx in valid_inds:
+                        newRecons[new_count, :, :, :] = img1[valid_idx, :, :, :] * std[valid_idx, :, None, None] + mean[valid_idx, :, None, None]
+                        newEmbed1[new_count, :, :, :] = embedImg1[valid_idx, :, :, :]
+                        newEmbed2[new_count, :, :, :] = embedImg2[valid_idx, :, :, :]
 
-                if len(valid_inds) == 0:
-                    continue
+                    recons = recons.repeat(len(valid_inds), 1, 1, 1, 1)
+                    recons[:, k, :, :, :] = newRecons
 
-                newEmbed1 = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
-                newEmbed2 = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
-                newRecons = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
-                lpips_vals = np.repeat(lpips_vals, len(valid_inds), axis=0)
+                    lpips_vals[:, k] = self.model.forward(newEmbed1.to("cuda:0"), newEmbed2.to("cuda:0")).data.cpu().squeeze().numpy()
 
-                new_count = 0
-                for valid_idx in valid_inds:
-                    newRecons[new_count, :, :, :] = img1[valid_idx, :, :, :] * std[valid_idx, :, None, None] + mean[valid_idx, :, None, None]
-                    newEmbed1[new_count, :, :, :] = embedImg1[valid_idx, :, :, :]
-                    newEmbed2[new_count, :, :, :] = embedImg2[valid_idx, :, :, :]
+                for l in range(lpips_vals.shape[0]):
+                    fig_count += 1
+                    lth_vals = np.array(lpips_vals[l, :])
 
-                recons = recons.repeat(len(valid_inds), 1, 1, 1, 1)
-                recons[:, k, :, :, :] = newRecons
+                    idx = np.argpartition(lth_vals, 5)
 
-                lpips_vals[:, k] = self.model.forward(newEmbed1.to("cuda:0"), newEmbed2.to("cuda:0")).data.cpu().squeeze().numpy()
+                    plot_recons = torch.zeros(5, 3, 256, 256)
+                    fig = plt.figure()
+                    fig.subplots_adjust(wspace=0, hspace=0.05)
 
-            for l in range(lpips_vals.shape[0]):
-                fig_count += 1
-                lth_vals = np.array(lpips_vals[l, :])
+                    fig_idx = 0
+                    for plot_idx in idx:
+                        ax = fig.add_subplot(1, 5, fig_idx + 1)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        # if r == 2:
+                        #     ax.set_xlabel('Ours',fontweight='bold')
+                        ax.imshow(recons[l, plot_idx, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                        fig_idx += 1
 
-                idx = np.argpartition(lth_vals, 5)
+                    plt.savefig(f'neurips_plots/lpips/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
+                    plt.close(fig)
 
-                plot_recons = torch.zeros(5, 3, 256, 256)
-                fig = plt.figure()
-                fig.subplots_adjust(wspace=0, hspace=0.05)
 
-                fig_idx = 0
-                for plot_idx in idx:
-                    ax = fig.add_subplot(1, 5, fig_idx + 1)
-                    ax.set_xticks([])
-                    ax.set_yticks([])
-                    # if r == 2:
-                    #     ax.set_xlabel('Ours',fontweight='bold')
-                    ax.imshow(recons[l, plot_idx, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    fig_idx += 1
-
-                plt.savefig(f'neurips_plots/lpips/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
-                plt.close(fig)
-
+        sorted_dict = sorted(im_dict.items(), key=lambda x: x[1], reverse=True)[-25:]
         print(str(dict(sorted_dict[-25:])))
-        # return np.mean(meta_dists)
 
 
 class PerceptualLoss(torch.nn.Module):
