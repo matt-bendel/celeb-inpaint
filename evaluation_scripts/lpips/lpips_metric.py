@@ -66,7 +66,7 @@ class LPIPSMetric:
 
                 for l in range(lpips_vals.shape[0]):
                     total += 1
-                    im_dict[total] = np.max(lpips_vals[l, :]) - np.max(lpips_vals_lang[l, :])
+                    im_dict[total] = np.min(lpips_vals[l, :]) - np.min(lpips_vals_lang[l, :])
 
         sorted_dict = dict(sorted(im_dict.items(), key=lambda x: x[1], reverse=True)[-25:])
         print(sorted_dict.keys())
