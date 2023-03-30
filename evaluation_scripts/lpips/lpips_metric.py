@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from evaluation_scripts.lpips.dist_model import DistModel
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 class LPIPSMetric:
     def __init__(self, G, data_loader):
