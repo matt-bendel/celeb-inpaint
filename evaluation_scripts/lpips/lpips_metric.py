@@ -116,8 +116,8 @@ class LPIPSMetric:
                     lth_vals = np.array(lpips_vals[l, :])
 
                     idx = np.argpartition(lth_vals, 5)
+                    print(idx)
 
-                    plot_recons = torch.zeros(5, 3, 256, 256)
                     fig = plt.figure()
                     fig.subplots_adjust(wspace=0, hspace=0.05)
 
