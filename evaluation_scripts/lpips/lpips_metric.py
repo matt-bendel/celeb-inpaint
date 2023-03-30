@@ -118,8 +118,10 @@ class LPIPSMetric:
                         newEmbed2[new_count, :, :, :] = embedImg2[valid_idx, :, :, :]
                         new_count += 1
 
-                    recons = torch.zeros(1, samp_count, 3, 256, 256).cuda()
-                    recons = recons.repeat(len(valid_inds), 1, 1, 1, 1)
+                    if k == 0:
+                        recons = torch.zeros(1, samp_count, 3, 256, 256).cuda()
+                        recons = recons.repeat(len(valid_inds), 1, 1, 1, 1)
+
                     recons[:, k, :, :, :] = newRecons[:, :, :, :]
 
                     lpips_vals[:, k] = self.model.forward(newEmbed1.to("cuda:0"), newEmbed2.to("cuda:0")).data.cpu().squeeze().numpy()
