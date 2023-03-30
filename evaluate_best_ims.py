@@ -108,8 +108,17 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
             for z in range(num_code):
                 gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None, truncation_latent=None) * std[:, :, None, None] + mean[:, :, None, None]
 
+                for l in range(x.size(0)):
+                    gens[l, z, :, :, :] = (gens[l, z, :, :, :] - torch.min(gens[l, z, :, :, :])) / (torch.max(gens[l, z, :, :, :]) - torch.min(gens[l, z, :, :, :]))
+
             x = x * std[:, :, None, None] + mean[:, :, None, None]
             y_unnorm = y * std[:, :, None, None] + mean[:, :, None, None]
+
+            for l in range(x.size(0)):
+                x[l, :, :, :] = (x[l, :, :, :] - torch.min(x[l, :, :, :])) / (
+                            torch.max(x[l, :, :, :]) - torch.min(x[l, :, :, :]))
+
+
 
             dists_vals = np.zeros((x.size(0), num_code))
 
@@ -121,7 +130,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
                 # ssim_vals = []
                 # for l in range(num_code):
                 #     ssim_vals.append(ssim(x[j].cpu().numpy(), gens[j, z].cpu().numpy()))
-                im_dict[total] = np.min(dists_vals[j, :])
+                im_dict[total] = np.max(dists_vals[j, :])
                 # im_dict[str(total)] = np.mean(ssim_vals)
 
     # sorted_dict = sorted(im_dict.items(), key=lambda x:x[1], reverse=True)
@@ -153,8 +162,15 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
                                                                                                       None] + mean[:, :,
                                                                                                               None,
                                                                                                               None]
+                for l in range(x.size(0)):
+                    gens[l, z, :, :, :] = (gens[l, z, :, :, :] - torch.min(gens[l, z, :, :, :])) / (torch.max(gens[l, z, :, :, :]) - torch.min(gens[l, z, :, :, :]))
+
             x = x * std[:, :, None, None] + mean[:, :, None, None]
             y_unnorm = y * std[:, :, None, None] + mean[:, :, None, None]
+
+            for l in range(x.size(0)):
+                x[l, :, :, :] = (x[l, :, :, :] - torch.min(x[l, :, :, :])) / (
+                            torch.max(x[l, :, :, :]) - torch.min(x[l, :, :, :]))
 
             for l in range(x.size(0)):
                 total += 1
@@ -187,8 +203,8 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
                 fig_count += 1
                 lth_vals = np.array(dists_vals[l, :])
 
-                # idx = np.argpartition(lth_vals, 5)
-                idx = np.argpartition(lth_vals, -5)[-5:]
+                idx = np.argpartition(lth_vals, 5)
+                # idx = np.argpartition(lth_vals, -5)[-5:]
 
                 fig = plt.figure()
                 fig.subplots_adjust(wspace=0, hspace=0.05)
