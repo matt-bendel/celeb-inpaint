@@ -121,7 +121,7 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
                 # ssim_vals = []
                 # for l in range(num_code):
                 #     ssim_vals.append(ssim(x[j].cpu().numpy(), gens[j, z].cpu().numpy()))
-                im_dict[total] = np.max(dists_vals[j, :])
+                im_dict[total] = np.min(dists_vals[j, :])
                 # im_dict[str(total)] = np.mean(ssim_vals)
 
     # sorted_dict = sorted(im_dict.items(), key=lambda x:x[1], reverse=True)
@@ -189,8 +189,6 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
 
                 # idx = np.argpartition(lth_vals, 5)
                 idx = np.argpartition(lth_vals, -5)[-5:]
-                print(idx)
-                print(dists_vals)
 
                 fig = plt.figure()
                 fig.subplots_adjust(wspace=0, hspace=0.05)
