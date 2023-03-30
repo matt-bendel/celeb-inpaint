@@ -45,7 +45,7 @@ class LPIPSMetric:
                     embedImgLang2 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
 
                     for l in range(img1.size(0)):
-                        recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{j*20 + l - 1}_sample_{k}.pt')
+                        recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{j*20 + l}_sample_{k}.pt')
                         langevin_ims[l, k, :, :, :] = recon_object['x_hat']
                         if k == 0:
                             langevin_x[l, :, :, :] = recon_object['gt']
