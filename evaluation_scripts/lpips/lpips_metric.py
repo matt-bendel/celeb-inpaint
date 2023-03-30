@@ -66,7 +66,7 @@ class LPIPSMetric:
 
                 for l in range(lpips_vals.shape[0]):
                     total += 1
-                    im_dict[total] = np.min(lpips_vals[l, :] - lpips_vals_lang)#np.max(lpips_vals[l, :])
+                    im_dict[total] = np.max(lpips_vals[l, :])#np.min(lpips_vals[l, :] - lpips_vals_lang)#
 
         sorted_dict = dict(sorted(im_dict.items(), key=lambda x: x[1], reverse=True)[-25:])
         print(sorted_dict.keys())
@@ -164,7 +164,7 @@ class LPIPSMetric:
                         #     ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(recons[l, idx[r], :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'neurips_plots/lpips_compare/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
+                    plt.savefig(f'neurips_plots/lpips/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
 
