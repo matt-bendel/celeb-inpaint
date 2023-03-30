@@ -30,6 +30,10 @@ class LPIPSMetric:
                 std = std.cuda()
                 samp_count = 32
                 lpips_vals = np.zeros((y.size(0), samp_count))
+                lpips_vals_lang = np.zeros((y.size(0), samp_count))
+
+                langevin_ims = torch.zeros(size=(x.size(0), samp_count, 3, 256, 256)).cuda()
+                langevin_x = torch.zeros(size=(x.size(0), 3, 256, 256)).cuda()
 
                 for k in range(samp_count):
                     img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
@@ -37,7 +41,15 @@ class LPIPSMetric:
                     embedImg1 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
                     embedImg2 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
 
+                    embedImgLang1 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
+                    embedImgLang2 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
+
                     for l in range(img1.size(0)):
+                        recon_object = torch.load(f'/storage/celebA-HQ/langevin_recons_256/image_{l}_sample_{k}.pt')
+                        langevin_ims[l, k, :, :, :] = recon_object['x_hat']
+                        if k == 0:
+                            langevin_x[l, :, :, :] = recon_object['gt']
+
                         im1 = img1[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
                         im1 = 2 * (im1 - torch.min(im1)) / (torch.max(im1) - torch.min(im1)) - 1
                         embedImg1[l, :, :, :] = im1
@@ -46,11 +58,15 @@ class LPIPSMetric:
                         im2 = 2 * (im2 - torch.min(im2)) / (torch.max(im2) - torch.min(im2)) - 1
                         embedImg2[l, :, :, :] = im2
 
+                        embedImgLang1[l, :, :, :] = 2*(langevin_x[l, :, :, :] - torch.min(langevin_x[l, :, :, :])) / (torch.max(langevin_x[l, :, :, :]) - torch.min(langevin_x[l, :, :, :])) - 1
+                        embedImgLang2[l, :, :, :] = 2*(langevin_ims[l, k, :, :, :] - torch.min(langevin_ims[l, k, :, :, :])) / (torch.max(langevin_ims[l, k, :, :, :]) - torch.min(langevin_ims[l, k, :, :, :])) - 1
+
                     lpips_vals[:, k] = self.model.forward(embedImg1.to("cuda:0"), embedImg2.to("cuda:0")).data.cpu().squeeze().numpy()
+                    lpips_vals_lang[:, k] = self.model.forward(embedImgLang1.to("cuda:0"), embedImgLang2.to("cuda:0")).data.cpu().squeeze().numpy()
 
                 for l in range(lpips_vals.shape[0]):
                     total += 1
-                    im_dict[total] = np.max(lpips_vals[l, :])
+                    im_dict[total] = np.min(lpips_vals[l, :] - lpips_vals_lang)#np.max(lpips_vals[l, :])
 
         sorted_dict = dict(sorted(im_dict.items(), key=lambda x: x[1], reverse=True)[-25:])
         print(sorted_dict.keys())
