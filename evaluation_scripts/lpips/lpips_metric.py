@@ -72,13 +72,14 @@ class LPIPSMetric:
                 lpips_vals = np.zeros((1, samp_count))
 
                 no_valid = False
+                valid_inds = []
+
                 for k in range(samp_count):
                     img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
 
                     embedImg1 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
                     embedImg2 = torch.zeros(size=(img1.size(0), 3, 256, 256)).cuda()
 
-                    valid_inds = []
                     for l in range(img1.size(0)):
                         if k == 0:
                             total += 1
