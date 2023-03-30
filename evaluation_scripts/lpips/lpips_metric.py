@@ -53,6 +53,7 @@ class LPIPSMetric:
                     im_dict[total] = np.max(lpips_vals[l, :])
 
         sorted_dict = dict(sorted(im_dict.items(), key=lambda x: x[1], reverse=True)[-25:])
+        print(sorted_dict.keys())
         # TODO: CONVERT TO DICT
         total = 0
         fig_count = 0
@@ -83,6 +84,7 @@ class LPIPSMetric:
                         if total not in sorted_dict.keys():
                             continue
                         else:
+                            print("Valid!")
                             valid_inds.append(l)
 
                         im1 = img1[l, :, :, :] * std[l, :, None, None] + mean[l, :, None, None]
@@ -117,6 +119,8 @@ class LPIPSMetric:
 
                 if no_valid:
                     continue
+                else:
+                    print("Valid inds...")
 
                 for l in range(lpips_vals.shape[0]):
                     fig_count += 1
