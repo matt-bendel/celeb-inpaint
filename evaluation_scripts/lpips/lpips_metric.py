@@ -70,6 +70,7 @@ class LPIPSMetric:
                 recons = torch.zeros(1, samp_count, 3, 256, 256).cuda()
                 lpips_vals = np.zeros((1, samp_count))
 
+                no_valid = False
                 for k in range(samp_count):
                     img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
 
@@ -93,7 +94,8 @@ class LPIPSMetric:
                         embedImg2[l, :, :, :] = im2
 
                     if len(valid_inds) == 0:
-                        continue
+                        no_valid = True
+                        break
 
                     newEmbed1 = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
                     newEmbed2 = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
@@ -105,12 +107,16 @@ class LPIPSMetric:
                         newRecons[new_count, :, :, :] = img1[valid_idx, :, :, :] * std[valid_idx, :, None, None] + mean[valid_idx, :, None, None]
                         newEmbed1[new_count, :, :, :] = embedImg1[valid_idx, :, :, :]
                         newEmbed2[new_count, :, :, :] = embedImg2[valid_idx, :, :, :]
+                        new_count += 1
 
                     recons = torch.zeros(1, samp_count, 3, 256, 256).cuda()
                     recons = recons.repeat(len(valid_inds), 1, 1, 1, 1)
                     recons[:, k, :, :, :] = newRecons[:, :, :, :]
 
                     lpips_vals[:, k] = self.model.forward(newEmbed1.to("cuda:0"), newEmbed2.to("cuda:0")).data.cpu().squeeze().numpy()
+
+                if no_valid:
+                    continue
 
                 for l in range(lpips_vals.shape[0]):
                     fig_count += 1
