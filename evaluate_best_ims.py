@@ -187,7 +187,8 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
                 fig_count += 1
                 lth_vals = np.array(dists_vals[l, :])
 
-                idx = np.argpartition(lth_vals, 5)
+                # idx = np.argpartition(lth_vals, 5)
+                idx = np.argpartition(lth_vals, -5)[-5:]
                 print(idx)
                 print(dists_vals)
                 exit()
