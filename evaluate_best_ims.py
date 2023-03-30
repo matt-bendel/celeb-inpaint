@@ -116,18 +116,94 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
             for l in range(num_code):
                 dists_vals[:, l] = dists(x, gens[:, l, :, :, :]).cpu().numpy()
 
-            dists_vals = np.mean(dists_vals, axis=1)
+            dists_vals = np.max(dists_vals, axis=1)
 
             for j in range(y.size(0)):
                 total += 1
                 # ssim_vals = []
                 # for l in range(num_code):
                 #     ssim_vals.append(ssim(x[j].cpu().numpy(), gens[j, z].cpu().numpy()))
-                im_dict[str(total)] = dists_vals[j]
+                im_dict[total] = dists_vals[j]
                 # im_dict[str(total)] = np.mean(ssim_vals)
 
-    sorted_dict = sorted_footballers_by_goals = sorted(im_dict.items(), key=lambda x:x[1], reverse=True)
-    print(str(dict(sorted_dict[-25:])))
+    # sorted_dict = sorted(im_dict.items(), key=lambda x:x[1], reverse=True)
+    # print(str(dict(sorted_dict[-25:])))
+
+    sorted_dict = dict(sorted(im_dict.items(), key=lambda x: x[1], reverse=True)[-25:])
+    print(sorted_dict.keys())
+    # TODO: CONVERT TO DICT
+    total = 0
+    fig_count = 0
+    with torch.no_grad():
+        for j, data in enumerate(test_loader):
+            x, y, mean, std, mask = data[0]
+            x = x.cuda()
+            y = y.cuda()
+            mask = mask.cuda()
+            mean = mean.cuda()
+            std = std.cuda()
+            samp_count = 32
+            dists_vals = np.zeros((1, samp_count))
+
+            no_valid = False
+            valid_inds = []
+
+            gens = torch.zeros(size=(y.size(0), num_code, args.in_chans, 256, 256),
+                               device=args.device)
+            for z in range(samp_count):
+                gens[:, z, :, :, :] = G(y, x=x, mask=mask, truncation=None, truncation_latent=None) * std[:, :, None,
+                                                                                                      None] + mean[:, :,
+                                                                                                              None,
+                                                                                                              None]
+            x = x * std[:, :, None, None] + mean[:, :, None, None]
+            y_unnorm = y * std[:, :, None, None] + mean[:, :, None, None]
+
+            for l in range(x.size(0)):
+                total += 1
+
+                if total not in sorted_dict:
+                    continue
+                else:
+                    print("Valid!")
+                    valid_inds.append(l)
+
+            if len(valid_inds) == 0:
+                no_valid = True
+                continue
+
+            newX = torch.zeros(len(valid_inds), 3, 256, 256).cuda()
+            newGens = torch.zeros(len(valid_inds), num_code, 3, 256, 256).cuda()
+
+            dists_vals = np.repeat(lpips_vals, len(valid_inds), axis=0)
+
+            new_count = 0
+            for valid_idx in valid_inds:
+                newGens[new_count, :, :, :, :] = gens[valid_idx, :, :, :, :]
+                newX[new_count, :, :, :] = x[valid_idx, :, :, :]
+                new_count += 1
+
+            for z in range(num_code):
+                dists_vals[:, z] = dists(newX, newGens[:, z, :, :, :]).cpu().numpy()
+
+            for l in range(dists_vals.shape[0]):
+                fig_count += 1
+                lth_vals = np.array(dists_vals[l, :])
+
+                idx = np.argpartition(lth_vals, 5)
+
+                fig = plt.figure()
+                fig.subplots_adjust(wspace=0, hspace=0.05)
+
+                for r in range(5):
+                    ax = fig.add_subplot(1, 5, r + 1)
+                    ax.set_xticks([])
+                    ax.set_yticks([])
+                    # if r == 2:
+                    #     ax.set_xlabel('Ours',fontweight='bold')
+                    ax.imshow(gens[l, idx[r], :, :, :].cpu().numpy().transpose(1, 2, 0))
+
+                plt.savefig(f'neurips_plots/dists/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
+                plt.close(fig)
 
 def get_cfid(args, G, test_loader, num_samps, dev_loader, train_loader):
     print("GETTING INCEPTION EMBEDDING")
@@ -204,9 +280,9 @@ if __name__ == '__main__':
     train_loader, val_loader, test_loader = create_data_loaders(args)
 
 
-    get_lpips(args, G, test_loader, 1, None, truncation_latent=None)
-    exit()
+    # get_lpips(args, G, test_loader, 1, None, truncation_latent=None)
+    # exit()
 
-    vals = [5]
+    vals = [32]
     for val in vals:
         get_metrics(args, G, test_loader, val, truncation=None)
