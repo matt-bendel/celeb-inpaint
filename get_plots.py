@@ -114,6 +114,9 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
             for j in range(y.size(0)):
                 total += 1
 
+                ssims = []
+
+
                 if total in best_lpips:
                     fig_count += 1
 
