@@ -100,7 +100,7 @@ class LPIPSMetric:
 
                 new_count = 0
                 for valid_idx in valid_inds:
-                    newRecons[new_count, :, :, :] = im1[valid_idx, :, :, :] * std[valid_idx, :, None, None] + mean[valid_idx, :, None, None]
+                    newRecons[new_count, :, :, :] = img1[valid_idx, :, :, :] * std[valid_idx, :, None, None] + mean[valid_idx, :, None, None]
                     newEmbed1[new_count, :, :, :] = embedImg1[valid_idx, :, :, :]
                     newEmbed2[new_count, :, :, :] = embedImg2[valid_idx, :, :, :]
 
