@@ -188,6 +188,9 @@ def get_metrics(args, G, test_loader, num_code, truncation=None):
                 lth_vals = np.array(dists_vals[l, :])
 
                 idx = np.argpartition(lth_vals, 5)
+                print(idx)
+                print(dists_vals)
+                exit()
 
                 fig = plt.figure()
                 fig.subplots_adjust(wspace=0, hspace=0.05)
