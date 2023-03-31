@@ -132,44 +132,44 @@ def get_metrics(args, num_code):
             plt.savefig(f'neurips_plots/lpips_compare/5_recons_langevin_{ssim_fig_count}',bbox_inches='tight', dpi=300)
             plt.close(fig)
 
-        if total in best_lpips:
-            lpips_fig_count += 1
+        # if total in best_lpips:
+        #     lpips_fig_count += 1
+        #
+        #     fig = plt.figure()
+        #     fig.subplots_adjust(wspace=0, hspace=0.05)
+        #
+        #     for r in range(5):
+        #         ax = fig.add_subplot(1, 5, r + 1)
+        #         ax.set_xticks([])
+        #         ax.set_yticks([])
+        #         # if r == 2:
+        #         #     ax.set_xlabel('Ours',fontweight='bold')
+        #         ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
+        #
+        #     plt.savefig(f'neurips_plots/lpips/5_recons_langevin_{lpips_fig_count}',bbox_inches='tight', dpi=300)
+        #     plt.close(fig)
 
-            fig = plt.figure()
-            fig.subplots_adjust(wspace=0, hspace=0.05)
-
-            for r in range(5):
-                ax = fig.add_subplot(1, 5, r + 1)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                # if r == 2:
-                #     ax.set_xlabel('Ours',fontweight='bold')
-                ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
-
-            plt.savefig(f'neurips_plots/lpips/5_recons_langevin_{lpips_fig_count}',bbox_inches='tight', dpi=300)
-            plt.close(fig)
-
-        if total in best_dists:
-            dists_fig_count += 1
-
-            fig = plt.figure()
-            fig.subplots_adjust(wspace=0, hspace=0.05)
-
-            for r in range(5):
-                ax = fig.add_subplot(1, 5, r + 1)
-                ax.set_xticks([])
-                ax.set_yticks([])
-                # if r == 2:
-                #     ax.set_xlabel('Ours',fontweight='bold')
-                ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
-
-            plt.savefig(f'neurips_plots/dists/5_recons_langevin_{dists_fig_count}',bbox_inches='tight', dpi=300)
-            plt.close(fig)
-            #
-            # fig = plt.figure()
-            # plt.imshow(gt.transpose(1, 2, 0))
-            # plt.savefig(f'langevin_gt_{fig_count}.png')
-            # plt.close(fig)
+        # if total in best_dists:
+        #     dists_fig_count += 1
+        #
+        #     fig = plt.figure()
+        #     fig.subplots_adjust(wspace=0, hspace=0.05)
+        #
+        #     for r in range(5):
+        #         ax = fig.add_subplot(1, 5, r + 1)
+        #         ax.set_xticks([])
+        #         ax.set_yticks([])
+        #         # if r == 2:
+        #         #     ax.set_xlabel('Ours',fontweight='bold')
+        #         ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
+        #
+        #     plt.savefig(f'neurips_plots/dists/5_recons_langevin_{dists_fig_count}',bbox_inches='tight', dpi=300)
+        #     plt.close(fig)
+        #     #
+        #     # fig = plt.figure()
+        #     # plt.imshow(gt.transpose(1, 2, 0))
+        #     # plt.savefig(f'langevin_gt_{fig_count}.png')
+        #     # plt.close(fig)
 
         if total % 50 == 0:
             # continue
