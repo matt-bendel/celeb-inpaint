@@ -17,7 +17,7 @@ from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 from wrappers.our_gen_wrapper import load_best_gan
 
 # best_ssims = [159, 220, 621, 518, 151, 33, 431, 835, 575, 649, 763, 522, 652, 343, 594, 711, 985, 972, 339, 374, 190, 590, 958, 580, 956]
-best_lpips = [159, 133, 655, 522, 985, 267, 220, 594, 94, 707, 845, 984, 198, 112, 623, 565, 625, 41, 580, 467, 747, 992, 898, 733, 234]
+best_lpips = [826, 557, 512, 898, 987, 429, 112, 412, 862, 349, 368, 867, 198, 660, 647, 391, 984, 267, 594, 431, 234, 870, 763, 845, 565]
 best_lpips_v_score = [814, 811, 552, 557, 808, 747, 550, 872, 867, 544, 812, 806, 900, 870, 889, 893, 558, 554, 548, 888, 890, 895, 885, 882, 898]
 # best_dists = [460, 904, 468, 401, 126, 862, 984, 987, 577, 554, 97, 592, 733, 990, 605, 349, 178, 669, 647, 332, 579, 635, 985, 429, 512]
 
@@ -155,19 +155,19 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
 
                     place = 1
 
-                    fig = plt.figure()
-                    fig.subplots_adjust(wspace=0, hspace=0.05)
-
-                    for r in range(5):
-                        ax = fig.add_subplot(1, 5, r+1)
-                        ax.set_xticks([])
-                        ax.set_yticks([])
-                        # if r == 2:
-                        #     ax.set_xlabel('Ours',fontweight='bold')
-                        ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
-
-                    plt.savefig(f'neurips_plots/lpips/5_recons_ours_{fig_count}.png',bbox_inches='tight', dpi=300)
-                    plt.close(fig)
+                    # fig = plt.figure()
+                    # fig.subplots_adjust(wspace=0, hspace=0.05)
+                    #
+                    # for r in range(5):
+                    #     ax = fig.add_subplot(1, 5, r+1)
+                    #     ax.set_xticks([])
+                    #     ax.set_yticks([])
+                    #     # if r == 2:
+                    #     #     ax.set_xlabel('Ours',fontweight='bold')
+                    #     ax.imshow(gens_ours[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                    #
+                    # plt.savefig(f'neurips_plots/lpips/5_recons_ours_{fig_count}.png',bbox_inches='tight', dpi=300)
+                    # plt.close(fig)
 
                     fig = plt.figure()
                     fig.subplots_adjust(wspace=0, hspace=0.05)
