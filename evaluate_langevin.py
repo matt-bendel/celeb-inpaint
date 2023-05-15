@@ -25,6 +25,7 @@ best_ssims = [159, 220, 621, 518, 151, 33, 431, 835, 575, 649, 763, 522, 652, 34
 best_lpips = [826, 557, 512, 898, 987, 429, 112, 412, 862, 349, 368, 867, 198, 660, 647, 391, 984, 267, 594, 431, 234, 870, 763, 845, 565]
 best_lpips_v_score = [814, 811, 552, 557, 808, 747, 550, 872, 867, 544, 812, 806, 900, 870, 889, 893, 558, 554, 548, 888, 890, 895, 885, 882, 898]
 best_dists = [460, 904, 468, 401, 126, 862, 984, 987, 577, 554, 97, 592, 733, 990, 605, 349, 178, 669, 647, 332, 579, 635, 985, 429, 512]
+ethnicity_div = [149, 152, 232, 316, 329, 441, 575, 625, 685, 709, 714, 732, 738, 749, 786, 795, 941, 986]
 
 def psnr(
         gt: np.ndarray, pred: np.ndarray, maxval: Optional[float] = None
@@ -115,7 +116,7 @@ def get_metrics(args, num_code):
         losses['psnr'].append(psnr(gt, avg.cpu().numpy()))
         losses['1-psnr'].append(psnr(gt, gens[0].cpu().numpy()))
 
-        if total in best_lpips_v_score:
+        if total in ethnicity_div:
             ssim_fig_count += 1
 
             fig = plt.figure()
@@ -129,7 +130,7 @@ def get_metrics(args, num_code):
                 #     ax.set_xlabel('Ours',fontweight='bold')
                 ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-            plt.savefig(f'neurips_plots/lpips_compare/5_recons_langevin_{ssim_fig_count}',bbox_inches='tight', dpi=300)
+            plt.savefig(f'neurips_plots/all/5_recons_langevin_{total}',bbox_inches='tight', dpi=300)
             plt.close(fig)
 
         # if total in best_lpips:
