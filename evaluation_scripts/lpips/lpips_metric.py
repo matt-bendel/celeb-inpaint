@@ -88,7 +88,7 @@ class LPIPSMetric:
                 lpips_vals = np.zeros((1, samp_count))
 
                 no_valid = False
-                valid_inds = range(0, 1000)
+                valid_inds = []
 
                 for k in range(samp_count):
                     img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
