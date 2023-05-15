@@ -287,7 +287,7 @@ if __name__ == '__main__':
     args.in_chans = 3
     args.out_chans = 3
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/cvpr_ours_256'
+    args.checkpoint_dir = '/storage/matt_models/inpainting/cvpr_ours_256'
 
     G = load_best_gan(args)
     G.update_gen_status(val=True)
