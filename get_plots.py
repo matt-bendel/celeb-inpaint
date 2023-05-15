@@ -118,7 +118,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                 ssims = []
 
 
-                if total in best_lpips_v_score:
+                if True:
                     fig_count += 1
 
                     fig = plt.figure()
