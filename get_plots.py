@@ -213,10 +213,10 @@ if __name__ == '__main__':
     args.in_chans = 3
     args.out_chans = 3
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/cvpr_ours_256'
+    args.checkpoint_dir = '/storage/matt_models/inpainting/cvpr_ours_256'
     G_ours = load_best_gan(args)
 
-    args.checkpoint_dir = '/home/bendel.8/Git_Repos/celeb-inpaint/trained_models/cvpr_comodgan_256'
+    args.checkpoint_dir = '/storage/matt_models/inpainting/cvpr_comodgan_256'
     G_comod = load_best_gan(args)
 
     _, _, test_loader = create_data_loaders(args)
