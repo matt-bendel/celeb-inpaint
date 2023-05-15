@@ -124,13 +124,13 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                     fig = plt.figure()
                     plt.axis('off')
                     plt.imshow(x[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    plt.savefig(f'neurips_plots/lpips_compare/original_{fig_count}.png', bbox_inches='tight', dpi=300)
+                    plt.savefig(f'neurips_plots/all/original_{fig_count}.png', bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
                     fig = plt.figure()
                     plt.axis('off')
                     plt.imshow(y_unnorm[j, :, :, :].cpu().numpy().transpose(1, 2, 0))
-                    plt.savefig(f'neurips_plots/lpips_compare/masked_{fig_count}.png', bbox_inches='tight', dpi=300)
+                    plt.savefig(f'neurips_plots/all/masked_{fig_count}.png', bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
                     # fig, ax1 = plt.subplots(1, 1)
@@ -180,7 +180,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         #     ax.set_xlabel('CoModGAN',fontweight='bold')
                         ax.imshow(gens_comod_psi_1[j, r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'neurips_plots/lpips_compare/5_recons_comodgan_{fig_count}.png',bbox_inches='tight', dpi=300)
+                    plt.savefig(f'neurips_plots/all/5_recons_comodgan_{fig_count}.png',bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
 
