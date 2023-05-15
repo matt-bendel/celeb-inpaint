@@ -88,7 +88,7 @@ class LPIPSMetric:
                 lpips_vals = np.zeros((1, samp_count))
 
                 no_valid = False
-                valid_inds = []
+                valid_inds = range(0, 1000)
 
                 for k in range(samp_count):
                     img1 = self.G(y, x=x, mask=mask, truncation=None, truncation_latent=None)
@@ -100,11 +100,7 @@ class LPIPSMetric:
                         if k == 0:
                             total += 1
 
-                            if total not in sorted_dict:
-                                continue
-                            else:
-                                print("Valid!")
-                                valid_inds.append(l)
+                            valid_inds.append(l)
                         else:
                             if l not in valid_inds:
                                 continue
@@ -164,7 +160,7 @@ class LPIPSMetric:
                         #     ax.set_xlabel('Ours',fontweight='bold')
                         ax.imshow(recons[l, idx[r], :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'neurips_plots/lpips/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
+                    plt.savefig(f'neurips_plots/all/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
 
