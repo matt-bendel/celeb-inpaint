@@ -133,7 +133,7 @@ def get_metrics(args, num_code):
                 #     ax.set_xlabel('Ours',fontweight='bold')
                 ax.imshow(gens[r, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-            plt.savefig(f'neurips_plots/all/5_recons_langevin_{total}',bbox_inches='tight', dpi=300)
+            plt.savefig(f'neurips_plots/test_ours/5_recons_langevin_{total}',bbox_inches='tight', dpi=300)
             plt.close(fig)
 
         # if total in best_lpips:
