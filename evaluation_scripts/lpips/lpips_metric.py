@@ -154,14 +154,15 @@ class LPIPSMetric:
                         fig.subplots_adjust(wspace=0, hspace=0.05)
 
                         tc = 1
-                        for r in range(25):#[3, 1, 5, 16, 8]:
-                            ax = fig.add_subplot(1, 25, r+1)
+                        samp_nums = [31, 30, 29, 26, 25, 24, 23, 21, 20, 18, 17, 16, 13 ,12 ,10, 8, 7]
+                        for r in [31, 30, 29, 26, 25, 24, 23, 21, 20, 18, 17, 16, 13 ,12 ,10, 8, 7]:
+                            ax = fig.add_subplot(1, len(samp_nums), tc)
                             tc += 1
                             ax.set_xticks([])
                             ax.set_yticks([])
                             # if r == 2:
                             #     ax.set_xlabel('Ours',fontweight='bold')
-                            ax.imshow(recons[l, idx[r], :, :, :].cpu().numpy().transpose(1, 2, 0))
+                            ax.imshow(recons[l, idx[r - 7], :, :, :].cpu().numpy().transpose(1, 2, 0))
 
                         plt.savefig(f'neurips_plots/test_ours/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
                         plt.close(fig)
