@@ -164,7 +164,7 @@ class LPIPSMetric:
                             ax.set_yticks([])
                             # if r == 2:
                             #     ax.set_xlabel('Ours',fontweight='bold')
-                            ax.imshow(recons[l, idx[r], :, :, :].cpu().numpy().transpose(1, 2, 0))
+                            ax.imshow(recons[l, idx[r-2], :, :, :].cpu().numpy().transpose(1, 2, 0))
 
                         plt.savefig(f'neurips_plots/test_ours/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
                         plt.close(fig)
