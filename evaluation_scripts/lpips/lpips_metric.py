@@ -147,7 +147,7 @@ class LPIPSMetric:
                     fig_count += 1
                     lth_vals = np.array(lpips_vals[l, :])
 
-                    idx = np.argpartition(lth_vals, 25)
+                    idx = np.argpartition(lth_vals, 32)
 
                     if fig_count == 786 or fig_count == 749 or fig_count == 870:
                         fig = plt.figure()
@@ -157,8 +157,8 @@ class LPIPSMetric:
                         samp_nums = [31, 30, 29, 26, 25, 24, 23, 21, 20, 18, 17, 16, 13 ,12 ,10, 8, 7]
                         subsamp_nums = [3, 6, 7, 8, 10, 12, 15, 16]
                         subsubsamp_nums = [0, 1, 2, 3, 7]
-                        for r in [0, 3, 4, 6, 7, 22, 20]:
-                            ax = fig.add_subplot(1, 7, tc)
+                        for r in range(32):
+                            ax = fig.add_subplot(1, 32, tc)
                             tc += 1
                             ax.set_xticks([])
                             ax.set_yticks([])
