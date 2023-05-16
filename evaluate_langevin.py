@@ -123,10 +123,9 @@ def get_metrics(args, num_code):
             fig.subplots_adjust(wspace=0, hspace=0.05)
 
             for r in range(5):
+                ax = fig.add_subplot(1, 5, r + 1)
                 if r == 3:
                     r = 5
-
-                ax = fig.add_subplot(1, 5, r + 1)
                 ax.set_xticks([])
                 ax.set_yticks([])
                 # if r == 2:
