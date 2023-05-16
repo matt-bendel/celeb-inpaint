@@ -149,7 +149,7 @@ class LPIPSMetric:
 
                     idx = np.argpartition(lth_vals, 25)
 
-                    if fig_count == 786 or fig_count == 749 or fig_count == 575:
+                    if fig_count == 786 or fig_count == 749 or fig_count == 565:
                         fig = plt.figure()
                         fig.subplots_adjust(wspace=0, hspace=0.05)
 
