@@ -147,21 +147,22 @@ class LPIPSMetric:
                     fig_count += 1
                     lth_vals = np.array(lpips_vals[l, :])
 
-                    idx = np.argpartition(lth_vals, 5)
+                    idx = np.argpartition(lth_vals, 10)
 
-                    fig = plt.figure()
-                    fig.subplots_adjust(wspace=0, hspace=0.05)
+                    if fig_count == 786 or fig_count == 749 or fig_count == 575:
+                        fig = plt.figure()
+                        fig.subplots_adjust(wspace=0, hspace=0.05)
 
-                    for r in range(5):
-                        ax = fig.add_subplot(1, 5, r + 1)
-                        ax.set_xticks([])
-                        ax.set_yticks([])
-                        # if r == 2:
-                        #     ax.set_xlabel('Ours',fontweight='bold')
-                        ax.imshow(recons[l, idx[r], :, :, :].cpu().numpy().transpose(1, 2, 0))
+                        for r in range(10):
+                            ax = fig.add_subplot(1, 10, r + 1)
+                            ax.set_xticks([])
+                            ax.set_yticks([])
+                            # if r == 2:
+                            #     ax.set_xlabel('Ours',fontweight='bold')
+                            ax.imshow(recons[l, idx[r], :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'neurips_plots/all/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
-                    plt.close(fig)
+                        plt.savefig(f'neurips_plots/test_ours/5_recons_ours_{fig_count}.png', bbox_inches='tight', dpi=300)
+                        plt.close(fig)
 
 
         sorted_dict = sorted(im_dict.items(), key=lambda x: x[1], reverse=True)[-25:]
