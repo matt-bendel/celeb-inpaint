@@ -153,8 +153,8 @@ class LPIPSMetric:
                         fig = plt.figure()
                         fig.subplots_adjust(wspace=0, hspace=0.05)
 
-                        for r in range(20):
-                            ax = fig.add_subplot(1, 20, r + 1)
+                        for r in [3, 1, 5, 16, 8]:
+                            ax = fig.add_subplot(1, 5, r + 1)
                             ax.set_xticks([])
                             ax.set_yticks([])
                             # if r == 2:
