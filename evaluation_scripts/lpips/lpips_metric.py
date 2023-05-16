@@ -147,14 +147,14 @@ class LPIPSMetric:
                     fig_count += 1
                     lth_vals = np.array(lpips_vals[l, :])
 
-                    idx = np.argpartition(lth_vals, 10)
+                    idx = np.argpartition(lth_vals, 20)
 
                     if fig_count == 786 or fig_count == 749 or fig_count == 575:
                         fig = plt.figure()
                         fig.subplots_adjust(wspace=0, hspace=0.05)
 
-                        for r in range(10):
-                            ax = fig.add_subplot(1, 10, r + 1)
+                        for r in range(20):
+                            ax = fig.add_subplot(1, 20, r + 1)
                             ax.set_xticks([])
                             ax.set_yticks([])
                             # if r == 2:
