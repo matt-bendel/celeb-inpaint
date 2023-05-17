@@ -92,6 +92,7 @@ class LPIPSMetric:
 
                 if temp_count < 647:
                     total += y.size(0)
+                    fig_count += y.size(0)
                     continue
 
                 no_valid = False
