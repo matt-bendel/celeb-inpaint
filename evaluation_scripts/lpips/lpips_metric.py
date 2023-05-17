@@ -90,7 +90,7 @@ class LPIPSMetric:
 
                 temp_count = total + y.size(0)
 
-                if temp_count < 647:
+                if temp_count < 732:
                     total += y.size(0)
                     fig_count += y.size(0)
                     continue
@@ -157,7 +157,7 @@ class LPIPSMetric:
 
                     idx = np.argpartition(lth_vals, 30)
 
-                    if fig_count == 647:
+                    if fig_count == 732:
                         fig = plt.figure()
                         fig.subplots_adjust(wspace=0, hspace=0.05)
 
@@ -166,8 +166,8 @@ class LPIPSMetric:
                         subsamp_nums = [3, 6, 7, 8, 10, 12, 15, 16]
                         subsubsamp_nums = [0, 1, 2, 3, 7]
                         # [0, 4, 5, 6, 20, 22, 23, 24, 25, 27]
-                        for r in [0, 5, 22, 24, 27]:
-                            ax = fig.add_subplot(1, 5, tc)
+                        for r in range(30):
+                            ax = fig.add_subplot(1, 30, tc)
                             tc += 1
                             ax.set_xticks([])
                             ax.set_yticks([])
