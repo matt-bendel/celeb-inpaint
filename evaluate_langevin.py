@@ -128,7 +128,7 @@ def get_metrics(args, num_code):
                 ax.set_yticks([])
                 # if r == 2:
                 #     ax.set_xlabel('Ours',fontweight='bold')
-                ax.imshow(gens[r+5, :, :, :].cpu().numpy().transpose(1, 2, 0))
+                ax.imshow(gens[r+10, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
             plt.savefig(f'neurips_plots/test_ours/5_recons_langevin_{total}',bbox_inches='tight', dpi=300)
             plt.close(fig)
