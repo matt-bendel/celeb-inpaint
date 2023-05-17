@@ -93,6 +93,11 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
         G_comod.update_gen_status(val=True)
         with torch.no_grad():
             x, y, mean, std, mask = data[0]
+            temp_total = total + y.size(0)
+
+            if temp_total < 870:
+                total += y.size(0)
+                continue
 
             mean = mean.cuda()
             std = std.cuda()
