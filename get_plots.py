@@ -256,7 +256,7 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         #     ax.set_xlabel('CoModGAN',fontweight='bold')
                         ax.imshow(gens_comod_psi_1[j, r + 25, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-                    plt.savefig(f'neurips_plots/test_ours/5_recons_comodgan_{total}_5.png', bbox_inches='tight',
+                    plt.savefig(f'neurips_plots/test_ours/5_recons_comodgan_{total}_6.png', bbox_inches='tight',
                                 dpi=300)
                     plt.close(fig)
 
