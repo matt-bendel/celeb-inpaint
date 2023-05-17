@@ -165,8 +165,8 @@ class LPIPSMetric:
                         samp_nums = [31, 30, 29, 26, 25, 24, 23, 21, 20, 18, 17, 16, 13 ,12 ,10, 8, 7]
                         subsamp_nums = [3, 6, 7, 8, 10, 12, 15, 16]
                         subsubsamp_nums = [0, 1, 2, 3, 7]
-                        for r in range(30):
-                            ax = fig.add_subplot(1, 30, tc)
+                        for r in [0, 4, 5, 6, 20, 22, 23, 24, 25, 27]:
+                            ax = fig.add_subplot(1, 10, tc)
                             tc += 1
                             ax.set_xticks([])
                             ax.set_yticks([])
