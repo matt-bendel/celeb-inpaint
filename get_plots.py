@@ -231,6 +231,9 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                     plt.savefig(f'neurips_plots/test_ours/5_recons_comodgan_{total}_4.png', bbox_inches='tight', dpi=300)
                     plt.close(fig)
 
+                    fig = plt.figure()
+                    fig.subplots_adjust(wspace=0, hspace=0.05)
+
                     for r in range(5):
                         ax = fig.add_subplot(1, 5, r + 1)
                         ax.set_xticks([])
@@ -240,6 +243,21 @@ def get_plots(args, G_ours, G_comod, test_loader, truncation, truncation_latent)
                         ax.imshow(gens_comod_psi_1[j, r+20, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
                     plt.savefig(f'neurips_plots/test_ours/5_recons_comodgan_{total}_5.png', bbox_inches='tight', dpi=300)
+                    plt.close(fig)
+
+                    fig = plt.figure()
+                    fig.subplots_adjust(wspace=0, hspace=0.05)
+
+                    for r in range(5):
+                        ax = fig.add_subplot(1, 5, r + 1)
+                        ax.set_xticks([])
+                        ax.set_yticks([])
+                        # if r == 2:
+                        #     ax.set_xlabel('CoModGAN',fontweight='bold')
+                        ax.imshow(gens_comod_psi_1[j, r + 25, :, :, :].cpu().numpy().transpose(1, 2, 0))
+
+                    plt.savefig(f'neurips_plots/test_ours/5_recons_comodgan_{total}_5.png', bbox_inches='tight',
+                                dpi=300)
                     plt.close(fig)
 
 
