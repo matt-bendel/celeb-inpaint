@@ -101,6 +101,9 @@ def get_metrics(args, num_code):
     for i in range(1000):
         total += 1
 
+        if i + 1 != 870:
+            continue
+
         gens = torch.zeros(size=(num_code, 3, 256, 256))
         recon_object = None
 
@@ -130,7 +133,49 @@ def get_metrics(args, num_code):
                 #     ax.set_xlabel('Ours',fontweight='bold')
                 ax.imshow(gens[r+10, :, :, :].cpu().numpy().transpose(1, 2, 0))
 
-            plt.savefig(f'neurips_plots/test_ours/5_recons_langevin_{total}',bbox_inches='tight', dpi=300)
+            plt.savefig(f'neurips_plots/test_ours/5_recons_langevin_{total}_1.png',bbox_inches='tight', dpi=300)
+            plt.close(fig)
+
+            fig = plt.figure()
+            fig.subplots_adjust(wspace=0, hspace=0.05)
+
+            for r in range(5):
+                ax = fig.add_subplot(1, 5, r + 1)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                # if r == 2:
+                #     ax.set_xlabel('Ours',fontweight='bold')
+                ax.imshow(gens[r + 15, :, :, :].cpu().numpy().transpose(1, 2, 0))
+
+            plt.savefig(f'neurips_plots/test_ours/5_recons_langevin_{total}_2.png', bbox_inches='tight', dpi=300)
+            plt.close(fig)
+
+            fig = plt.figure()
+            fig.subplots_adjust(wspace=0, hspace=0.05)
+
+            for r in range(5):
+                ax = fig.add_subplot(1, 5, r + 1)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                # if r == 2:
+                #     ax.set_xlabel('Ours',fontweight='bold')
+                ax.imshow(gens[r + 20, :, :, :].cpu().numpy().transpose(1, 2, 0))
+
+            plt.savefig(f'neurips_plots/test_ours/5_recons_langevin_{total}_3.png', bbox_inches='tight', dpi=300)
+            plt.close(fig)
+
+            fig = plt.figure()
+            fig.subplots_adjust(wspace=0, hspace=0.05)
+
+            for r in range(5):
+                ax = fig.add_subplot(1, 5, r + 1)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                # if r == 2:
+                #     ax.set_xlabel('Ours',fontweight='bold')
+                ax.imshow(gens[r + 25, :, :, :].cpu().numpy().transpose(1, 2, 0))
+
+            plt.savefig(f'neurips_plots/test_ours/5_recons_langevin_{total}_4.png', bbox_inches='tight', dpi=300)
             plt.close(fig)
 
         # if total in best_lpips:
