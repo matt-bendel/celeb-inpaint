@@ -17,6 +17,7 @@ class LPIPSMetric:
         im_dict = {}
 
         for i in range(1):
+            break
             dists = []
             total = 0
             for j, data in tqdm(enumerate(self.loader),
@@ -87,6 +88,12 @@ class LPIPSMetric:
                 recons = torch.zeros(1, samp_count, 3, 256, 256).cuda()
                 lpips_vals = np.zeros((1, samp_count))
 
+                temp_count = total + y.size(0)
+
+                if temp_count < 647:
+                    total += y.size(0)
+                    continue
+
                 no_valid = False
                 valid_inds = []
 
@@ -149,7 +156,7 @@ class LPIPSMetric:
 
                     idx = np.argpartition(lth_vals, 30)
 
-                    if fig_count == 870:
+                    if fig_count == 647:
                         fig = plt.figure()
                         fig.subplots_adjust(wspace=0, hspace=0.05)
 
