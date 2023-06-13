@@ -99,7 +99,7 @@ if __name__ == '__main__':
                     v_re = vh[l].reshape((3, 256, 256))
                     v_re = (v_re - np.min(v_re)) / (np.max(v_re) - np.min(v_re))
                     plt.figure()
-                    plt.imshow(v_re)
+                    plt.imshow(v_re.transpose(1, 2, 0))
                     plt.colorbar()
                     plt.savefig(f'sv_test/test_sv_v_{current_count}_{l}.png')
                     plt.close()
