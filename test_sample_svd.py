@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
                 single_samps = single_samps - np_avg[None, :, :, :]
 
-                cov_mat = np.zeros((num_code, avg_gen_np.shape[-1] * avg_gen_np.shape[-2]))
+                cov_mat = np.zeros((num_code, avg_gen_np.shape[-1] * np_avg.shape[-2]))
 
                 for z in range(num_code):
                     cov_mat[z, :] = single_samps[z].flatten()
