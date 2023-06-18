@@ -50,7 +50,7 @@ if __name__ == '__main__':
     G.update_gen_status(val=True)
 
     train_loader, val_loader, test_loader = create_data_loaders(args)
-    num_code = 2
+    num_code = 4
     current_count = 0
     count = 5
 
@@ -95,7 +95,7 @@ if __name__ == '__main__':
                 plt.savefig(f'sv_test/test_sv_{current_count}.png')
                 plt.close()
 
-                for l in range(2):
+                for l in range(4):
                     v_re = vh[l].reshape((3, 256, 256))
                     v_re = (v_re - np.min(v_re)) / (np.max(v_re) - np.min(v_re))
                     plt.figure()
