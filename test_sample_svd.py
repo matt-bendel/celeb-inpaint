@@ -50,7 +50,7 @@ if __name__ == '__main__':
     G.update_gen_status(val=True)
 
     train_loader, val_loader, test_loader = create_data_loaders(args)
-    num_code = 2
+    num_code = 4
     current_count = 0
     count = 5
 
