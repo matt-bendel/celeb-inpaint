@@ -103,4 +103,5 @@ if __name__ == '__main__':
                     plt.savefig(f'sv_test/test_sv_v_{num_code}_{current_count}_{l}.png')
                     plt.close()
 
+                exit()
                 current_count += 1
